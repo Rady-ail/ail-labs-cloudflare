@@ -1,0 +1,20 @@
+[build]
+  publish = "public"
+  functions = "netlify/functions"
+  command = "npm install"
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["pg"]
+
+# Semua request ke /api/... diarahkan ke Express (lewat Netlify Function)
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Panel admin (public/admin/index.html) tetap bisa diakses tanpa slash di akhir
+[[redirects]]
+  from = "/admin"
+  to = "/admin/index.html"
+  status = 200

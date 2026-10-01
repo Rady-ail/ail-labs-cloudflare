@@ -1,0 +1,18 @@
+.ssh/
+.git-credentials
+.bash_history
+.gitconfig
+.lesshst
+.npm/
+downloads/
+live.html
+node_modules/
+*.local-backup
+
+# Local/environment secrets and machine-specific files
+.env
+.env.*
+!.env.example
+.wrangler/
+.dev.vars
+.dev.vars.*

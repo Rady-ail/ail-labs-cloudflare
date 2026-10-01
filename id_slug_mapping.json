@@ -1,0 +1,497 @@
+{
+  "1": {
+    "slug": "clearskin_concentrate",
+    "category_slug": "acne",
+    "name": "ClearSkin Concentrate"
+  },
+  "2": {
+    "slug": "clearskin_back_lotion",
+    "category_slug": "acne",
+    "name": "ClearSkin Back Lotion"
+  },
+  "3": {
+    "slug": "clearskin_spot_cream",
+    "category_slug": "acne",
+    "name": "ClearSkin Spot Cream"
+  },
+  "4": {
+    "slug": "clearskin_clinda_gel",
+    "category_slug": "acne",
+    "name": "ClearSkin Clinda Gel"
+  },
+  "5": {
+    "slug": "clearskin_niacin_duo",
+    "category_slug": "acne",
+    "name": "ClearSkin Niacin Duo"
+  },
+  "6": {
+    "slug": "clearskin_scar_fix_niacin",
+    "category_slug": "acne",
+    "name": "ClearSkin Scar Fix Niacin"
+  },
+  "7": {
+    "slug": "clearskin_scar_fix_clinda",
+    "category_slug": "acne",
+    "name": "ClearSkin Scar Fix Clinda"
+  },
+  "8": {
+    "slug": "clearskin_tretinoin_max",
+    "category_slug": "acne",
+    "name": "ClearSkin Tretinoin Max"
+  },
+  "9": {
+    "slug": "clearskin_tretinoin_plus",
+    "category_slug": "acne",
+    "name": "ClearSkin Tretinoin Plus"
+  },
+  "10": {
+    "slug": "clearskin_tretinoin_mild",
+    "category_slug": "acne",
+    "name": "ClearSkin Tretinoin Mild"
+  },
+  "11": {
+    "slug": "clearskin_combo_plus",
+    "category_slug": "acne",
+    "name": "ClearSkin Combo Plus"
+  },
+  "12": {
+    "slug": "clearskin_combo_max",
+    "category_slug": "acne",
+    "name": "ClearSkin Combo Max"
+  },
+  "13": {
+    "slug": "clearskin_bpo5",
+    "category_slug": "acne",
+    "name": "ClearSkin BPO5"
+  },
+  "14": {
+    "slug": "clearskin_bpo2_5",
+    "category_slug": "acne",
+    "name": "ClearSkin BPO2.5"
+  },
+  "15": {
+    "slug": "clearskin_adapalene",
+    "category_slug": "acne",
+    "name": "ClearSkin Adapalene"
+  },
+  "16": {
+    "slug": "clearskin_centella_soothe",
+    "category_slug": "acne",
+    "name": "ClearSkin Centella Soothe"
+  },
+  "17": {
+    "slug": "clearskin_night_repair",
+    "category_slug": "acne",
+    "name": "ClearSkin Night Repair"
+  },
+  "18": {
+    "slug": "clearskin_strongest",
+    "category_slug": "acne",
+    "name": "ClearSkin Strongest"
+  },
+  "19": {
+    "slug": "silkyglow_renew",
+    "category_slug": "body_lotion",
+    "name": "SilkyGlow Renew"
+  },
+  "20": {
+    "slug": "silkyglow_bright",
+    "category_slug": "body_lotion",
+    "name": "SilkyGlow Bright"
+  },
+  "21": {
+    "slug": "silkyglow_bright_plus",
+    "category_slug": "body_lotion",
+    "name": "SilkyGlow Bright Plus"
+  },
+  "22": {
+    "slug": "silkyglow_bright_max",
+    "category_slug": "body_lotion",
+    "name": "SilkyGlow Bright Max"
+  },
+  "23": {
+    "slug": "specialcare_underarm_bright",
+    "category_slug": "lain_lain",
+    "name": "SpecialCare Underarm Bright"
+  },
+  "24": {
+    "slug": "specialcare_underarm_intense",
+    "category_slug": "lain_lain",
+    "name": "SpecialCare Underarm Intense"
+  },
+  "25": {
+    "slug": "specialcare_lip_tint",
+    "category_slug": "lain_lain",
+    "name": "SpecialCare Lip Tint"
+  },
+  "26": {
+    "slug": "specialcare_anti_aging",
+    "category_slug": "lain_lain",
+    "name": "SpecialCare Anti Aging"
+  },
+  "27": {
+    "slug": "specialcare_neutralizer",
+    "category_slug": "lain_lain",
+    "name": "SpecialCare Neutralizer"
+  },
+  "28": {
+    "slug": "hydraglow_barrier",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Barrier"
+  },
+  "29": {
+    "slug": "hydraglow_bright",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Bright"
+  },
+  "30": {
+    "slug": "hydraglow_renew_8",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Renew 8"
+  },
+  "31": {
+    "slug": "hydraglow_renew_10",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Renew 10"
+  },
+  "32": {
+    "slug": "hydraglow_renew_12",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Renew 12"
+  },
+  "33": {
+    "slug": "hydraglow_duo_peel",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Duo Peel"
+  },
+  "34": {
+    "slug": "hydraglow_collagen",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Collagen"
+  },
+  "35": {
+    "slug": "hydraglow_lactic",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Lactic"
+  },
+  "36": {
+    "slug": "hydraglow_vitc",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow VitC"
+  },
+  "37": {
+    "slug": "hydraglow_calm",
+    "category_slug": "moisturizer",
+    "name": "HydraGlow Calm"
+  },
+  "38": {
+    "slug": "peelpro_tca_10",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 10"
+  },
+  "39": {
+    "slug": "peelpro_tca_15",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 15"
+  },
+  "40": {
+    "slug": "peelpro_tca_20",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 20"
+  },
+  "41": {
+    "slug": "peelpro_tca_30",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 30"
+  },
+  "42": {
+    "slug": "peelpro_tca_35",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 35"
+  },
+  "43": {
+    "slug": "peelpro_tca_50",
+    "category_slug": "peeling",
+    "name": "PeelPro TCA 50"
+  },
+  "44": {
+    "slug": "peelpro_ga_10",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 10"
+  },
+  "45": {
+    "slug": "peelpro_ga_15",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 15"
+  },
+  "46": {
+    "slug": "peelpro_ga_20",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 20"
+  },
+  "47": {
+    "slug": "peelpro_ga_30",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 30"
+  },
+  "48": {
+    "slug": "peelpro_ga_35",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 35"
+  },
+  "49": {
+    "slug": "peelpro_ga_50",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 50"
+  },
+  "50": {
+    "slug": "peelpro_ga_70",
+    "category_slug": "peeling",
+    "name": "PeelPro GA 70"
+  },
+  "51": {
+    "slug": "peelpro_sa_10",
+    "category_slug": "peeling",
+    "name": "PeelPro SA 10"
+  },
+  "52": {
+    "slug": "peelpro_sa_20",
+    "category_slug": "peeling",
+    "name": "PeelPro SA 20"
+  },
+  "53": {
+    "slug": "peelpro_sa_30",
+    "category_slug": "peeling",
+    "name": "PeelPro SA 30"
+  },
+  "54": {
+    "slug": "pureessence_vitc",
+    "category_slug": "serum",
+    "name": "PureEssence VitC"
+  },
+  "55": {
+    "slug": "pureessence_niacinamide",
+    "category_slug": "serum",
+    "name": "PureEssence Niacinamide"
+  },
+  "56": {
+    "slug": "pureessence_acne_clear",
+    "category_slug": "serum",
+    "name": "PureEssence Acne Clear"
+  },
+  "57": {
+    "slug": "pureessence_aha_renew",
+    "category_slug": "serum",
+    "name": "PureEssence AHA Renew"
+  },
+  "58": {
+    "slug": "pureessence_flek_fix",
+    "category_slug": "serum",
+    "name": "PureEssence Flek Fix"
+  },
+  "59": {
+    "slug": "pureessence_collagen",
+    "category_slug": "serum",
+    "name": "PureEssence Collagen"
+  },
+  "60": {
+    "slug": "pureessence_centella",
+    "category_slug": "serum",
+    "name": "PureEssence Centella"
+  },
+  "61": {
+    "slug": "clearfix_triam_solution",
+    "category_slug": "solution",
+    "name": "ClearFix Triam Solution"
+  },
+  "62": {
+    "slug": "clearfix_fluci_solution",
+    "category_slug": "solution",
+    "name": "ClearFix Fluci Solution"
+  },
+  "63": {
+    "slug": "medicare_desonide",
+    "category_slug": "steroid",
+    "name": "MediCare Desonide"
+  },
+  "64": {
+    "slug": "medicare_dexamethasone",
+    "category_slug": "steroid",
+    "name": "MediCare Dexamethasone"
+  },
+  "65": {
+    "slug": "medicare_betamethasone",
+    "category_slug": "steroid",
+    "name": "MediCare Betamethasone"
+  },
+  "66": {
+    "slug": "medicare_momethasone",
+    "category_slug": "steroid",
+    "name": "MediCare Momethasone"
+  },
+  "67": {
+    "slug": "medicare_flucinolone",
+    "category_slug": "steroid",
+    "name": "MediCare Flucinolone"
+  },
+  "68": {
+    "slug": "medicare_triamcinolone",
+    "category_slug": "steroid",
+    "name": "MediCare Triamcinolone"
+  },
+  "69": {
+    "slug": "medicare_klobetasol",
+    "category_slug": "steroid",
+    "name": "MediCare Klobetasol"
+  },
+  "70": {
+    "slug": "sunguard_basic",
+    "category_slug": "sunscreen",
+    "name": "SunGuard Basic"
+  },
+  "71": {
+    "slug": "sunguard_renew",
+    "category_slug": "sunscreen",
+    "name": "SunGuard Renew"
+  },
+  "72": {
+    "slug": "sunguard_bright",
+    "category_slug": "sunscreen",
+    "name": "SunGuard Bright"
+  },
+  "73": {
+    "slug": "sunguard_acne_care",
+    "category_slug": "sunscreen",
+    "name": "SunGuard Acne Care"
+  },
+  "74": {
+    "slug": "sunguard_white",
+    "category_slug": "sunscreen",
+    "name": "SunGuard White+"
+  },
+  "75": {
+    "slug": "sunguard_thiamidol_pro",
+    "category_slug": "sunscreen",
+    "name": "SunGuard Thiamidol Pro"
+  },
+  "76": {
+    "slug": "radiance_dexa_max",
+    "category_slug": "whitening",
+    "name": "Radiance Dexa Max"
+  },
+  "77": {
+    "slug": "radiance_dexa_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Dexa Plus"
+  },
+  "78": {
+    "slug": "radiance_dexa_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Dexa Mild"
+  },
+  "79": {
+    "slug": "radiance_deso_max",
+    "category_slug": "whitening",
+    "name": "Radiance Deso Max"
+  },
+  "80": {
+    "slug": "radiance_deso_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Deso Plus"
+  },
+  "81": {
+    "slug": "radiance_deso_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Deso Mild"
+  },
+  "82": {
+    "slug": "radiance_beta_max",
+    "category_slug": "whitening",
+    "name": "Radiance Beta Max"
+  },
+  "83": {
+    "slug": "radiance_beta_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Beta Plus"
+  },
+  "84": {
+    "slug": "radiance_beta_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Beta Mild"
+  },
+  "85": {
+    "slug": "radiance_fluci_max",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci Max"
+  },
+  "86": {
+    "slug": "radiance_fluci_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci Plus"
+  },
+  "87": {
+    "slug": "radiance_fluci_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci Mild"
+  },
+  "88": {
+    "slug": "radiance_fluci_05_max",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-05 Max"
+  },
+  "89": {
+    "slug": "radiance_fluci_05_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-05 Plus"
+  },
+  "90": {
+    "slug": "radiance_fluci_05_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-05 Mild"
+  },
+  "91": {
+    "slug": "radiance_fluci_025_max",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-025 Max"
+  },
+  "92": {
+    "slug": "radiance_fluci_025_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-025 Plus"
+  },
+  "93": {
+    "slug": "radiance_fluci_025_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Fluci-025 Mild"
+  },
+  "94": {
+    "slug": "radiance_mome_max",
+    "category_slug": "whitening",
+    "name": "Radiance Mome Max"
+  },
+  "95": {
+    "slug": "radiance_mome_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Mome Plus"
+  },
+  "96": {
+    "slug": "radiance_mome_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Mome Mild"
+  },
+  "97": {
+    "slug": "radiance_mome_05_max",
+    "category_slug": "whitening",
+    "name": "Radiance Mome-05 Max"
+  },
+  "98": {
+    "slug": "radiance_mome_05_plus",
+    "category_slug": "whitening",
+    "name": "Radiance Mome-05 Plus"
+  },
+  "99": {
+    "slug": "radiance_mome_05_mild",
+    "category_slug": "whitening",
+    "name": "Radiance Mome-05 Mild"
+  }
+}
