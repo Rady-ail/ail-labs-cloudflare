@@ -1,0 +1,556 @@
+/* ============================================
+   AIL LABS — GLASSMORPHISM THEME
+   v5: Teal • Emerald • Silver — glass, blur & gradient dipulihkan
+   Diturunkan dari warna logo Ail Labs (#3C7C84).
+   index.html tidak punya elemen <div class="bg-mesh">, jadi mesh
+   background dipasang di body::before (fixed, z-index -1) supaya
+   backdrop-blur pada .glass punya sesuatu nyata di belakangnya.
+   ============================================ */
+
+:root {
+  /* PRIMARY — TEAL */
+  --green-900: #153237;
+  --green-800: #1E3E44;
+  --green-700: #3C7C84;
+  --green-500: #74ADB4;
+
+  /* EMERALD — aksen premium/harga */
+  --emerald-700: #2F4A41;
+  --emerald-600: #407767;
+  --emerald-500: #5CA389;
+  --emerald-300: #D6E7DF;
+
+  /* SILVER — netral */
+  --silver-100: #F5F6F6;
+  --silver-200: #EDEFEF;
+  --silver-400: #B7C0C2;
+  --silver-600: #7B898E;
+
+  /* TEXT */
+  --ink-900: #1A2123;
+  --ink-600: #3C4649;
+  --ink-400: #8D979A;
+
+  /* STATUS */
+  --danger: #A6453B;
+  --danger-soft: #F6E7E4;
+  --ok: #407767;
+  --ok-soft: #E5EFEB;
+
+  /* CARD — glassmorphism nyata, dipulihkan dari flat solid */
+  --glass-top: rgba(255, 255, 255, 0.58);
+  --glass-mid: rgba(255, 255, 255, 0.40);
+  --glass-bottom: rgba(255, 255, 255, 0.24);
+  --glass-border: rgba(255, 255, 255, 0.45);
+  --glass-shadow: 0 8px 32px rgba(21, 50, 55, 0.14);
+  --glass-inset: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+
+  --emerald-foil: linear-gradient(135deg, var(--green-500) 0%, var(--emerald-500) 50%, var(--emerald-700) 100%);
+
+  /* Blur dipulihkan */
+  --blur-light: 8px;
+  --blur-standard: 16px;
+  --blur-strong: 24px;
+  --blur-heavy: 32px;
+
+  /* RADIUS — sedikit lebih rapat untuk kesan rapi */
+  --radius-xl: 20px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+  --radius-sm: 10px;
+
+  /* ANIMASI */
+  --spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", 'Montserrat', 'Century Gothic', CenturyGothic, AppleGothic, system-ui, sans-serif;
+  color: var(--ink-900);
+  background:
+    radial-gradient(ellipse 900px 700px at 12% -8%, rgba(116, 173, 180, 0.40), transparent 60%),
+    radial-gradient(ellipse 800px 800px at 105% 5%, rgba(92, 163, 137, 0.34), transparent 55%),
+    radial-gradient(ellipse 1000px 900px at 50% 115%, rgba(214, 231, 223, 0.55), transparent 60%),
+    var(--silver-100);
+  background-attachment: fixed;
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--emerald-300);
+  color: var(--green-900);
+}
+
+/* scrollbar minimal */
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(21, 50, 55, 0.22);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(21, 50, 55, 0.38);
+  background-clip: padding-box;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(21, 50, 55, 0.28) transparent;
+}
+
+/* ============================================
+   BACKGROUND — mesh gradient nyata
+   index.html tidak punya <div class="bg-mesh">, jadi mesh
+   dipasang langsung sebagai background milik body (lihat rule
+   body di atas), bukan pseudo-element terpisah.
+   ============================================ */
+
+.bg-mesh {
+  display: none;
+}
+
+/* ============================================
+   KARTU / PANEL — glassmorphism dipulihkan
+   ============================================ */
+
+.glass {
+  position: relative;
+  background: linear-gradient(165deg, var(--glass-top), var(--glass-bottom));
+  border: 1px solid var(--glass-border);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  box-shadow: var(--glass-shadow), var(--glass-inset);
+  backdrop-filter: blur(var(--blur-standard)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--blur-standard)) saturate(160%);
+}
+
+.glass > * {
+  position: relative;
+}
+
+.glass-light {
+  background: rgba(255, 255, 255, 0.32);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--blur-light)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-light)) saturate(150%);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(var(--blur-light)) saturate(140%);
+  -webkit-backdrop-filter: blur(var(--blur-light)) saturate(140%);
+}
+
+.glass-prominent {
+  background: linear-gradient(165deg, var(--glass-top), var(--glass-mid));
+  border: 1px solid var(--glass-border);
+  border-top-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 16px 40px rgba(21, 50, 55, 0.18), var(--glass-inset);
+  backdrop-filter: blur(var(--blur-strong)) saturate(165%);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(165%);
+}
+
+/* varian premium/VIP — metallic glass + glow, dipulihkan dari flat silver */
+.glass-metallic {
+  position: relative;
+  background: linear-gradient(145deg, rgba(245, 246, 246, 0.55), rgba(183, 192, 194, 0.30));
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 10px 28px rgba(21, 50, 55, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  backdrop-filter: blur(var(--blur-light)) saturate(150%);
+  -webkit-backdrop-filter: blur(var(--blur-light)) saturate(150%);
+}
+
+/* ============================================
+   KARTU PRODUK & BARIS — jadi kaca individual
+   Sebelumnya .row/.cart-row cuma baris polos di dalam
+   satu panel .group.glass bersama. Sekarang tiap baris
+   adalah kartu kaca sendiri yang melayang terpisah —
+   .group jadi wadah transparan yang cuma mengatur jarak.
+   ============================================ */
+
+.group {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row,
+.cart-row {
+  position: relative;
+  margin: 0;
+  border-radius: var(--radius-lg) !important;
+  border-bottom: none !important;
+  background: linear-gradient(165deg, var(--glass-top), var(--glass-bottom));
+  border: 1px solid var(--glass-border);
+  border-top-color: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 6px 20px rgba(21, 50, 55, 0.12), var(--glass-inset);
+  backdrop-filter: blur(var(--blur-light)) saturate(155%);
+  -webkit-backdrop-filter: blur(var(--blur-light)) saturate(155%);
+  transition: transform 0.18s var(--spring), box-shadow 0.18s var(--spring), background 0.18s var(--spring);
+}
+
+.row:active,
+.cart-row:active {
+  transform: scale(0.985);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.3));
+  box-shadow: 0 3px 10px rgba(21, 50, 55, 0.1), var(--glass-inset);
+}
+
+/* ============================================
+   HERO & KONTAK — kaca gelap (teal frosted),
+   dipulihkan dari flat solid var(--green-900)
+   ============================================ */
+
+.hero-card,
+.contact-card {
+  background: linear-gradient(160deg, rgba(30, 66, 71, 0.72), rgba(13, 34, 38, 0.62)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top-color: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(var(--blur-strong)) saturate(160%);
+  -webkit-backdrop-filter: blur(var(--blur-strong)) saturate(160%);
+  box-shadow: 0 20px 48px rgba(6, 20, 22, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+/* ============================================
+   UTILITAS
+   ============================================ */
+
+.fade-in {
+  animation: fadeUp 0.28s var(--spring);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ripple-fx {
+  display: none;
+}
+
+.rippling {
+  position: relative;
+  overflow: hidden;
+}
+
+.text-muted {
+  color: var(--ink-400);
+}
+
+.text-primary {
+  color: var(--green-700);
+}
+
+.text-emerald {
+  color: var(--emerald-600);
+}
+
+/* gradient text dipulihkan */
+.text-foil {
+  background-image: var(--emerald-foil);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* divider gradient + glow tipis, dipulihkan */
+.divider-metallic {
+  height: 2px;
+  width: 48px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green-500), var(--emerald-500), var(--silver-400));
+  margin: 10px 0;
+  border: none;
+  box-shadow: 0 0 8px rgba(92, 163, 137, 0.35);
+}
+
+/* lift lembut saat hover, tanpa efek berlebihan */
+.elevate-hover {
+  transition: transform 0.2s var(--spring), box-shadow 0.2s var(--spring);
+}
+.elevate-hover:hover,
+.elevate-hover:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(21, 50, 55, 0.10);
+}
+
+/* ============================================
+   TOMBOL & ELEMEN INTERAKTIF
+   ============================================ */
+
+button, .btn {
+  cursor: pointer;
+  border: none;
+  font-family: inherit;
+  transition: transform 0.15s var(--spring), background 0.15s, box-shadow 0.15s;
+}
+
+button:active, .btn:active {
+  transform: scale(0.97);
+}
+
+a:focus-visible,
+button:focus-visible,
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--emerald-500);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* tombol CTA utama — gradient + glow, dipulihkan dari solid */
+.btn-emerald {
+  background: linear-gradient(135deg, var(--emerald-500), var(--emerald-700));
+  color: #fff;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  padding: 12px 20px;
+  box-shadow: 0 6px 20px rgba(64, 119, 103, 0.38);
+}
+.btn-emerald:hover {
+  background: linear-gradient(135deg, var(--emerald-600), var(--green-800));
+  box-shadow: 0 8px 26px rgba(64, 119, 103, 0.48);
+}
+
+/* Badge status */
+.badge-ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* badge premium — gradient emerald + glow, dipulihkan dari solid */
+.badge-emerald {
+  background: linear-gradient(135deg, var(--emerald-300), var(--emerald-500) 130%);
+  color: var(--emerald-700);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 8px rgba(92, 163, 137, 0.25);
+}
+
+/* badge netral — sheen silver tipis, dipulihkan dari solid */
+.badge-silver {
+  background: linear-gradient(135deg, var(--silver-200), var(--silver-400) 150%);
+  color: var(--silver-600);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--silver-400);
+}
+
+/* ============================================
+   FORM
+   ============================================ */
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  background: #FFFFFF;
+  border: 1px solid rgba(21, 50, 55, 0.14);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink-900);
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--green-700);
+  box-shadow: 0 0 0 3px rgba(60, 124, 132, 0.14);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+
+@media (max-width: 768px) {
+  :root {
+    --radius-xl: 18px;
+    --radius-lg: 14px;
+  }
+
+  body {
+    padding: 0;
+  }
+}
+
+/* ============================================
+   SCROLL REVEAL — ringan, tanpa efek berat
+   ============================================ */
+
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: revealIn 0.4s var(--spring) forwards;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+@keyframes revealIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scroll-reveal.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================
+   SKELETON LOADING — tetap dipakai, tanpa shimmer berat
+   ============================================ */
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--silver-200);
+  border-radius: var(--radius-sm);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.65), transparent);
+  animation: shimmerBg 1.6s infinite;
+  background-size: 1000px 100%;
+}
+
+@keyframes shimmerBg {
+  0%, 100% {
+    background-position: -1000px 0;
+  }
+  50% {
+    background-position: 1000px 0;
+  }
+}
+
+.count-up {
+  display: inline-block;
+  animation: fadeUp 0.25s var(--spring);
+}
+
+/* ============================================
+   PRINT (struk/invoice)
+   ============================================ */
+
+@media print {
+  .bg-mesh,
+  .topbar,
+  header,
+  nav,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+
+  .glass,
+  .glass-metallic {
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: none;
+  }
+
+  .divider-metallic {
+    background: var(--emerald-600);
+  }
+}
+
+/* ============================================
+   REDUCED MOTION
+   ============================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

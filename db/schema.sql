@@ -1,0 +1,125 @@
+-- =========================================================
+-- Skema database AIL LABS Katalog (PostgreSQL)
+-- Jalankan file ini sekali di database kamu (Supabase/Neon/dll)
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS categories (
+  id          SERIAL PRIMARY KEY,
+  name        TEXT UNIQUE NOT NULL,
+  sort_order  INTEGER NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS products (
+  id            SERIAL PRIMARY KEY,
+  category_id   INTEGER NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+  name          TEXT NOT NULL,
+  kandungan     TEXT NOT NULL DEFAULT '',
+  kemasan       TEXT NOT NULL DEFAULT '',
+  harga         INTEGER NOT NULL DEFAULT 0,
+  aktif         BOOLEAN NOT NULL DEFAULT true,
+  sort_order    INTEGER NOT NULL DEFAULT 0,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
+CREATE INDEX IF NOT EXISTS idx_products_name ON products USING gin (to_tsvector('simple', name || ' ' || kandungan));
+
+CREATE TABLE IF NOT EXISTS orders (
+  id            SERIAL PRIMARY KEY,
+  customer_name TEXT NOT NULL,
+  note          TEXT DEFAULT '',
+  items         JSONB NOT NULL,
+  total         INTEGER NOT NULL DEFAULT 0,
+  status        TEXT NOT NULL DEFAULT 'baru', -- baru | diproses | selesai | batal
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS admin_users (
+  id            SERIAL PRIMARY KEY,
+  username      TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- =========================================================
+-- Tabel tambahan: pelacakan pengunjung & analytics
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS visitors (
+  id              SERIAL PRIMARY KEY,
+  session_id      TEXT UNIQUE NOT NULL,
+  ip_address      TEXT,
+  user_agent      TEXT,
+  page_visited    TEXT DEFAULT '/',
+  referrer        TEXT,
+  entry_time      TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_activity   TIMESTAMPTZ NOT NULL DEFAULT now(),
+  exit_time       TIMESTAMPTZ,
+  duration_ms     INTEGER DEFAULT 0,
+  is_active       BOOLEAN NOT NULL DEFAULT true
+);
+
+CREATE INDEX IF NOT EXISTS idx_visitors_session ON visitors(session_id);
+CREATE INDEX IF NOT EXISTS idx_visitors_active ON visitors(is_active);
+CREATE INDEX IF NOT EXISTS idx_visitors_entry_time ON visitors(entry_time DESC);
+CREATE INDEX IF NOT EXISTS idx_visitors_last_activity ON visitors(last_activity DESC);
+
+CREATE TABLE IF NOT EXISTS page_views (
+  id              SERIAL PRIMARY KEY,
+  session_id      TEXT NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+  page_path       TEXT NOT NULL,
+  timestamp       TIMESTAMPTZ NOT NULL DEFAULT now(),
+  duration_ms     INTEGER DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_pageviews_session ON page_views(session_id);
+CREATE INDEX IF NOT EXISTS idx_pageviews_timestamp ON page_views(timestamp DESC);
+
+CREATE TABLE IF NOT EXISTS user_events (
+  id              SERIAL PRIMARY KEY,
+  session_id      TEXT NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+  event_type      TEXT NOT NULL, -- 'view_product', 'add_to_cart', 'checkout_start', 'purchase', dll
+  event_data      JSONB,
+  timestamp       TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_user_events_session ON user_events(session_id);
+CREATE INDEX IF NOT EXISTS idx_user_events_type ON user_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_user_events_timestamp ON user_events(timestamp DESC);
+
+-- =========================================================
+-- Tabel tambahan: pengaturan umum (dipakai untuk toggle & isi popup promo)
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS settings (
+  key         TEXT PRIMARY KEY,
+  value       JSONB NOT NULL,
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- Nilai default popup promo (bisa diubah lewat tab "Promo" di admin panel)
+INSERT INTO settings (key, value) VALUES (
+  'promo_popup',
+  '{
+    "active": false,
+    "badge": "Promo Spesial",
+    "title": "Judul Promo Ail Labs",
+    "subtitle": "Deskripsi singkat promo — ganti sesuai kebutuhan",
+    "discount": "30%-50%",
+    "note": "S&K berlaku. Chat admin untuk info lebih lanjut.",
+    "whatsapp_number": "6287817391521",
+    "whatsapp_message": "Halo Ail Labs, saya mau tanya soal promo",
+    "reappear_hours": 24
+  }'::jsonb
+) ON CONFLICT (key) DO NOTHING;
+
+-- Catatan: tabel daily_analytics, hourly_stats, product_analytics,
+-- conversion_funnel, export_logs, system_logs dari schema-upgrade.sql
+-- yang diupload TIDAK disertakan di sini karena tidak ada satu pun
+-- route/endpoint yang menulis ke tabel-tabel tersebut (semua endpoint
+-- analytics.js menghitung langsung dari visitors/page_views/user_events/
+-- orders secara real-time). Tabel kosong yang tidak pernah diisi hanya
+-- menambah kerumitan skema tanpa manfaat. Bisa ditambahkan nanti kalau
+-- memang mau precompute/agregat harian untuk performa.

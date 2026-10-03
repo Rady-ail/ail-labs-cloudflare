@@ -6,6 +6,7 @@ const path = require('path');
 const compression = require('compression');
 
 const app = express();
+const isCloudflareWorker = typeof WebSocketPair !== 'undefined';
 
 // BUGFIX: `origin: true` me-reflect origin APAPUN sambil tetap mengizinkan
 // cookie (credentials: true) — terlalu longgar untuk endpoint yang pakai
@@ -22,7 +23,7 @@ app.use(cors({
   origin: allowedOrigins.length > 0 ? allowedOrigins : false,
   credentials: true,
 }));
-app.use(compression());
+if (!isCloudflareWorker) app.use(compression());
 app.use(express.json());
 const passport = require('passport');
 app.use(passport.initialize());
@@ -55,16 +56,18 @@ app.use('/api/admin', require('./routes/promoKategori'));
 // Catatan: di Netlify, folder public/ sudah otomatis disajikan sebagai
 // situs statis (lewat pengaturan "publish" di netlify.toml), jadi baris
 // ini terutama dipakai saat jalan lokal / di Render.
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
+if (typeof __dirname !== 'undefined') {
+  app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
 
-app.get('/admin', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/admin/index.html'));
-});
+  app.get('/admin', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/admin/index.html'));
+  });
 
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/index.html'));
-});
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public/index.html'));
+  });
+}
 
-if (typeof navigator === 'undefined' || navigator.userAgent !== 'Cloudflare-Workers') require('./jobs/broadcastScheduler')();
+if (!isCloudflareWorker) require('./jobs/broadcastScheduler')();
 
 module.exports = app;
