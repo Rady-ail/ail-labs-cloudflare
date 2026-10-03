@@ -35,6 +35,48 @@ jobs:
           wranglerVersion: '4.86.0'
           command: deploy
 
+      - name: Diagnose Cloudflare account on deploy failure
+        if: failure() && steps.deploy.outcome == 'failure'
+        shell: bash
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          account_id_length=${#CLOUDFLARE_ACCOUNT_ID}
+          if [[ "$CLOUDFLARE_ACCOUNT_ID" =~ ^[0-9a-f]{32}$ ]]; then
+            account_id_format=true
+          else
+            account_id_format=false
+          fi
+          printf 'CLOUDFLARE_ACCOUNT_ID length: %s\n' "$account_id_length"
+          printf 'CLOUDFLARE_ACCOUNT_ID format valid: %s\n' "$account_id_format"
+          printf 'CLOUDFLARE_API_TOKEN length: %s\n' "${#CLOUDFLARE_API_TOKEN}"
+
+          echo 'Cloudflare account names accessible to this token:'
+          if ! curl --silent --show-error --fail \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            https://api.cloudflare.com/client/v4/accounts \
+            | node -e '
+              let input = "";
+              process.stdin.setEncoding("utf8");
+              process.stdin.on("data", chunk => input += chunk);
+              process.stdin.on("end", () => {
+                try {
+                  const response = JSON.parse(input);
+                  if (!response.success || !Array.isArray(response.result)) throw new Error();
+                  for (const account of response.result) {
+                    if (typeof account.name === "string") console.log(account.name);
+                  }
+                } catch {
+                  console.error("Could not read account names from Cloudflare API.");
+                  process.exitCode = 1;
+                }
+              });
+            '; then
+            echo 'Could not retrieve Cloudflare account names.'
+          fi
+
       - name: Set runtime secrets
         shell: bash
         env:
