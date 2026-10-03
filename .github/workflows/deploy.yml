@@ -36,7 +36,7 @@ jobs:
           command: deploy
 
       - name: Diagnose Cloudflare account on deploy failure
-        if: failure() && steps.deploy.outcome == 'failure'
+        if: failure() && (steps.deploy.outcome == 'failure' || steps.deploy_final.outcome == 'failure')
         shell: bash
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -96,9 +96,18 @@ jobs:
             process.stdout.write(JSON.stringify(secrets));
           ' | npx wrangler secret bulk
 
+      - name: Deploy Worker with runtime secrets
+        id: deploy_final
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: '4.86.0'
+          command: deploy
+
       - name: Verify deployment
         env:
-          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+          DEPLOYMENT_URL: ${{ steps.deploy_final.outputs.deployment-url }}
         shell: bash
         run: |
           if [[ -z "$DEPLOYMENT_URL" ]]; then

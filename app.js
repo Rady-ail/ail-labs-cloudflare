@@ -9,7 +9,6 @@ const app = express();
 const isCloudflareWorker = typeof WebSocketPair !== 'undefined';
 const sessionSecret = process.env.SESSION_SECRET;
 
-if (!sessionSecret) throw new Error('SESSION_SECRET wajib dikonfigurasi.');
 app.set('trust proxy', 1);
 
 // BUGFIX: `origin: true` me-reflect origin APAPUN sambil tetap mengizinkan
@@ -31,13 +30,20 @@ if (!isCloudflareWorker) app.use(compression());
 app.use(express.json());
 const passport = require('passport');
 app.use(passport.initialize());
-app.use(cookieSession({
-  name: 'ail_session',
-  secret: sessionSecret,
-  maxAge: 24 * 60 * 60 * 1000, // 24 jam
-  sameSite: 'lax',
-  secure: isCloudflareWorker || process.env.NODE_ENV === 'production',
-}));
+if (sessionSecret) {
+  app.use(cookieSession({
+    name: 'ail_session',
+    secret: sessionSecret,
+    maxAge: 24 * 60 * 60 * 1000, // 24 jam
+    sameSite: 'lax',
+    secure: isCloudflareWorker || process.env.NODE_ENV === 'production',
+  }));
+} else {
+  app.use((req, res, next) => {
+    req.session = {};
+    next();
+  });
+}
 
 app.use(require('./middleware/attachCustomer'));
 
