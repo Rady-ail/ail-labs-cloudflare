@@ -13,8 +13,12 @@ function logLoginAttempt({ success, username, req }) {
 // POST /api/auth/login
 router.post('/login', (req, res) => {
   const { username, password } = req.body || {};
-  const validUser = process.env.ADMIN_USERNAME || 'admin';
-  const validPass = process.env.ADMIN_PASSWORD || 'admin';
+  const validUser = process.env.ADMIN_USERNAME;
+  const validPass = process.env.ADMIN_PASSWORD;
+
+  if (!validUser || !validPass) {
+    return res.status(503).json({ error: 'Login admin belum dikonfigurasi.' });
+  }
 
   if (username === validUser && password === validPass) {
     req.session.isAdmin = true;

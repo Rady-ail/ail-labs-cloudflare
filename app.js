@@ -7,6 +7,10 @@ const compression = require('compression');
 
 const app = express();
 const isCloudflareWorker = typeof WebSocketPair !== 'undefined';
+const sessionSecret = process.env.SESSION_SECRET;
+
+if (!sessionSecret) throw new Error('SESSION_SECRET wajib dikonfigurasi.');
+app.set('trust proxy', 1);
 
 // BUGFIX: `origin: true` me-reflect origin APAPUN sambil tetap mengizinkan
 // cookie (credentials: true) — terlalu longgar untuk endpoint yang pakai
@@ -29,9 +33,10 @@ const passport = require('passport');
 app.use(passport.initialize());
 app.use(cookieSession({
   name: 'ail_session',
-  secret: process.env.SESSION_SECRET || 'ganti-secret-ini',
+  secret: sessionSecret,
   maxAge: 24 * 60 * 60 * 1000, // 24 jam
   sameSite: 'lax',
+  secure: isCloudflareWorker || process.env.NODE_ENV === 'production',
 }));
 
 app.use(require('./middleware/attachCustomer'));

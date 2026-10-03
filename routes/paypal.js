@@ -44,7 +44,12 @@ async function verifyAndConvert(items) {
     totalIDR += harga * qty;
     verifiedItems.push({ cat: it.cat, name: p.name, kemasan: p.kemasan, harga, qty });
   }
-  const rate = Number(process.env.PAYPAL_USD_RATE || 15800);
+  const rate = Number(process.env.PAYPAL_USD_RATE);
+  if (!Number.isFinite(rate) || rate <= 0) {
+    const error = new Error('PAYPAL_USD_RATE belum dikonfigurasi.');
+    error.status = 503;
+    throw error;
+  }
   const totalUSD = (totalIDR / rate).toFixed(2);
   return { totalIDR, totalUSD, verifiedItems };
 }
@@ -70,7 +75,7 @@ router.post('/create-order', async (req, res) => {
     res.json({ id: order.result.id, totalUSD });
   } catch (err) {
     console.error(err);
-    res.status(400).json({ error: err.message || 'Gagal membuat order PayPal.' });
+    res.status(err.status || 400).json({ error: err.message || 'Gagal membuat order PayPal.' });
   }
 });
 
@@ -99,7 +104,7 @@ router.post('/capture-order/:orderID', async (req, res) => {
     res.status(201).json(rows[0]);
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Gagal memproses pembayaran.' });
+    res.status(err.status || 500).json({ error: 'Gagal memproses pembayaran.' });
   }
 });
 

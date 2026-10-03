@@ -2,7 +2,13 @@
   "name": "ail-labs-katalog",
   "main": "src/worker.js",
   "compatibility_date": "2026-10-03",
+  "keep_vars": true,
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://ail-aesthetic-labs.my.id",
+    "GOOGLE_CALLBACK_URL": "https://ail-aesthetic-labs.my.id/api/customer/auth/google/callback",
+    "PAYPAL_MODE": "live"
+  },
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
