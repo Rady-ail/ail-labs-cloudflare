@@ -53,9 +53,6 @@ jobs:
             }
             process.stdout.write(JSON.stringify(secrets));
           ' | npx wrangler secret bulk
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
       - name: Verify deployment
         env:
