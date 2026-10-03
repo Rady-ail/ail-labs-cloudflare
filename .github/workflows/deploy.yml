@@ -34,9 +34,25 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: '4.86.0'
           command: deploy
-          secrets: |
-            DATABASE_URL
-            SESSION_SECRET
+
+      - name: Set runtime secrets
+        shell: bash
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          set -euo pipefail
+          node -e '
+            const secrets = {
+              DATABASE_URL: process.env.DATABASE_URL,
+              SESSION_SECRET: process.env.SESSION_SECRET,
+            };
+            if (Object.values(secrets).some(value => !value)) {
+              console.error("A required runtime secret is missing.");
+              process.exit(1);
+            }
+            process.stdout.write(JSON.stringify(secrets));
+          ' | npx wrangler secret bulk
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
