@@ -132,6 +132,17 @@ body{
 /* Bank & info card kecil ikut kaca senada */
 .bank-card{background:rgba(255,255,255,.4)!important;border:1px solid var(--glass-edge-soft);border-top-color:var(--glass-edge)}
 </style>
+<style>
+.ui-icon{display:inline-block;flex:none;color:inherit;stroke:currentColor;stroke-width:1.85;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;pointer-events:none}
+.icon-btn{display:inline-flex;align-items:center;justify-content:center}
+.tabbar{width:min(calc(100% - 24px),420px);justify-content:space-between;gap:2px}
+.tab{position:relative;flex:1 1 0;min-width:44px;min-height:48px;padding:6px 5px;gap:2px;color:var(--ink-400);transition:background .2s var(--spring),color .2s var(--spring),transform .2s var(--spring)}
+.tab.active{background:var(--green-700);color:#fff}
+.tab:active{transform:scale(.97)}
+.tab-badge{position:absolute;top:2px;right:calc(50% - 22px);z-index:1}
+.qty-btn{display:inline-flex;align-items:center;justify-content:center;min-width:32px;min-height:32px}
+@media(max-width:380px){.tabbar{width:calc(100% - 20px);gap:1px;padding:5px}.tab{padding:5px 3px;font-size:10px}}
+</style>
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -187,6 +198,26 @@ src="https://www.facebook.com/tr?id=27916556354683462&ev=PageView&noscript=1"
 import * as React from "https://cdn.jsdelivr.net/npm/react@19.0.0/+esm";
 import { createRoot } from "https://cdn.jsdelivr.net/npm/react-dom@19.0.0/client/+esm";
 const { useState, useEffect, useRef } = React;
+
+function UiIcon({ name, size=20, filled=false }){
+  return (
+    <svg className="ui-icon" width={size} height={size} viewBox="0 0 24 24" fill={name==='heart' && filled ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.85" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+      {name==='grid' && <><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/></>}
+      {name==='user' && <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>}
+      {name==='info' && <><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 8h.01"/></>}
+      {name==='cart' && <><path d="M3 4h2l2.2 11.1a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 1.9-1.4L21 8H6"/><circle cx="10" cy="20" r="1"/><circle cx="18" cy="20" r="1"/></>}
+      {name==='clock' && <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>}
+      {name==='search' && <><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.5 4.5"/></>}
+      {name==='heart' && <path d="M20.8 8.7c0 5-8.8 10.1-8.8 10.1S3.2 13.7 3.2 8.7a4.6 4.6 0 0 1 8.8-1.8 4.6 4.6 0 0 1 8.8 1.8Z"/>}
+      {name==='package' && <><path d="m12 3 9 4.5v9L12 21l-9-4.5v-9L12 3Z"/><path d="m3.5 7.7 8.5 4.4 8.5-4.4"/><path d="M12 12v9"/><path d="m7.5 5.3 9 4.5"/></>}
+      {name==='logout' && <><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M12 3h5a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-5"/></>}
+      {name==='plus' && <><path d="M12 5v14"/><path d="M5 12h14"/></>}
+      {name==='minus' && <path d="M5 12h14"/>}
+      {name==='close' && <><path d="m18 6-12 12"/><path d="m6 6 12 12"/></>}
+      {name==='back' && <><path d="m15 18-6-6 6-6"/><path d="M9 12h11"/></>}
+    </svg>
+  );
+}
 
 /* ================= Konstanta & helper (persis logika lama) ================= */
 const CATEGORY_GROUP_MAP = { "Cannula":"Threadlift & Consumable Medis", "Needle":"Threadlift & Consumable Medis", "Threadlift":"Threadlift & Consumable Medis", "Filler":"Filler & Skinbooster", "Skinbooster":"Filler & Skinbooster", "Body Lotion":"Body Care & Slimming", "Slimming":"Body Care & Slimming" };
@@ -294,11 +325,11 @@ function ProductModal({ state, onClose, onQtyChange, onAdd, onWish, currentUser,
         animate={{ opacity:1, y:0, scale:1 }}
         exit={{ opacity:0, y:16, scale:.97, transition:{ duration:.16, ease:'easeIn' } }}
         transition={{ type:'spring', stiffness:420, damping:36, mass:.8 }}>
-        <button className="modal-close" aria-label="Tutup" onClick={onClose}>×</button>
-        <button className="modal-wish-btn" type="button" onClick={()=> state && onWish(state)}>{wished ? '♥' : '♡'}</button>
+        <button className="modal-close" aria-label="Tutup" onClick={onClose}><UiIcon name="close" /></button>
+        <button className="modal-wish-btn" type="button" onClick={()=> state && onWish(state)}><UiIcon name="heart" filled={wished} /></button>
         {state && state.foto
           ? <img className="modal-photo" alt="" src={state.foto} style={{width:'100%', borderRadius:'16px'}} />
-          : <div className="modal-photo-placeholder">🧴</div>}
+          : <div className="modal-photo-placeholder"><UiIcon name="package" size={26} /></div>}
         <p className="modal-cat">{state?.cat}</p>
         <h3>{state?.name}</h3>
         <p className="modal-kand">{state?.kand}</p>
@@ -308,9 +339,9 @@ function ProductModal({ state, onClose, onQtyChange, onAdd, onWish, currentUser,
             <div className="modal-price">{fmt(state?.harga)}</div>
           </div>
           <div className="modal-qty">
-            <button className="qty-btn" type="button" onClick={()=> onQtyChange(-1)}>−</button>
+            <button className="qty-btn" type="button" aria-label="Kurangi jumlah" onClick={()=> onQtyChange(-1)}><UiIcon name="minus" size={16} /></button>
             <span className="qty-val">{state?.qty ?? 1}</span>
-            <button className="qty-btn" type="button" onClick={()=> onQtyChange(1)}>+</button>
+            <button className="qty-btn" type="button" aria-label="Tambah jumlah" onClick={()=> onQtyChange(1)}><UiIcon name="plus" size={16} /></button>
           </div>
         </div>
         <button className="modal-add-btn checkout-btn" type="button" style={{display: showPurchase ? '' : 'none'}} onClick={onAdd}>Tambah ke Keranjang</button>
@@ -764,11 +795,11 @@ function App(){
             <div className="brand"><span className="brand-mark" style={{width:'34px', height:'34px', borderRadius:'50%', display:'flex', alignItems:'center', justifyContent:'center', background:'var(--green-900)'}}><img src="/images/logo-badge-silver.png" alt="ail labs" style={{width:'78%', height:'78%', objectFit:'contain'}} /></span></div>
             <div className="topbar-actions" style={{display:'flex', gap:'6px'}}>
               <button className="icon-btn" aria-label="Wishlist" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff', position:'relative', display: isApproved ? '' : 'none'}} onClick={()=> switchView('wishlist', null)}>
-                ♡{Object.keys(wishlist).length > 0 && <span className="icon-badge" style={{position:'absolute', top:'-2px', right:'-2px', minWidth:'16px', height:'16px', borderRadius:'999px', background:'var(--emerald-600)', color:'#fff', fontSize:'9.5px', textAlign:'center'}}>{Object.keys(wishlist).length}</span>}
+                <UiIcon name="heart" size={19} />{Object.keys(wishlist).length > 0 && <span className="icon-badge" style={{position:'absolute', top:'-2px', right:'-2px', minWidth:'16px', height:'16px', borderRadius:'999px', background:'var(--emerald-600)', color:'#fff', fontSize:'9.5px', textAlign:'center'}}>{Object.keys(wishlist).length}</span>}
               </button>
-              <button className="icon-btn" aria-label="Cari" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={()=> setSearchOpen(o=>!o)}>🔍</button>
-              {isApproved && <button className="icon-btn" aria-label="Profil Saya" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={openProfileModal}>👤</button>}
-              {currentUser && <button className="icon-btn" aria-label="Keluar" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={handleLogout}>↪</button>}
+              <button className="icon-btn" aria-label="Cari" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={()=> setSearchOpen(o=>!o)}><UiIcon name="search" /></button>
+              {isApproved && <button className="icon-btn" aria-label="Profil Saya" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={openProfileModal}><UiIcon name="user" /></button>}
+              {currentUser && <button className="icon-btn" aria-label="Keluar" style={{width:'38px', height:'38px', borderRadius:'50%', border:'1px solid #E4E8E8', background:'#fff'}} onClick={handleLogout}><UiIcon name="logout" /></button>}
             </div>
           </div>
           <div className="chip-scroller glass" style={{display:'flex', gap:'3px', overflowX:'auto', padding:'5px', borderRadius:'999px'}}>
@@ -822,7 +853,7 @@ function App(){
                       const wished = !!wishlist[cartKey(group.cat,name,kemasan)];
                       return (
                         <div className="row" key={ii} onClick={()=> openProductModal(group.cat, name, kand, kemasan, harga, foto)}>
-                          {foto ? <img className="row-thumb" src={foto} alt={name} loading="lazy" /> : <div className="row-thumb" style={{display:'flex', alignItems:'center', justifyContent:'center'}}>🧴</div>}
+                          {foto ? <img className="row-thumb" src={foto} alt={name} loading="lazy" /> : <div className="row-thumb" style={{display:'flex', alignItems:'center', justifyContent:'center'}}><UiIcon name="package" size={22} /></div>}
                           <div className="row-body" style={{flex:1, minWidth:0}}>
                             <p className="row-name">{name}</p>
                             <p className="row-sub" style={{fontSize:'12px', color:'var(--ink-600)', margin:0}}>{kand}</p>
@@ -831,7 +862,7 @@ function App(){
                               {currentUser ? <div className="row-price">{fmt(harga)}</div> : <div className="row-price row-price-locked">Masuk</div>}
                             </div>
                           </div>
-                          {currentUser && <button className="wish-btn" type="button" style={{border:'none', background:'none', cursor:'pointer'}} onClick={(e)=>{ e.stopPropagation(); handleRowWish(group.cat, name, kemasan, harga); }}>{wished ? '♥' : '♡'}</button>}
+                          {currentUser && <button className="wish-btn" type="button" style={{border:'none', background:'none', cursor:'pointer'}} onClick={(e)=>{ e.stopPropagation(); handleRowWish(group.cat, name, kemasan, harga); }}><UiIcon name="heart" size={19} filled={wished} /></button>}
                         </div>
                       );
                     })}
@@ -887,7 +918,7 @@ function App(){
                     <div className="cart-row" key={key}>
                       <div className="cart-row-main"><p className="cart-row-name">{it.name}</p><p className="cart-row-price">{it.kemasan} · {fmt(it.harga)}</p></div>
                       <div className="cart-row-trail">
-                        <div className="cart-qty"><button className="qty-btn" type="button" onClick={()=> changeCartQty(key,-1)}>−</button><span className="qty-val">{it.qty}</span><button className="qty-btn" type="button" onClick={()=> changeCartQty(key,1)}>+</button></div>
+                        <div className="cart-qty"><button className="qty-btn" type="button" aria-label="Kurangi jumlah" onClick={()=> changeCartQty(key,-1)}><UiIcon name="minus" size={16} /></button><span className="qty-val">{it.qty}</span><button className="qty-btn" type="button" aria-label="Tambah jumlah" onClick={()=> changeCartQty(key,1)}><UiIcon name="plus" size={16} /></button></div>
                         <div className="cart-subtotal">{fmt(it.harga * it.qty)}</div>
                         <button className="cart-remove" type="button" onClick={()=> removeCartItem(key)}>Hapus</button>
                       </div>
@@ -925,7 +956,7 @@ function App(){
 
       <main className={"view" + (activeView==='wishlist' ? " active" : "")} id="view-wishlist">
         <div className="section-head glass" style={{paddingTop:'20px'}}>
-          <button className="back-chip" type="button" onClick={()=> switchView('katalog','katalog')}>‹ Kembali</button>
+          <button className="back-chip" type="button" onClick={()=> switchView('katalog','katalog')}><UiIcon name="back" size={16} /> Kembali</button>
           <span className="section-count">{Object.keys(wishlist).length} produk</span>
         </div>
         <h1 className="view-title">Wishlist Saya</h1>
@@ -953,7 +984,7 @@ function App(){
 
       <main className={"view" + (activeView==='riwayat' ? " active" : "")} id="view-riwayat">
         <div className="section-head glass" style={{paddingTop:'20px'}}>
-          <button className="back-chip" type="button" onClick={()=> switchView('cart','cart')}>‹ Kembali</button>
+          <button className="back-chip" type="button" onClick={()=> switchView('cart','cart')}><UiIcon name="back" size={16} /> Kembali</button>
           <button className="clear-history-btn" type="button" onClick={clearHistory}>Hapus Semua</button>
         </div>
         <h1 className="view-title">Riwayat Pesanan</h1>
@@ -978,11 +1009,11 @@ function App(){
       </main>
 
       <nav className="tabbar glass" id="tabbar">
-        <button className={"tab" + (activeTab==='katalog' ? " active" : "")} onClick={()=> handleTabClick('katalog')}>📂<br/>Katalog</button>
-        {isApproved && <button className={"tab" + (activeTab==='cart' ? " active" : "")} onClick={()=> handleTabClick('cart')}>{cartCount > 0 && <span className="tab-badge">{cartCount}</span>}🛒<br/>Keranjang</button>}
-        {!isApproved && <button className={"tab" + (activeTab==='login' ? " active" : "")} onClick={()=> handleTabClick('login')}>👤<br/>Masuk</button>}
-        {isApproved && <button className={"tab" + (activeTab==='riwayat' ? " active" : "")} onClick={()=> handleTabClick('riwayat')}>🕒<br/>Riwayat</button>}
-        <button className={"tab" + (activeTab==='info' ? " active" : "")} onClick={()=> handleTabClick('info')}>ℹ️<br/>Disclaimer</button>
+        <button className={"tab" + (activeTab==='katalog' ? " active" : "")} onClick={()=> handleTabClick('katalog')}><UiIcon name="grid" size={22} /><br/>Katalog</button>
+        {isApproved && <button className={"tab" + (activeTab==='cart' ? " active" : "")} onClick={()=> handleTabClick('cart')}>{cartCount > 0 && <span className="tab-badge">{cartCount}</span>}<UiIcon name="cart" size={22} /><br/>Keranjang</button>}
+        {!isApproved && <button className={"tab" + (activeTab==='login' ? " active" : "")} onClick={()=> handleTabClick('login')}><UiIcon name="user" size={22} /><br/>Masuk</button>}
+        {isApproved && <button className={"tab" + (activeTab==='riwayat' ? " active" : "")} onClick={()=> handleTabClick('riwayat')}><UiIcon name="clock" size={22} /><br/>Riwayat</button>}
+        <button className={"tab" + (activeTab==='info' ? " active" : "")} onClick={()=> handleTabClick('info')}><UiIcon name="info" size={22} /><br/>Disclaimer</button>
       </nav>
     </React.Fragment>
   );
