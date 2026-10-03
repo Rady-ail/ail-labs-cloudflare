@@ -1,6 +1,11 @@
 {
   "name": "ail-labs-katalog-v2",
   "main": "src/worker.js",
+  "workers_dev": true,
+  "routes": [
+    { "pattern": "ail-aesthetic-labs.my.id", "custom_domain": true },
+    { "pattern": "www.ail-aesthetic-labs.my.id", "custom_domain": true }
+  ],
   "compatibility_date": "2026-10-03",
   "keep_vars": true,
   "compatibility_flags": ["nodejs_compat"],
