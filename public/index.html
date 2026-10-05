@@ -268,10 +268,9 @@ main.view.active{display:block!important;scroll-margin-top:150px}
   transition:transform .22s var(--spring),box-shadow .22s var(--spring)!important;
 }
 .row:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(17,24,39,.07)!important}
-.row-thumb,.modal-photo{
-  width:100%!important;aspect-ratio:1/1!important;height:auto!important;object-fit:cover!important;
-  border-radius:0!important;background:#F3F4F6!important;
-}
+.row .row-thumb,.modal-card .modal-photo{display:block;width:100%;aspect-ratio:1/1;height:auto;min-height:120px;object-fit:cover;border-radius:0;background:#F3F4F6}
+.row .row-thumb{flex-shrink:0}
+.modal-card .modal-photo{border-radius:16px;}
 .row-body{padding:0 14px!important}
 .row-name{font-family:var(--font-main)!important;font-size:14px!important;line-height:1.35!important;font-weight:600!important;color:var(--mm-text)!important;margin:0 0 4px!important}
 .row-sub{font-size:12px!important;line-height:1.45!important;color:var(--mm-muted)!important}
@@ -335,8 +334,8 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 .contact-card{background:var(--mm-text)!important;border-radius:var(--mm-radius)!important;box-shadow:none!important}
 a{color:var(--mm-teal)}
 .toast{background:var(--mm-text)!important;border-radius:10px!important;box-shadow:0 8px 20px rgba(17,24,39,.14)!important}
-.section-block{opacity:0;transform:translateY(8px);transition:opacity .25s ease,transform .25s ease}
-.section-block.is-visible{opacity:1;transform:none}
+.section-block{opacity:1;visibility:visible;transform:none;min-height:1px}
+.section-block.is-visible{opacity:1;visibility:visible;transform:none}
 @media(min-width:700px){
   .topbar{padding-left:24px!important;padding-right:24px!important}
   main.view{padding-left:24px!important;padding-right:24px!important}
@@ -647,7 +646,9 @@ function App(){
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeCat, setActiveCat] = useState('Semua');
   const [catalogUnlocked, setCatalogUnlocked] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+    const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState('');
+const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [cart, setCart] = useState(() => loadJSON(CART_STORAGE_KEY, {}));
   const [wishlist, setWishlist] = useState(() => loadJSON(WISHLIST_STORAGE_KEY, {}));
