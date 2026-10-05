@@ -1,0 +1,25 @@
+name: Integrity Audit
+
+on:
+  push:
+    branches:
+      - integrity-audit
+
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Validate JavaScript syntax
+        run: |
+          set -euo pipefail
+          node --check app.js
+          for f in routes/*.js db/*.js jobs/*.js src/*.js; do
+            [ -f "$f" ] && node --check "$f"
+          done
+          echo "PASS JavaScript syntax"
+      - name: Validate Wrangler config
+        run: npx wrangler deploy --dry-run
