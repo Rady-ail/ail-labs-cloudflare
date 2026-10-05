@@ -222,6 +222,29 @@ BEGIN
   END IF;
 END $;
 
+-- =========================================================
+-- RELATIONS — tahap 3
+-- =========================================================
+-- customers.id sudah terverifikasi ada di database produksi. FK ini dibuat
+-- NOT VALID agar orphan legacy rows tidak menggagalkan perubahan schema.
+-- Setelah audit produksi, jalankan VALIDATE CONSTRAINT.
+DO $
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_customer_id_fkey'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_customer_id_fkey
+      FOREIGN KEY (customer_id) REFERENCES customers(id)
+      ON DELETE SET NULL
+      NOT VALID;
+  END IF;
+END $;
+
+-- Index FK sudah tersedia pada tahap 1 (idx_orders_customer_id).
+-- ON DELETE SET NULL menjaga histori order tetap ada bila akun customer dihapus.
+-- Tidak menambah FK ke tabel produksi lain yang definisinya belum diaudit.
+
 -- Catatan tahap 2:
 -- Constraint ini sengaja belum VALIDATE. Audit produksi harus lebih dulu mencari
 -- baris legacy yang melanggar aturan, lalu baris tersebut dibersihkan/diperbaiki
