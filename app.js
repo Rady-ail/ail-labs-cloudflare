@@ -52,6 +52,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
+app.use('/api/paypal', require('./routes/paypal'));
 app.use('/api/promo', require('./routes/promo'));
 app.use('/api/visitors', require('./routes/visitors'));
 app.use('/api/analytics', require('./routes/analytics'));
@@ -59,7 +60,6 @@ app.use('/api/customers', require('./routes/customers'));
 app.use('/api/customer/auth', require('./routes/customerAuth'));
 app.use('/api/broadcast', require('./routes/broadcast'));
 app.use('/api/whatsapp', require('./routes/whatsapp-webhook'));
-app.use(require('./routes/promo'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/admin', require('./routes/promoKategori'));
 
