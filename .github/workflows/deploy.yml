@@ -118,6 +118,8 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
           set -euo pipefail
           node -e '
@@ -125,9 +127,21 @@ jobs:
               DATABASE_URL: process.env.DATABASE_URL,
               SESSION_SECRET: process.env.SESSION_SECRET,
             };
-            if (Object.values(secrets).some(value => !value)) {
+            const googleId = process.env.GOOGLE_CLIENT_ID;
+            const googleSecret = process.env.GOOGLE_CLIENT_SECRET;
+            if (!secrets.DATABASE_URL || !secrets.SESSION_SECRET) {
               console.error("A required runtime secret is missing.");
               process.exit(1);
+            }
+            if (Boolean(googleId) !== Boolean(googleSecret)) {
+              console.error("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together.");
+              process.exit(1);
+            }
+            if (googleId && googleSecret) {
+              secrets.GOOGLE_CLIENT_ID = googleId;
+              secrets.GOOGLE_CLIENT_SECRET = googleSecret;
+            } else {
+              console.log("Google customer login secrets are not configured yet; deployment will keep the existing runtime state.");
             }
             process.stdout.write(JSON.stringify(secrets));
           ' | npx wrangler secret bulk
