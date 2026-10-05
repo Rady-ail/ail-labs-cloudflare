@@ -550,13 +550,21 @@ function App(){
   /* --- katalog --- */
   async function loadCatalogFromAPI(){
     try{
-      const res = await fetch('/api/products');
-      if(!res.ok) throw new Error('Gagal memuat produk');
+      const res = await fetch('/api/products', { credentials:'include' });
+      if(!res.ok) throw new Error('Gagal memuat produk (HTTP ' + res.status + ')');
       const data = await res.json();
+      if(!Array.isArray(data)) throw new Error('Format katalog tidak valid');
       setCatalog(data);
       const groups = groupsInCatalogFrom(data);
-      if(groups.length) setActiveGroup(g => g === null ? groups[0] : g);
-    } catch(err){ console.error(err); setCatalog([]); }
+      if(groups.length){
+        setActiveGroup(g => g === null ? groups[0] : g);
+        setCatalogUnlocked(true);
+      }
+    } catch(err){
+      console.error('Catalog API error:', err);
+      setCatalog([]);
+      setCatalogUnlocked(false);
+    }
   }
 
   useEffect(()=>{ checkAuthStatus(); loadCatalogFromAPI(); retryPendingOrderSync(); }, []);
