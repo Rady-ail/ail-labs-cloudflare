@@ -177,6 +177,58 @@ CREATE INDEX IF NOT EXISTS idx_user_events_session_timestamp
 CREATE INDEX IF NOT EXISTS idx_user_events_type_timestamp
   ON user_events(event_type, timestamp DESC);
 
+-- =========================================================
+-- INTEGRITY — tahap 2
+-- =========================================================
+-- Constraint memakai NOT VALID agar data legacy yang belum diaudit tidak
+-- diblokir saat schema diterapkan. Constraint tetap berlaku untuk INSERT/UPDATE
+-- baru. VALIDATE CONSTRAINT dilakukan setelah audit data produksi.
+DO $
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'products_harga_nonnegative'
+  ) THEN
+    ALTER TABLE products
+      ADD CONSTRAINT products_harga_nonnegative CHECK (harga >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_total_nonnegative'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_total_nonnegative CHECK (total >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_status_allowed'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_status_allowed
+      CHECK (status IN ('baru', 'diproses', 'selesai', 'batal')) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'visitors_duration_nonnegative'
+  ) THEN
+    ALTER TABLE visitors
+      ADD CONSTRAINT visitors_duration_nonnegative CHECK (duration_ms >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'page_views_duration_nonnegative'
+  ) THEN
+    ALTER TABLE page_views
+      ADD CONSTRAINT page_views_duration_nonnegative CHECK (duration_ms >= 0) NOT VALID;
+  END IF;
+END $;
+
+-- Catatan tahap 2:
+-- Constraint ini sengaja belum VALIDATE. Audit produksi harus lebih dulu mencari
+-- baris legacy yang melanggar aturan, lalu baris tersebut dibersihkan/diperbaiki
+-- sebelum VALIDATE CONSTRAINT dijalankan.
+-- Foreign key orders.customer_id -> customers(id) ditunda ke tahap 3 sampai
+-- definisi produksi customers diverifikasi penuh.
+
 -- Catatan indeks tahap 1:
 -- Semua perubahan di atas bersifat additive dan idempotent.
 -- Tidak mengubah data, tidak menambah foreign key baru, dan tidak mengasumsikan
