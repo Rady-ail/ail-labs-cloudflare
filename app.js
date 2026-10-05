@@ -81,6 +81,5 @@ if (typeof __dirname !== 'undefined') {
   });
 }
 
-if (!isCloudflareWorker) require('./jobs/broadcastScheduler')();
 
 module.exports = app;
