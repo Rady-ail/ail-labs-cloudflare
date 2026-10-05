@@ -1,0 +1,17 @@
+{
+  "name": "ail-labs-catalog-preview",
+  "main": "src/worker.js",
+  "workers_dev": true,
+  "compatibility_date": "2026-10-03",
+  "keep_vars": true,
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ALLOWED_ORIGIN": "",
+    "PAYPAL_MODE": "live"
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"]
+  }
+}
