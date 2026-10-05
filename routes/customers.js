@@ -36,6 +36,28 @@ router.get('/', async (req, res) => {
   }
 });
 
+
+router.patch('/:id/type', async (req, res) => {
+  const allowed = ['klinik', 'dokter', 'rumah_sakit', 'distributor', 'lainnya'];
+  const customerType = typeof req.body?.customer_type === 'string'
+    ? req.body.customer_type.trim().toLowerCase()
+    : '';
+  if (!allowed.includes(customerType)) {
+    return res.status(400).json({ error: 'customer_type tidak valid.' });
+  }
+  try {
+    const { rows } = await pool.query(
+      'UPDATE customers SET customer_type = $1 WHERE id = $2 RETURNING *',
+      [customerType, req.params.id]
+    );
+    if (!rows[0]) return res.status(404).json({ error: 'Pelanggan tidak ditemukan' });
+    res.json(rows[0]);
+  } catch (err) {
+    console.error('Gagal mengubah customer_type:', err);
+    res.status(500).json({ error: 'Gagal mengubah tipe pelanggan' });
+  }
+});
+
 router.post('/:id/approve', async (req, res) => {
   try {
     const { rows } = await pool.query(
