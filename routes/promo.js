@@ -2,8 +2,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 const { normalizePhoneNumber, broadcastInChunks } = require('../services/fonnteService');
+const { requireAdmin } = require('./authMiddleware');
 
-router.post('/api/admin/promo', async (req, res) => {
+router.post('/api/admin/promo', requireAdmin, async (req, res) => {
   try {
     const { title, description, discount, imageUrl } = req.body;
 
