@@ -1,0 +1,31 @@
+/* AIL LABS admin — premium cinematic finishing layer */
+body{
+  background:
+    radial-gradient(900px 560px at 8% -8%,rgba(76,132,130,.20),transparent 62%),
+    radial-gradient(720px 500px at 92% 0%,rgba(214,190,132,.08),transparent 60%),
+    linear-gradient(145deg,#050909 0%,#081314 52%,#050808 100%)!important;
+}
+.bg-mesh{opacity:.72!important;filter:saturate(.78) contrast(1.04)}
+header{
+  width:min(1180px,calc(100% - 28px));margin:12px auto 0!important;
+  background:linear-gradient(145deg,rgba(18,31,32,.94),rgba(5,11,12,.94))!important;
+  border-color:rgba(224,236,234,.16)!important;
+  box-shadow:0 22px 60px rgba(0,0,0,.44),inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+main{width:min(1180px,calc(100% - 28px));max-width:none!important}
+.stat-card,.card,.panel,.table-wrap,.admin-card{
+  border-color:rgba(224,236,234,.13)!important;
+  box-shadow:0 24px 60px rgba(0,0,0,.30)!important;
+}
+button,.btn{
+  transition:transform .2s cubic-bezier(.22,1,.36,1),filter .2s ease,box-shadow .2s ease;
+}
+button:hover,.btn:hover{filter:brightness(1.05)}
+button:active,.btn:active{transform:scale(.98)}
+@media(max-width:700px){
+  header{width:calc(100% - 18px)}
+  main{width:calc(100% - 18px)}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
