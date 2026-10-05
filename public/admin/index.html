@@ -978,8 +978,8 @@ async function loadBroadcastMassalKategori(){
     }
     listEl.innerHTML = rows.map(r => `
       <div class="checkbox-field">
-        <input type="checkbox" class="bcMassalKategori" value="${r.kategori}" checked>
-        <label>${r.kategori} (${r.ada_no_hp} dari ${r.total} punya no HP)</label>
+        <input type="checkbox" class="bcMassalKategori" value="${esc(r.kategori)}" checked>
+        <label>${esc(r.kategori)} (${esc(r.ada_no_hp)} dari ${esc(r.total)} punya no HP)</label>
       </div>
     `).join('');
   } catch(err){
@@ -1034,8 +1034,8 @@ async function loadBroadcastJadwalKategori(){
     }
     listEl.innerHTML = rows.map(r => `
       <div class="checkbox-field">
-        <input type="checkbox" class="bcJadwalKategori" value="${r.kategori}">
-        <label>${r.kategori} (${r.ada_no_hp} dari ${r.total} punya no HP)</label>
+        <input type="checkbox" class="bcJadwalKategori" value="${esc(r.kategori)}">
+        <label>${esc(r.kategori)} (${esc(r.ada_no_hp)} dari ${esc(r.total)} punya no HP)</label>
       </div>
     `).join('');
   } catch(err){
@@ -1224,12 +1224,12 @@ function renderProductTable(){
   if(rows.length===0){ tbody.innerHTML = `<tr><td colspan="8" class="empty">Tidak ada produk.</td></tr>`; return; }
   tbody.innerHTML = rows.map(p=>`
     <tr>
-      <td>${p.foto_url ? `<img src="${p.foto_url}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">` : `<span class="muted">—</span>`}</td>
-      <td><b>${p.name}</b></td>
-      <td class="muted">${p.kandungan||''}</td>
-      <td><span class="kemasan-pill">${p.kemasan||''}</span></td>
+      <td>${p.foto_url ? `<img src="${escAttr(p.foto_url)}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;">` : `<span class="muted">—</span>`}</td>
+      <td><b>${esc(p.name)}</b></td>
+      <td class="muted">${esc(p.kandungan||'')}</td>
+      <td><span class="kemasan-pill">${esc(p.kemasan||'')}</span></td>
       <td class="price-cell">${fmt(p.harga)}</td>
-      <td>${p.category_name}</td>
+      <td>${esc(p.category_name)}</td>
       <td><span class="pill ${p.aktif?'on':'off'}">${p.aktif?'Aktif':'Nonaktif'}</span></td>
       <td class="row-actions">
         <button class="btn btn-secondary btn-small" onclick="openProductModal(${p.id})">Ubah</button>
@@ -1241,7 +1241,7 @@ function renderProductTable(){
 
 function openProductModal(id){
   const catSelect = document.getElementById('pCategory');
-  catSelect.innerHTML = CATEGORIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  catSelect.innerHTML = CATEGORIES.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
 
   if(id){
     const p = PRODUCTS.find(x=>x.id===id);
@@ -1346,7 +1346,7 @@ async function deleteProduct(id){
 async function loadCategories(){
   CATEGORIES = await api('/categories');
   const filterSelect = document.getElementById('prodCatFilter');
-  filterSelect.innerHTML = '<option value="">Semua kategori</option>' + CATEGORIES.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  filterSelect.innerHTML = '<option value="">Semua kategori</option>' + CATEGORIES.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('');
   renderCategoryTable();
 }
 
@@ -1357,7 +1357,7 @@ function renderCategoryTable(){
     const count = PRODUCTS.filter(p=>p.category_id===c.id).length;
     return `
     <tr>
-      <td><b>${c.name}</b></td>
+      <td><b>${esc(c.name)}</b></td>
       <td>${c.sort_order}</td>
       <td>${count}</td>
       <td class="row-actions">
@@ -1443,7 +1443,7 @@ async function loadKontakList(){
         <td><b>${r.nama}</b></td>
         <td>${r.no_hp || '-'}</td>
         <td>${r.alamat || '-'}</td>
-        <td>${r.kategori}</td>
+        <td>${esc(r.kategori)}</td>
         <td>${r.sumber_tabel}</td>
         <td class="row-actions">
           <button class="btn btn-secondary btn-small" onclick="openKontakModal(${r.id})">Ubah</button>
@@ -1511,11 +1511,11 @@ async function loadOrders(){
   if(ORDERS.length===0){ tbody.innerHTML = `<tr><td colspan="5" class="empty">Belum ada pesanan masuk.</td></tr>`; return; }
   tbody.innerHTML = ORDERS.map(o=>{
     const date = new Date(o.created_at).toLocaleString('id-ID');
-    const itemsSummary = (o.items||[]).map(it=>`${it.qty}× ${it.name}`).join(', ');
+    const itemsSummary = (o.items||[]).map(it=>`${it.qty}× ${esc(it.name)}`).join(', ');
     return `
     <tr>
       <td class="muted">${date}</td>
-      <td><b>${o.customer_name}</b>${o.note?`<div class="muted">${o.note}</div>`:''}</td>
+      <td><b>${esc(o.customer_name)}</b>${o.note?`<div class="muted">${esc(o.note)}</div>`:''}</td>
       <td>${itemsSummary}</td>
       <td class="price-cell">${fmt(o.total)}</td>
       <td>
@@ -1573,7 +1573,7 @@ function renderCustomerTable(){
           <option value="customer" ${c.customer_type==='customer'?'selected':''}>Customer Umum</option>
         </select>
       </td>
-      <td><span class="pill ${CUSTOMER_STATUS_PILL[c.status]||'off'}">${c.status}</span></td>
+      <td><span class="pill ${CUSTOMER_STATUS_PILL[c.status]||'off'}">${esc(c.status)}</span></td>
       <td>
         <button class="btn btn-primary" onclick="updateCustomerStatus(${c.id},'approve')">Approve</button>
         <button class="btn btn-secondary" onclick="updateCustomerStatus(${c.id},'reject')">Reject</button>
@@ -1653,7 +1653,7 @@ function renderTopProducts(rows){
   if(filtered.length===0){ tbody.innerHTML = `<tr><td colspan="4" class="empty">Belum ada aktivitas produk tercatat.</td></tr>`; return; }
   tbody.innerHTML = filtered.map(r=>`
     <tr>
-      <td><b>${r.name}</b></td>
+      <td><b>${esc(r.name)}</b></td>
       <td>${r.views||0}</td>
       <td>${r.add_to_cart||0}</td>
       <td>${r.purchases||0}</td>
