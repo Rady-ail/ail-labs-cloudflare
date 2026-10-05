@@ -139,7 +139,7 @@
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(240px circle at var(--cgi-mx, 50%) var(--cgi-my, 50%), rgba(255, 250, 235, .55), rgba(240, 210, 140, .12) 40%, rgba(255, 255, 255, 0) 70%);
+  background: radial-gradient(240px circle at var(--cgi-mx, 50%) var(--cgi-my, 50%), rgba(255, 250, 235, .3), rgba(240, 210, 140, .1) 40%, rgba(255, 255, 255, 0) 70%);
   transition: opacity .25s var(--cgi-ease);
 }
 .row.cgi-tilt,
