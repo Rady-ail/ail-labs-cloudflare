@@ -905,11 +905,29 @@ function App(){
     const done = ()=>{ setCopyLabel('Tersalin'); setTimeout(()=> setCopyLabel('Salin'), 1600); };
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(BANK_ACC_NO).then(done).catch(done); } else { done(); }
   }
-  function confirmPaymentWhatsApp(){
-    const msg = `==========================================\n    KONFIRMASI PEMBAYARAN — AIL LABS     \n==========================================\n\nHalo, saya sudah melakukan transfer ke rekening\nBCA a.n. Fudhail Aesthetic Labs, PT.\n\nBerikut saya lampirkan bukti pembayarannya.\nMohon dicek dan diproses pesanannya. Terima kasih! 🙏`;
-    openWA(msg);
+  async function confirmPaymentEmail(){
+    const btn = document.querySelector('[data-payment-confirm]');
+    if(btn){ btn.disabled = true; btn.textContent = 'Mengirim konfirmasi…'; }
+    try{
+      const response = await fetch('/api/payment-confirmation/confirm',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          customer_name: currentUser?.name || currentUser?.displayName || 'Pelanggan AIL LABS',
+          customer_email: currentUser?.email || '',
+          note: 'Konfirmasi pembayaran dikirim dari halaman Prosedur Pembayaran.'
+        })
+      });
+      const data = await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(data.error || 'Konfirmasi pembayaran gagal dikirim.');
+      if(btn) btn.textContent = 'Konfirmasi Pembayaran Terkirim';
+      alert('Konfirmasi pembayaran telah dikirim ke info@ail-aesthetic-labs.my.id.');
+    }catch(err){
+      console.error(err);
+      if(btn){ btn.disabled = false; btn.textContent = 'Konfirmasi Pembayaran'; }
+      alert(err.message || 'Konfirmasi pembayaran gagal dikirim.');
+    }
   }
-
   /* --- riwayat --- */
   function reorderHistory(id){
     const order = history.find(o=>o.id===id); if(!order) return;
@@ -1154,7 +1172,7 @@ function App(){
             </div>
             <button className="copy-btn" type="button" style={{border:'none', borderRadius:'999px', padding:'8px 14px', fontSize:'12px', fontWeight:700, background:'#fff', cursor:'pointer'}} onClick={copyBankAccount}>{copyLabel}</button>
           </div>
-          <button className="checkout-btn" type="button" style={{marginTop:'12px'}} onClick={confirmPaymentWhatsApp}>Konfirmasi Pembayaran via WhatsApp</button>
+          <button className="checkout-btn" type="button" style={{marginTop:'12px'}} onClick={confirmPaymentEmail}>Konfirmasi Pembayaran</button>
         </div>
         <div className="contact-card glass" style={{padding:'18px', color:'#fff', background:'var(--green-900)', borderRadius:'var(--radius-lg)'}}>
           <h2>PT Fudhail Aesthetic Laboratories</h2>
