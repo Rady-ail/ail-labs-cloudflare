@@ -262,7 +262,7 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 }
 .row{
   min-width:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;
-  padding:0 0 14px!important;margin:0!important;overflow:hidden!important;cursor:pointer!important;
+  padding:0 0 16px!important;margin:0!important;overflow:hidden!important;cursor:pointer!important;
   background:var(--mm-surface)!important;border:1px solid var(--mm-border)!important;border-radius:var(--mm-radius)!important;
   box-shadow:var(--mm-shadow)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   transition:transform .22s var(--spring),box-shadow .22s var(--spring)!important;
@@ -1305,3 +1305,4 @@ createRoot(document.getElementById('root')).render(<App />);
 
 </body>
 </html>
+\n<style id="design-polish-cards">\n.row .row-thumb{width:100%!important;height:auto!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:0!important;background:#F3F4F6!important;}\n.row .row-thumb-placeholder{display:flex!important;align-items:center!important;justify-content:center!important;}\n.row .row-body{padding:0 14px!important;}\n.row .row-name{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;min-height:2.7em!important;line-height:1.35!important;font-size:14px!important;}\n.row .row-sub{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;line-height:1.45!important;min-height:2.9em!important;}\n.row .row-bottom{align-items:center!important;gap:8px!important;}\n.row .wish-btn{min-width:44px!important;min-height:44px!important;margin:0 10px 0 auto!important;}\n@media(min-width:700px){.group{gap:16px!important}.row .row-name{font-size:15px!important}}\n</style>\n
