@@ -269,8 +269,8 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 }
 .row:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(17,24,39,.07)!important}
 .row-thumb,.modal-photo{
-  width:100%!important;aspect-ratio:1/1!important;height:auto!important;object-fit:cover!important;
-  border-radius:0!important;background:#F3F4F6!important;
+  display:block!important;width:100%!important;aspect-ratio:1/1!important;height:auto!important;min-height:120px!important;
+  object-fit:cover!important;border-radius:0!important;background:#F3F4F6!important;
 }
 .row-body{padding:0 14px!important}
 .row-name{font-family:var(--font-main)!important;font-size:14px!important;line-height:1.35!important;font-weight:600!important;color:var(--mm-text)!important;margin:0 0 4px!important}
@@ -335,8 +335,8 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 .contact-card{background:var(--mm-text)!important;border-radius:var(--mm-radius)!important;box-shadow:none!important}
 a{color:var(--mm-teal)}
 .toast{background:var(--mm-text)!important;border-radius:10px!important;box-shadow:0 8px 20px rgba(17,24,39,.14)!important}
-.section-block{opacity:0;transform:translateY(8px);transition:opacity .25s ease,transform .25s ease}
-.section-block.is-visible{opacity:1;transform:none}
+.section-block{opacity:1;visibility:visible;transform:none;min-height:1px}
+.section-block.is-visible{opacity:1;visibility:visible;transform:none}
 @media(min-width:700px){
   .topbar{padding-left:24px!important;padding-right:24px!important}
   main.view{padding-left:24px!important;padding-right:24px!important}
@@ -1105,7 +1105,8 @@ function App(){
                       const wished = !!wishlist[cartKey(group.cat,name,kemasan)];
                       return (
                         <div className="row" key={ii} onClick={()=> openProductModal(group.cat, name, kand, kemasan, harga, foto)}>
-                          {foto ? <img className="row-thumb" src={foto} alt={name} loading="lazy" /> : <div className="row-thumb" style={{display:'flex', alignItems:'center', justifyContent:'center'}}><UiIcon name="package" size={22} /></div>}
+                          {foto ? <img className="row-thumb" src={foto} alt={name} loading="lazy" onError={(e)=>{e.currentTarget.style.display='none'; e.currentTarget.nextElementSibling?.removeAttribute('hidden');}} /> : null}
+                          <div className="row-thumb" hidden={!!foto} style={{display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF'}} aria-hidden="true"><UiIcon name="package" size={22} /></div>
                           <div className="row-body" style={{flex:1, minWidth:0}}>
                             <p className="row-name">{name}</p>
                             <p className="row-sub" style={{fontSize:'12px', color:'var(--ink-600)', margin:0}}>{kand}</p>
@@ -1122,7 +1123,7 @@ function App(){
                 </div>
               );
             });
-            if(totalMatches===0) return <div className="empty-state" style={{textAlign:'center', padding:'38px 20px', color:'var(--ink-400)'}}>Tidak ada produk yang cocok.</div>;
+            if(totalMatches===0) return <div className="empty-state" role="status" style={{textAlign:'center', padding:'38px 20px', color:'var(--mm-muted)'}}>Belum ada produk di kategori ini</div>;
             return blocks;
           })()}
         </div>
