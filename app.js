@@ -93,6 +93,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/categories', require('./routes/categories'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
+app.use('/api/payment-confirmation', require('./routes/payment-confirmation'));
 app.use('/api/paypal', require('./routes/paypal'));
 app.use('/api/promo', require('./routes/promo'));
 app.use('/api/visitors', require('./routes/visitors'));
