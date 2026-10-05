@@ -4,11 +4,10 @@
 // kirim personal satu-per-satu (jeda sesuai campaign, default 60 detik), lalu tandai
 // campaign 'selesai' begitu tidak ada lagi kontak 'pending' di antriannya.
 //
-// Cara pakai: panggil sekali saat app start, di app.js:
-//   require('./jobs/broadcastScheduler')();
-//
 // Penjadwalan dijalankan oleh Cloudflare Workers Cron Trigger melalui
 // src/worker.js; file ini hanya berisi logic yang dipanggil oleh handler scheduled.
+// Jangan memanggil scheduler ini dari app startup agar broadcast tidak berjalan
+// dua kali saat aplikasi dijalankan di lebih dari satu instance.
 
 const pool = require('../db/pool');
 const { tentukanSapaan, personalisasiPesan, kirimSatuPesan } = require('../utils/broadcastHelpers');
