@@ -268,10 +268,12 @@ main.view.active{display:block!important;scroll-margin-top:150px}
   transition:transform .22s var(--spring),box-shadow .22s var(--spring)!important;
 }
 .row:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(17,24,39,.07)!important}
-.row-thumb,.modal-photo{
-  display:block!important;width:100%!important;aspect-ratio:1/1!important;height:auto!important;min-height:120px!important;
-  object-fit:cover!important;border-radius:0!important;background:#F3F4F6!important;
+.row .row-thumb,.modal-card .modal-photo{
+  display:block;width:100%;aspect-ratio:1/1;height:auto;min-height:120px;
+  object-fit:cover;border-radius:0;background:#F3F4F6;
 }
+.row .row-thumb{flex-shrink:0}
+.modal-card .modal-photo{border-radius:16px;}
 .row-body{padding:0 14px!important}
 .row-name{font-family:var(--font-main)!important;font-size:14px!important;line-height:1.35!important;font-weight:600!important;color:var(--mm-text)!important;margin:0 0 4px!important}
 .row-sub{font-size:12px!important;line-height:1.45!important;color:var(--mm-muted)!important}
@@ -1105,8 +1107,19 @@ function App(){
                       const wished = !!wishlist[cartKey(group.cat,name,kemasan)];
                       return (
                         <div className="row" key={ii} onClick={()=> openProductModal(group.cat, name, kand, kemasan, harga, foto)}>
-                          {foto ? <img className="row-thumb" src={foto} alt={name} loading="lazy" onError={(e)=>{e.currentTarget.style.display='none'; e.currentTarget.nextElementSibling?.removeAttribute('hidden');}} /> : null}
-                          <div className="row-thumb" hidden={!!foto} style={{display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF'}} aria-hidden="true"><UiIcon name="package" size={22} /></div>
+                          {foto ? (
+                            <React.Fragment>
+                              <img className="row-thumb" src={foto} alt={name} loading="lazy"
+                                onError={(e)=>{ e.currentTarget.style.display='none'; const placeholder=e.currentTarget.nextElementSibling; if(placeholder) placeholder.removeAttribute('hidden'); }} />
+                              <div className="row-thumb row-thumb-placeholder" hidden style={{display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF'}} aria-hidden="true">
+                                <UiIcon name="package" size={22} />
+                              </div>
+                            </React.Fragment>
+                          ) : (
+                            <div className="row-thumb row-thumb-placeholder" style={{display:'flex', alignItems:'center', justifyContent:'center', color:'#9CA3AF'}} aria-hidden="true">
+                              <UiIcon name="package" size={22} />
+                            </div>
+                          )}
                           <div className="row-body" style={{flex:1, minWidth:0}}>
                             <p className="row-name">{name}</p>
                             <p className="row-sub" style={{fontSize:'12px', color:'var(--ink-600)', margin:0}}>{kand}</p>
