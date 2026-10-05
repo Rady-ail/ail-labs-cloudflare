@@ -50,3 +50,69 @@
 @media (prefers-reduced-motion: reduce) {
   .cgi-stage__media { transition: none; }
 }
+
+/* --- Latar sinematik: mesh gradient beranimasi + cahaya lembut + grain (compositor only) --- */
+.cgi-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cgi-backdrop__drift {
+  position: absolute;
+  inset: -12vh -10vw;
+}
+.cgi-backdrop__blob {
+  position: absolute;
+  width: 75vmax;
+  height: 75vmax;
+  border-radius: 50%;
+  opacity: .9;
+}
+.cgi-backdrop__blob--emerald { left: -30vmax; top: -22vmax; background: radial-gradient(closest-side, rgba(64, 119, 103, .42), rgba(64, 119, 103, 0)); }
+.cgi-backdrop__blob--teal { right: -32vmax; top: 18vh; background: radial-gradient(closest-side, rgba(116, 173, 180, .2), rgba(116, 173, 180, 0)); }
+.cgi-backdrop__blob--gold { left: 10vw; bottom: -40vmax; background: radial-gradient(closest-side, rgba(240, 210, 140, .13), rgba(240, 210, 140, 0)); }
+.cgi-backdrop__light {
+  position: absolute;
+  left: 50%;
+  top: -30vh;
+  width: 120vmax;
+  height: 70vh;
+  transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(246, 241, 228, .1), rgba(246, 241, 228, 0));
+}
+.cgi-backdrop__grain {
+  position: absolute;
+  inset: 0;
+  opacity: .07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Animasi hanya setelah tier diketahui sedang/tinggi (JS) — tier rendah & reduced-motion statis. */
+[data-cgi-tier="medium"] .cgi-backdrop__blob--emerald,
+[data-cgi-tier="high"] .cgi-backdrop__blob--emerald { animation: cgi-drift-a 26s var(--cgi-ease) infinite alternate; }
+[data-cgi-tier="medium"] .cgi-backdrop__blob--teal,
+[data-cgi-tier="high"] .cgi-backdrop__blob--teal { animation: cgi-drift-b 32s var(--cgi-ease) infinite alternate; }
+[data-cgi-tier="medium"] .cgi-backdrop__blob--gold,
+[data-cgi-tier="high"] .cgi-backdrop__blob--gold { animation: cgi-drift-c 38s var(--cgi-ease) infinite alternate; }
+@keyframes cgi-drift-a { to { transform: translate3d(14vw, 10vh, 0) scale(1.12); } }
+@keyframes cgi-drift-b { to { transform: translate3d(-12vw, -8vh, 0) scale(.9); } }
+@keyframes cgi-drift-c { to { transform: translate3d(8vw, -14vh, 0) scale(1.15); } }
+
+/* --- Reveal per section (IntersectionObserver di enhance.js) --- */
+.cgi-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition: opacity .6s var(--cgi-ease), transform .6s var(--cgi-ease);
+}
+.cgi-reveal.cgi-reveal-in { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cgi-backdrop__blob { animation: none !important; }
+  .cgi-backdrop__drift { transform: none !important; }
+  .cgi-reveal { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+@media print {
+  .cgi-backdrop { display: none; }
+  .cgi-reveal { opacity: 1 !important; transform: none !important; }
+}
