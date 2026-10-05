@@ -17,3 +17,7 @@ node_modules/
 .dev.vars
 .dev.vars.*
 .cf-token
+
+# Output build modul CGI (npm run build)
+public/cgi/cgi-core.js
+public/cgi/chunks/

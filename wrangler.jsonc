@@ -8,6 +8,8 @@
   "compatibility_date": "2026-10-03",
   "keep_vars": true,
   "compatibility_flags": ["nodejs_compat"],
+  // Bundle modul visual CGI (public/cgi/) sebelum dev/deploy.
+  "build": { "command": "npm run build" },
   "vars": {
     "ALLOWED_ORIGIN": "https://ail-aesthetic-labs.my.id",
     "GOOGLE_CALLBACK_URL": "https://ail-aesthetic-labs.my.id/api/customer/auth/google/callback",

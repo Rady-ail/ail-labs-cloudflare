@@ -1,0 +1,52 @@
+/* ============================================
+   CGI visual layer (feat/cgi-visual)
+   Dimuat setelah gaya inline index.html. Token warna/font memakai variabel yang sudah ada.
+   ============================================ */
+:root {
+  --cgi-ivory: #F6F1E4;
+  --cgi-champagne: #D9BC82;
+  --cgi-stage-bg: radial-gradient(120% 95% at 50% 32%, #1E4A49 0%, #0F2D2F 52%, #081A1C 100%);
+  --cgi-ease: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* --- Hero stage: poster statis + lapisan canvas/video --- */
+.cgi-stage {
+  position: relative;
+  height: clamp(196px, 56vw, 280px);
+  margin: -4px -6px 18px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--cgi-stage-bg);
+  box-shadow: inset 0 0 0 1px rgba(240, 210, 140, .18), 0 10px 28px rgba(4, 14, 16, .35);
+  isolation: isolate;
+}
+.cgi-stage__poster,
+.cgi-stage__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+.cgi-stage__media {
+  opacity: 0;
+  transition: opacity .6s var(--cgi-ease);
+}
+.cgi-stage__media.is-ready { opacity: 1; }
+.cgi-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(130% 105% at 50% 42%, transparent 58%, rgba(4, 14, 16, .5) 100%);
+}
+
+/* --- Shell statis sebelum React siap --- */
+.cgi-shell .topbar { display: block; }
+.cgi-shell__bar { height: 54px; border-radius: 999px; }
+.cgi-shell__chips { height: 41px; margin-top: 8px; border-radius: 999px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cgi-stage__media { transition: none; }
+}
