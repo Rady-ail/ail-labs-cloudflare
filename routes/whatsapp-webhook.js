@@ -1,4 +1,5 @@
 // routes/whatsapp-webhook.js
+const crypto = require('crypto');
 // Nampung pesan masuk dari customer via WhatsApp Cloud API,
 // cari produk yang cocok di katalog, balas dengan info/harga
 // (harga cuma muncul kalau nomor pengirim terdaftar & statusnya approved).
@@ -34,6 +35,18 @@ router.get('/webhook', (req, res) => {
 
 // 2) Terima pesan masuk
 router.post('/webhook', async (req, res) => {
+  const signature = req.get('X-Hub-Signature-256') || '';
+  const secret = process.env.WHATSAPP_APP_SECRET;
+  if(!secret || !req.rawBody || !signature.startsWith('sha256=')){
+    return res.sendStatus(403);
+  }
+  const expected = 'sha256=' + crypto.createHmac('sha256', secret).update(req.rawBody).digest('hex');
+  const provided = signature.slice(7);
+  const expectedHex = expected.slice(7);
+  if(provided.length !== expectedHex.length || !crypto.timingSafeEqual(Buffer.from(provided), Buffer.from(expectedHex))){
+    return res.sendStatus(403);
+  }
+
   // Selalu balas 200 duluan supaya Meta tidak retry berkali-kali,
   // proses baru dijalankan setelahnya.
   res.sendStatus(200);
