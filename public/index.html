@@ -830,7 +830,7 @@ function App(){
             <p className="hero-sub">Katalog profesional untuk klinik, distributor, dan partner private-label — dengan alur quotation dan pemesanan yang tetap terhubung ke sistem AIL LABS.</p>
             <div className="hero-actions">
               <button className="primary" type="button" onClick={()=>document.getElementById('productGroups')?.scrollIntoView({behavior:'smooth'})}>Explore catalog</button>
-              <button className="secondary" type="button" onClick={()=>switchView('cart','cart')}>Request quotation</button>
+              <button className="secondary" type="button" onClick={()=>isApproved?switchView('cart','cart'):openLoginModal()}>Request quotation</button>
             </div>
             <div className="cert-row">
               {['B2B CATALOG','CLINIC SUPPLY','PRIVATE LABEL'].map(c=> <span key={c} className="cert-pill">{c}</span>)}
