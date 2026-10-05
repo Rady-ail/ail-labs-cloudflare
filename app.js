@@ -27,7 +27,9 @@ app.use(cors({
   credentials: true,
 }));
 if (!isCloudflareWorker) app.use(compression());
-app.use(express.json());
+app.use(express.json({
+  verify: (req, res, buf) => { req.rawBody = Buffer.from(buf); }
+}));
 const passport = require('passport');
 app.use(passport.initialize());
 if (sessionSecret) {
