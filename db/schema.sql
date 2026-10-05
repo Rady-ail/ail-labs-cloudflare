@@ -161,3 +161,24 @@ INSERT INTO settings (key, value) VALUES (
 -- Index yang aman/idempotent untuk query admin/order:
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_payment_status ON orders(payment_status);
+CREATE INDEX IF NOT EXISTS idx_orders_paypal_order_id ON orders(paypal_order_id) WHERE paypal_order_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_products_category_sort
+  ON products(category_id, sort_order, id);
+
+CREATE INDEX IF NOT EXISTS idx_page_views_session_timestamp
+  ON page_views(session_id, timestamp DESC);
+
+CREATE INDEX IF NOT EXISTS idx_user_events_session_timestamp
+  ON user_events(session_id, timestamp DESC);
+
+CREATE INDEX IF NOT EXISTS idx_user_events_type_timestamp
+  ON user_events(event_type, timestamp DESC);
+
+-- Catatan indeks tahap 1:
+-- Semua perubahan di atas bersifat additive dan idempotent.
+-- Tidak mengubah data, tidak menambah foreign key baru, dan tidak mengasumsikan
+-- struktur tabel produksi yang belum diverifikasi. Constraint/data cleanup
+-- dilakukan pada tahap berikutnya setelah audit data produksi.
