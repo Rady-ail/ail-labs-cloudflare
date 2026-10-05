@@ -1,0 +1,25 @@
+# Header cache statis (Cloudflare Workers Static Assets).
+# HTML selalu divalidasi ulang agar rilis baru langsung terpakai.
+/
+  Cache-Control: no-cache
+/index.html
+  Cache-Control: no-cache
+
+# Chunk 3D ber-hash konten: aman di-cache selamanya.
+/cgi/chunks/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Entry CGI tanpa hash: cache singkat + revalidasi.
+/cgi/cgi-core.js
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Media hero (ganti file = ganti nama atau tunggu 1 hari).
+/cgi/media/*.webp
+  Content-Type: image/webp
+  Cache-Control: public, max-age=86400
+/cgi/media/*.webm
+  Content-Type: video/webm
+  Cache-Control: public, max-age=86400
+/cgi/media/*.mp4
+  Content-Type: video/mp4
+  Cache-Control: public, max-age=86400
