@@ -257,3 +257,31 @@ END $;
 -- Tidak mengubah data, tidak menambah foreign key baru, dan tidak mengasumsikan
 -- struktur tabel produksi yang belum diverifikasi. Constraint/data cleanup
 -- dilakukan pada tahap berikutnya setelah audit data produksi.
+
+
+-- =========================================================
+-- PAYMENT INTEGRITY — tahap 4
+-- =========================================================
+-- PayPal capture sekarang idempotent di level route. Race condition antar-request
+-- baru benar-benar tertutup setelah paypal_order_id dipastikan unik di produksi.
+-- Jangan membuat UNIQUE INDEX sebelum audit duplikasi berikut menghasilkan 0 baris.
+--
+-- Audit duplikasi:
+-- SELECT paypal_order_id, COUNT(*) AS jumlah
+-- FROM orders
+-- WHERE paypal_order_id IS NOT NULL
+-- GROUP BY paypal_order_id
+-- HAVING COUNT(*) > 1;
+--
+-- Audit nilai kosong/whitespace:
+-- SELECT COUNT(*) AS invalid_paypal_ids
+-- FROM orders
+-- WHERE paypal_order_id IS NOT NULL
+--   AND btrim(paypal_order_id) = '';
+--
+-- Setelah audit duplikasi = 0 dan invalid_paypal_ids = 0, barulah aman menambahkan:
+-- CREATE UNIQUE INDEX ... ON orders(paypal_order_id)
+-- WHERE paypal_order_id IS NOT NULL;
+--
+-- UNIQUE index sengaja BELUM dibuat otomatis di tahap ini karena schema repo tidak
+-- boleh mengasumsikan kondisi data legacy produksi yang belum diaudit.
