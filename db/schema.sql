@@ -183,7 +183,7 @@ CREATE INDEX IF NOT EXISTS idx_user_events_type_timestamp
 -- Constraint memakai NOT VALID agar data legacy yang belum diaudit tidak
 -- diblokir saat schema diterapkan. Constraint tetap berlaku untuk INSERT/UPDATE
 -- baru. VALIDATE CONSTRAINT dilakukan setelah audit data produksi.
-DO $
+DO $ail$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint WHERE conname = 'products_harga_nonnegative'
@@ -220,7 +220,7 @@ BEGIN
     ALTER TABLE page_views
       ADD CONSTRAINT page_views_duration_nonnegative CHECK (duration_ms >= 0) NOT VALID;
   END IF;
-END $;
+END $ail$;
 
 -- =========================================================
 -- RELATIONS — tahap 3
@@ -228,7 +228,7 @@ END $;
 -- customers.id sudah terverifikasi ada di database produksi. FK ini dibuat
 -- NOT VALID agar orphan legacy rows tidak menggagalkan perubahan schema.
 -- Setelah audit produksi, jalankan VALIDATE CONSTRAINT.
-DO $
+DO $ail$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM pg_constraint WHERE conname = 'orders_customer_id_fkey'
@@ -239,7 +239,7 @@ BEGIN
       ON DELETE SET NULL
       NOT VALID;
   END IF;
-END $;
+END $ail$;
 
 -- Index FK sudah tersedia pada tahap 1 (idx_orders_customer_id).
 -- ON DELETE SET NULL menjaga histori order tetap ada bila akun customer dihapus.
