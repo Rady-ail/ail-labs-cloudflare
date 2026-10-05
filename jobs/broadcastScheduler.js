@@ -15,26 +15,35 @@ const cron = require('node-cron');
 const pool = require('../db/pool');
 const { tentukanSapaan, personalisasiPesan, kirimSatuPesan } = require('../utils/broadcastHelpers');
 
-async function prosesSatuCampaign(campaign) {
+async function prosesSatuCampaign(campaign, maxContacts) {
+  const { rows: sentTodayRows } = await pool.query(
+    `SELECT COUNT(*)::int AS count
+     FROM broadcast_antrian
+     WHERE campaign_id = $1
+       AND status = 'terkirim'
+       AND (terkirim_at AT TIME ZONE 'Asia/Makassar')::date = (now() AT TIME ZONE 'Asia/Makassar')::date`,
+    [campaign.id]
+  );
+  const sentToday = Number(sentTodayRows[0]?.count || 0);
+  const remainingToday = Math.max(0, Number(campaign.per_hari || 0) - sentToday);
+  if (remainingToday <= 0) return 0;
+
+  const limit = Math.min(remainingToday, maxContacts);
   const { rows: antrian } = await pool.query(
     `SELECT id, nama, no_hp, kategori FROM broadcast_antrian
      WHERE campaign_id = $1 AND status = 'pending'
      ORDER BY RANDOM()
      LIMIT $2`,
-    [campaign.id, campaign.per_hari]
+    [campaign.id, limit]
   );
 
   if (!antrian.length) {
-    // Tidak ada sisa antrian pending -> campaign dianggap selesai
     await pool.query(
       `UPDATE broadcast_campaigns SET status = 'selesai', selesai_at = now() WHERE id = $1`,
       [campaign.id]
     );
-    console.log(`[broadcast-jadwal] Campaign #${campaign.id} selesai — semua kontak sudah diproses.`);
-    return;
+    return 0;
   }
-
-  console.log(`[broadcast-jadwal] Campaign #${campaign.id}: mengirim ${antrian.length} kontak hari ini...`);
 
   for (const kontak of antrian) {
     const sapaan = tentukanSapaan(kontak.nama, kontak.kategori);
@@ -55,32 +64,27 @@ async function prosesSatuCampaign(campaign) {
       console.error(`[broadcast-jadwal] Gagal ke ${kontak.nama} (${kontak.no_hp}):`, error, hasil);
     }
 
-    await new Promise((r) => setTimeout(r, (campaign.jeda_detik || 60) * 1000));
+    if (antrian.indexOf(kontak) < antrian.length - 1) {
+      await new Promise((resolve) => setTimeout(resolve, Math.min(Number(campaign.jeda_detik || 60), 60) * 1000));
+    }
   }
+  return antrian.length;
 }
 
-function mulaiScheduler() {
-  // '0 8 * * *' = menit 0, jam 8, tiap hari — dengan timezone eksplisit Asia/Makassar (WITA)
-  // supaya tidak terpengaruh timezone server Railway yang biasanya UTC.
-  cron.schedule(
-    '0 8 * * *',
-    async () => {
-      console.log('[broadcast-jadwal] Menjalankan pengiriman harian...');
-      try {
-        const { rows: campaigns } = await pool.query(
-          `SELECT id, pesan, per_hari, jeda_detik FROM broadcast_campaigns WHERE status = 'berjalan'`
-        );
-        for (const c of campaigns) {
-          await prosesSatuCampaign(c);
-        }
-        console.log('[broadcast-jadwal] Selesai untuk hari ini.');
-      } catch (err) {
-        console.error('[broadcast-jadwal] Error menjalankan scheduler:', err);
-      }
-    },
-    { timezone: 'Asia/Makassar' }
+async function runScheduledBroadcasts({ maxContacts = 10 } = {}) {
+  const { rows: campaigns } = await pool.query(
+    `SELECT id, pesan, per_hari, jeda_detik
+     FROM broadcast_campaigns
+     WHERE status = 'berjalan'
+     ORDER BY id`
   );
-  console.log('[broadcast-jadwal] Scheduler aktif — jalan tiap hari jam 08:00 WITA');
+  let processed = 0;
+  for (const campaign of campaigns) {
+    if (processed >= maxContacts) break;
+    processed += await prosesSatuCampaign(campaign, maxContacts - processed);
+  }
+  console.log(`[broadcast-jadwal] Cron run selesai: ${processed} kontak diproses.`);
+  return { campaigns: campaigns.length, processed };
 }
 
-module.exports = mulaiScheduler;
+module.exports = { runScheduledBroadcasts };
