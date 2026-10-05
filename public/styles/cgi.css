@@ -116,3 +116,41 @@
   .cgi-backdrop { display: none; }
   .cgi-reveal { opacity: 1 !important; transform: none !important; }
 }
+
+/* --- Kartu produk: kaca TANPA backdrop-filter (baris berulang), tilt + specular --- */
+.row,
+.cart-row {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  background: linear-gradient(158deg, rgba(250, 248, 242, .95), rgba(229, 238, 235, .88)) !important;
+  border: 1px solid rgba(255, 255, 255, .5) !important;
+  border-top-color: rgba(255, 255, 255, .9) !important;
+  box-shadow: 0 6px 18px rgba(4, 14, 16, .22), inset 0 1px 0 rgba(255, 255, 255, .75), inset 0 0 0 1px rgba(217, 188, 130, .12) !important;
+}
+.row { content-visibility: auto; contain-intrinsic-size: auto 92px; }
+.row-kemasan { color: #5B6266 !important; }
+/* Chip aktif: inline style background:transparent menimpa .chip.active; teks putih jadi tak terbaca di atas kartu terang. */
+.chip.active { background: var(--green-700) !important; }
+.row::after,
+.cart-row::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(240px circle at var(--cgi-mx, 50%) var(--cgi-my, 50%), rgba(255, 250, 235, .55), rgba(240, 210, 140, .12) 40%, rgba(255, 255, 255, 0) 70%);
+  transition: opacity .25s var(--cgi-ease);
+}
+.row.cgi-tilt,
+.cart-row.cgi-tilt {
+  will-change: transform;
+  transition: transform .12s linear, box-shadow .2s var(--cgi-ease);
+}
+.row.cgi-tilt::after,
+.cart-row.cgi-tilt::after { opacity: 1; }
+.row:focus-visible,
+.cart-row:focus-visible { outline: 2px solid var(--cgi-champagne); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  .row.cgi-tilt, .cart-row.cgi-tilt { transform: none !important; }
+}

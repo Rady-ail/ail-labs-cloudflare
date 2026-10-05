@@ -9,8 +9,10 @@ export function enhance() {
   const tier = detectTier();
   document.documentElement.dataset.cgiTier = tier;
   if (tier === 'low') return;
+  const root = document.getElementById('root');
   startParallax();
-  startReveal(document.getElementById('root'));
+  startReveal(root);
+  startTilt(root);
 }
 
 // Parallax latar: geser lapisan .cgi-backdrop__drift pelan mengikuti scroll (rAF, passive).
@@ -61,4 +63,49 @@ function startReveal(root) {
   new MutationObserver(() => { if (!raf) raf = requestAnimationFrame(scan); })
     .observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
   scan();
+}
+
+// Tilt 3D (maks 6 derajat) + kilau specular mengikuti pointer, hanya mouse/pen pada perangkat hover.
+const TILT_SELECTOR = '.row, .cart-row';
+const TILT_MAX_DEG = 6;
+
+function startTilt(root) {
+  if (!root || !matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  let active = null;
+  let raf = 0;
+  let px = 0;
+  let py = 0;
+
+  const release = () => {
+    if (!active) return;
+    active.classList.remove('cgi-tilt');
+    active.style.removeProperty('transform');
+    active = null;
+  };
+  const apply = () => {
+    raf = 0;
+    if (!active) return;
+    const r = active.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (px - r.left) / r.width));
+    const y = Math.min(1, Math.max(0, (py - r.top) / r.height));
+    active.style.setProperty('--cgi-mx', `${(x * 100).toFixed(1)}%`);
+    active.style.setProperty('--cgi-my', `${(y * 100).toFixed(1)}%`);
+    active.style.transform = `perspective(900px) rotateX(${((0.5 - y) * TILT_MAX_DEG).toFixed(2)}deg) rotateY(${((x - 0.5) * TILT_MAX_DEG).toFixed(2)}deg)`;
+  };
+
+  root.addEventListener('pointermove', (e) => {
+    if (e.pointerType === 'touch' || prefersReducedMotion()) return release();
+    const el = e.target.closest(TILT_SELECTOR);
+    if (el !== active) {
+      release();
+      if (!el) return;
+      active = el;
+      el.classList.add('cgi-tilt');
+    }
+    px = e.clientX;
+    py = e.clientY;
+    if (!raf) raf = requestAnimationFrame(apply);
+  }, { passive: true });
+  root.addEventListener('pointerleave', release);
+  window.addEventListener('blur', release);
 }
