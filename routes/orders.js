@@ -79,18 +79,27 @@ router.get('/', requireAdmin, async (req, res) => {
 // (dipanggil otomatis dari index.html setelah "Kirim ke WhatsApp" diklik, publik)
 router.post('/send-receipt', upload.single('file'), async (req, res) => {
   try {
-    const { invoice, email } = req.body || {};
+    const { invoice } = req.body || {};
+    const recipient = String(process.env.ADMIN_EMAIL || '').trim();
+    if (!recipient || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(recipient)) {
+      return res.status(503).json({ error: 'Penerima struk belum dikonfigurasi.' });
+    }
     if (!req.file) {
       return res.status(400).json({ error: 'File PDF tidak ditemukan.' });
     }
+    if (req.file.mimetype !== 'application/pdf' || req.file.buffer.slice(0, 5).toString('ascii') !== '%PDF-') {
+      return res.status(400).json({ error: 'File harus berupa PDF yang valid.' });
+    }
+    const safeInvoice = String(invoice || 'AIL LABS').replace(/[\\r\\n]/g, '').slice(0, 80);
     await transporter.sendMail({
       from: process.env.MAIL_FROM,
-      to: email || 'radyp13@gmail.com',
-      subject: `Struk Pesanan Baru - ${invoice || 'AIL LABS'}`,
-      text: `Terlampir struk pesanan ${invoice || ''} dari katalog AIL LABS.`,
+      to: recipient,
+      subject: `Struk Pesanan Baru - ${safeInvoice}`,
+      text: `Terlampir struk pesanan ${safeInvoice} dari katalog AIL LABS.`,
       attachments: [{
-        filename: `Struk-${invoice || 'order'}.pdf`,
+        filename: `Struk-${safeInvoice.replace(/[^a-zA-Z0-9._-]/g, '_')}.pdf`,
         content: req.file.buffer,
+        contentType: 'application/pdf',
       }],
     });
     res.json({ ok: true });
