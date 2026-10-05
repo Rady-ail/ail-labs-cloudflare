@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles/glassmorphism-enhanced.css">
+<link rel="stylesheet" href="/styles/ail-cinematic.css">
 <meta name="theme-color" content="#153237">
 <style>:root{--green-900:#153237;--green-700:#3D666C;--green-500:#74ADB4;--silver-400:#B7C0C2;--emerald-600:#407767;--emerald-500:#5CA389;--ink-900:#1C1C1E;--ink-600:#2D3B32;--ink-400:#8A8A8E;--gold-300:#F0D28C;--glass-border:#E4E8E8;--radius-xl:20px;--radius-lg:16px;--radius-md:12px;--radius-sm:10px;--spring:cubic-bezier(.22,1,.36,1);--font-main:-apple-system,BlinkMacSystemFont,'Montserrat',system-ui,sans-serif;--font-display:'Fraunces','Georgia',serif}*{box-sizing:border-box}body{font-family:var(--font-main);color:var(--ink-900);margin:0;min-height:100vh}.glass{border:1px solid var(--glass-border);border-radius:var(--radius-lg)}main.view{display:none;padding:6px 16px 108px;max-width:640px;margin:0 auto}main.view.active{display:block}.hero-card{margin:34px 0 20px;padding:22px;border-radius:var(--radius-xl);background:var(--green-900);color:#fff}.section-head{display:flex;justify-content:space-between;padding:11px 16px;margin-bottom:10px;border-radius:0 0 var(--radius-lg) var(--radius-lg)}.row{display:flex;gap:10px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(21,50,55,.06)}.row-thumb{width:46px;height:46px;border-radius:10px}.row-name{font-family:var(--font-display);font-weight:600;font-size:15px;margin:0}.row-price{font-weight:800;color:var(--emerald-600)}.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:16px;display:flex;gap:4px;padding:6px;border-radius:999px;z-index:50}.tab{border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 20px;border-radius:999px;color:var(--ink-600);font-size:10.5px;font-weight:600}.tab.active{background:var(--green-700);color:#fff}.checkout-btn{width:100%;border:none;border-radius:999px;padding:16px;font-size:15.5px;font-weight:700;color:#fff;cursor:pointer;background:var(--emerald-600);display:flex;align-items:center;justify-content:center;gap:9px}.modal-overlay{position:fixed;inset:0;z-index:100;background:rgba(13,31,35,.46);display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none}.modal-overlay.open{opacity:1;pointer-events:auto}.modal-card{width:100%;max-width:420px;border-radius:var(--radius-xl) var(--radius-xl) 0 0;padding:22px 20px;max-height:86vh;overflow-y:auto;background:#fff}.toast{position:fixed;left:50%;bottom:96px;z-index:120;transform:translateX(-50%);opacity:1;background:var(--green-900);color:#fff;font-size:13.5px;font-weight:600;padding:12px 20px;border-radius:999px}.cart-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid rgba(21,50,55,.08)}.form-field input,.form-field textarea{width:100%;border:1.5px solid rgba(21,50,55,.14);border-radius:var(--radius-sm);padding:11px 13px;font-family:inherit;font-size:13.5px}.bank-card{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--radius-md)}.google-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid rgba(21,50,55,.14);border-radius:999px;padding:14px;background:#fff;font-weight:700;cursor:pointer}.row-price-locked{font-size:11px;font-weight:700;color:var(--green-700);background:#EAF1F1;padding:5px 10px;border-radius:999px}body.guest-mode #wishlistToggle,body.guest-mode .tab[data-tab="cart"],body.guest-mode .tab[data-tab="riwayat"]{display:none!important}body:not(.guest-mode) #loginTab{display:none!important}#logoutBtn,#profileToggle{display:none!important}body.logged-in #logoutBtn,body.logged-in #profileToggle{display:flex!important}.pending-banner{display:flex;gap:10px;background:#FBF1DF;padding:12px 14px;border-radius:14px;margin:0 16px 12px}
 /* --- Perbaikan tampilan: elemen ini dipakai HTML/JS tapi sebelumnya tidak punya gaya, jadi terlihat berantakan --- */
@@ -819,12 +820,22 @@ function App(){
       <main className={"view" + (activeView==='katalog' ? " active" : "")} id="view-katalog">
         <div className="hero-card">
           <div className="hero-badge" style={{width:'73px', height:'73px', margin:'-46px auto 20px', borderRadius:'22px', background:'rgba(255,255,255,.85)', display:'flex', alignItems:'center', justifyContent:'center'}}><img src="/images/logo.png" alt="ail labs" style={{width:'70%'}} /></div>
-          <div className="hero-body" style={{textAlign:'center'}}>
-            <p className="eyebrow-hero" style={{fontFamily:'var(--font-display)', fontWeight:600, fontSize:'19px', textTransform:'uppercase', color:'#fff'}}>B2B Aesthetic Distributor Partner &amp; B2B Private Label Manufacturing</p>
-            <p className="hero-sub" style={{color:'rgba(255,255,255,.78)', fontSize:'13.5px'}}>Ekosistem aesthetic lengkap, dari klinik ke lab — bahan baku bersertifikat internasional</p>
-            <div className="cert-row" style={{display:'flex', gap:'8px', flexWrap:'wrap', justifyContent:'center'}}>
-              {['GMP','BPOM','CE','ISO 22716','FDA'].map(c=> <span key={c} className="cert-pill" style={{fontSize:'11px', fontWeight:600, color:'#fff', padding:'5px 10px', borderRadius:'999px', background:'rgba(255,255,255,.12)'}}>{c}</span>)}
+          <div className="hero-cgi" aria-hidden="true">
+            <div className="ring r1"></div><div className="ring r2"></div><div className="ring r3"></div>
+            <div className="core"></div><i className="orbit-dot d1"></i><i className="orbit-dot d2"></i><i className="orbit-dot d3"></i>
+          </div>
+          <div className="hero-body">
+            <div className="hero-badge"><img src="/images/logo.png" alt="AIL LABS" /></div>
+            <p className="eyebrow-hero">Aesthetic supply, engineered for serious B2B.</p>
+            <p className="hero-sub">Katalog profesional untuk klinik, distributor, dan partner private-label — dengan alur quotation dan pemesanan yang tetap terhubung ke sistem AIL LABS.</p>
+            <div className="hero-actions">
+              <button className="primary" type="button" onClick={()=>document.getElementById('productGroups')?.scrollIntoView({behavior:'smooth'})}>Explore catalog</button>
+              <button className="secondary" type="button" onClick={()=>switchView('cart','cart')}>Request quotation</button>
             </div>
+            <div className="cert-row">
+              {['B2B CATALOG','CLINIC SUPPLY','PRIVATE LABEL'].map(c=> <span key={c} className="cert-pill">{c}</span>)}
+            </div>
+            <div className="hero-meta"><span><i/>Product-led</span><span><i/>Quotation-ready</span><span><i/>Mobile-first</span></div>
           </div>
         </div>
 
@@ -834,6 +845,9 @@ function App(){
           </div>
         )}
 
+        <div className="section-head glass" style={{marginBottom:'18px'}}>
+          <div><h2>Curated B2B catalogue</h2><span className="section-count">Product intelligence · AIL LABS</span></div>
+        </div>
         <div id="productGroups">
           {!catalogUnlocked && <div className="empty-state" style={{textAlign:'center', padding:'38px 20px', color:'var(--ink-400)'}}>Tekan tombol kategori di atas untuk melihat daftar harga produk.</div>}
           {catalogUnlocked && (()=>{
