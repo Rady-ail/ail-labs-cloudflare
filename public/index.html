@@ -351,6 +351,11 @@ a{color:var(--mm-teal)}
   .hero-actions button:hover,.row:hover{transform:none!important}
 }
 </style>
+<style id="catalog-visibility-fix">
+.section-block{opacity:1!important;visibility:visible!important;transform:none!important;display:block!important}
+.section-block.is-visible{opacity:1!important;visibility:visible!important;transform:none!important}
+.row .row-thumb{display:block!important;visibility:visible!important;opacity:1!important;min-height:120px}
+</style>
 </head>
 <body>
 <div id="root"></div>
@@ -1785,8 +1790,10 @@ function App(){
           <div><h2>Katalog Produk</h2><span className="section-count">Produk terpilih · AIL LABS</span></div>
         </div>
         <div id="productGroups">
-          {!catalogUnlocked && <div className="empty-state" style={{textAlign:'center', padding:'38px 20px', color:'var(--ink-400)'}}>Pilih kategori untuk melihat produk dan harga.</div>}
-          {catalogUnlocked && (()=>{
+          {catalogLoading && <div className="empty-state" role="status" aria-live="polite" style={{textAlign:'center',padding:'38px 20px',color:'var(--mm-muted)'}}>Memuat katalog produk…</div>}
+          {!catalogLoading && catalogError && <div className="empty-state" role="alert" style={{textAlign:'center',padding:'38px 20px',color:'var(--mm-muted)'}}><strong style={{display:'block',color:'var(--mm-text)',marginBottom:'6px'}}>Katalog belum dapat dimuat</strong><span style={{display:'block',marginBottom:'14px'}}>{catalogError}</span><button type="button" onClick={loadCatalogFromAPI} style={{minHeight:'44px',border:'1px solid var(--mm-teal)',borderRadius:'999px',padding:'9px 16px',background:'#fff',color:'var(--mm-teal)',fontWeight:700,cursor:'pointer'}}>Coba lagi</button></div>}
+          {!catalogLoading && !catalogError && !catalogUnlocked && catalog.length===0 && <div className="empty-state" style={{textAlign:'center',padding:'38px 20px',color:'var(--mm-muted)'}}>Belum ada produk aktif di katalog.</div>}
+          {!catalogLoading && !catalogError && catalogUnlocked && (()=>{
             let totalMatches = 0;
             const blocks = catalog.map((group, gi)=>{
               if(activeGroup && groupOf(group.cat)!==activeGroup) return null;
