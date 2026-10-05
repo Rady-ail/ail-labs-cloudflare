@@ -7,11 +7,9 @@
 // Cara pakai: panggil sekali saat app start, di app.js:
 //   require('./jobs/broadcastScheduler')();
 //
-// Perlu package node-cron: npm install node-cron --save
-// (pakai --no-bin-links kalau folder project ada di shared storage Android/Termux
-// dan npm install biasa gagal EPERM karena symlink .bin)
+// Penjadwalan dijalankan oleh Cloudflare Workers Cron Trigger melalui
+// src/worker.js; file ini hanya berisi logic yang dipanggil oleh handler scheduled.
 
-const cron = require('node-cron');
 const pool = require('../db/pool');
 const { tentukanSapaan, personalisasiPesan, kirimSatuPesan } = require('../utils/broadcastHelpers');
 
