@@ -4,6 +4,11 @@ const paypal = require('@paypal/checkout-server-sdk');
 const pool = require('../db/pool');
 const { notifyNewOrder } = require('../services/zapierNotifyService');
 
+function normalizePayPalOrderId(value) {
+  const orderId = String(value || '').trim();
+  return /^[A-Za-z0-9_-]{8,100}$/.test(orderId) ? orderId : null;
+}
+
 function client() {
   const env = process.env.PAYPAL_MODE === 'live'
     ? new paypal.core.LiveEnvironment(process.env.PAYPAL_CLIENT_ID, process.env.PAYPAL_CLIENT_SECRET)
@@ -84,11 +89,33 @@ router.post('/capture-order/:orderID', async (req, res) => {
   if (!req.customer || req.customer.status !== 'approved') {
     return res.status(403).json({ error: 'Akun belum disetujui admin.' });
   }
+  const paypalOrderId = normalizePayPalOrderId(req.params.orderID);
+  if (!paypalOrderId) {
+    return res.status(400).json({ error: 'ID order PayPal tidak valid.' });
+  }
+
   try {
+    // Retry dari browser setelah order tersimpan harus idempotent. UNIQUE DB
+    // constraint tetap diperlukan untuk menutup race condition antar-request.
+    const existing = await pool.query(
+      'SELECT * FROM orders WHERE paypal_order_id = $1 LIMIT 1',
+      [paypalOrderId]
+    );
+    if (existing.rows.length > 0) {
+      const existingOrder = existing.rows[0];
+      if (Number(existingOrder.customer_id) !== Number(req.customer.id)) {
+        return res.status(409).json({ error: 'Order PayPal sudah terhubung ke akun lain.' });
+      }
+      if (existingOrder.payment_method === 'paypal' && existingOrder.payment_status === 'paid') {
+        return res.status(200).json(existingOrder);
+      }
+      return res.status(409).json({ error: 'Order PayPal sudah tercatat dan sedang diproses.' });
+    }
+
     const { customer_name, note, items } = req.body || {};
     const { totalIDR, totalUSD, verifiedItems } = await verifyAndConvert(items);
 
-    const request = new paypal.orders.OrdersCaptureRequest(req.params.orderID);
+    const request = new paypal.orders.OrdersCaptureRequest(paypalOrderId);
     const capture = await client().execute(request);
 
     if (capture.result.status !== 'COMPLETED') {
@@ -100,7 +127,7 @@ router.post('/capture-order/:orderID', async (req, res) => {
     const captured = capture.result.purchase_units?.[0]?.payments?.captures?.[0]?.amount;
     if (!captured || captured.currency_code !== 'USD' || captured.value !== totalUSD) {
       console.error('[PayPal] Capture amount mismatch', {
-        paypalOrderId: req.params.orderID,
+        paypalOrderId,
         expectedCurrency: 'USD',
         expectedValue: totalUSD,
         capturedCurrency: captured?.currency_code || null,
@@ -112,11 +139,30 @@ router.post('/capture-order/:orderID', async (req, res) => {
     const { rows } = await pool.query(
       `INSERT INTO orders (customer_id, customer_name, note, items, total, status, payment_method, payment_status, paypal_order_id)
        VALUES ($1,$2,$3,$4,$5,'diproses','paypal','paid',$6) RETURNING *`,
-      [req.customer.id, customer_name, note || '', JSON.stringify(verifiedItems), totalIDR, req.params.orderID]
+      [req.customer.id, customer_name, note || '', JSON.stringify(verifiedItems), totalIDR, paypalOrderId]
     );
     notifyNewOrder(rows[0]); // fire-and-forget, tidak menunda respons ke customer
     res.status(201).json(rows[0]);
   } catch (err) {
+    // Setelah UNIQUE constraint production diaktifkan, retry race akan masuk ke
+    // sini. Kembalikan row yang sudah tersimpan agar operasi tetap idempotent.
+    if (err?.code === '23505' && /paypal_order_id/i.test(err.constraint || '')) {
+      try {
+        const existing = await pool.query(
+          'SELECT * FROM orders WHERE paypal_order_id = $1 LIMIT 1',
+          [paypalOrderId]
+        );
+        if (existing.rows.length > 0) {
+          const existingOrder = existing.rows[0];
+          if (Number(existingOrder.customer_id) !== Number(req.customer.id)) {
+            return res.status(409).json({ error: 'Order PayPal sudah terhubung ke akun lain.' });
+          }
+          return res.status(200).json(existingOrder);
+        }
+      } catch (lookupError) {
+        console.error('[PayPal] Duplicate-order recovery lookup failed', lookupError);
+      }
+    }
     console.error(err);
     res.status(err.status || 500).json({ error: 'Gagal memproses pembayaran.' });
   }

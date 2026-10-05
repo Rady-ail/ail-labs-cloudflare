@@ -177,8 +177,111 @@ CREATE INDEX IF NOT EXISTS idx_user_events_session_timestamp
 CREATE INDEX IF NOT EXISTS idx_user_events_type_timestamp
   ON user_events(event_type, timestamp DESC);
 
+-- =========================================================
+-- INTEGRITY — tahap 2
+-- =========================================================
+-- Constraint memakai NOT VALID agar data legacy yang belum diaudit tidak
+-- diblokir saat schema diterapkan. Constraint tetap berlaku untuk INSERT/UPDATE
+-- baru. VALIDATE CONSTRAINT dilakukan setelah audit data produksi.
+DO $ail$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'products_harga_nonnegative'
+  ) THEN
+    ALTER TABLE products
+      ADD CONSTRAINT products_harga_nonnegative CHECK (harga >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_total_nonnegative'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_total_nonnegative CHECK (total >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_status_allowed'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_status_allowed
+      CHECK (status IN ('baru', 'diproses', 'selesai', 'batal')) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'visitors_duration_nonnegative'
+  ) THEN
+    ALTER TABLE visitors
+      ADD CONSTRAINT visitors_duration_nonnegative CHECK (duration_ms >= 0) NOT VALID;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'page_views_duration_nonnegative'
+  ) THEN
+    ALTER TABLE page_views
+      ADD CONSTRAINT page_views_duration_nonnegative CHECK (duration_ms >= 0) NOT VALID;
+  END IF;
+END $ail$;
+
+-- =========================================================
+-- RELATIONS — tahap 3
+-- =========================================================
+-- customers.id sudah terverifikasi ada di database produksi. FK ini dibuat
+-- NOT VALID agar orphan legacy rows tidak menggagalkan perubahan schema.
+-- Setelah audit produksi, jalankan VALIDATE CONSTRAINT.
+DO $ail$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint WHERE conname = 'orders_customer_id_fkey'
+  ) THEN
+    ALTER TABLE orders
+      ADD CONSTRAINT orders_customer_id_fkey
+      FOREIGN KEY (customer_id) REFERENCES customers(id)
+      ON DELETE SET NULL
+      NOT VALID;
+  END IF;
+END $ail$;
+
+-- Index FK sudah tersedia pada tahap 1 (idx_orders_customer_id).
+-- ON DELETE SET NULL menjaga histori order tetap ada bila akun customer dihapus.
+-- Tidak menambah FK ke tabel produksi lain yang definisinya belum diaudit.
+
+-- Catatan tahap 2:
+-- Constraint ini sengaja belum VALIDATE. Audit produksi harus lebih dulu mencari
+-- baris legacy yang melanggar aturan, lalu baris tersebut dibersihkan/diperbaiki
+-- sebelum VALIDATE CONSTRAINT dijalankan.
+-- Foreign key orders.customer_id -> customers(id) ditunda ke tahap 3 sampai
+-- definisi produksi customers diverifikasi penuh.
+
 -- Catatan indeks tahap 1:
 -- Semua perubahan di atas bersifat additive dan idempotent.
 -- Tidak mengubah data, tidak menambah foreign key baru, dan tidak mengasumsikan
 -- struktur tabel produksi yang belum diverifikasi. Constraint/data cleanup
 -- dilakukan pada tahap berikutnya setelah audit data produksi.
+
+
+-- =========================================================
+-- PAYMENT INTEGRITY — tahap 4
+-- =========================================================
+-- PayPal capture sekarang idempotent di level route. Race condition antar-request
+-- baru benar-benar tertutup setelah paypal_order_id dipastikan unik di produksi.
+-- Jangan membuat UNIQUE INDEX sebelum audit duplikasi berikut menghasilkan 0 baris.
+--
+-- Audit duplikasi:
+-- SELECT paypal_order_id, COUNT(*) AS jumlah
+-- FROM orders
+-- WHERE paypal_order_id IS NOT NULL
+-- GROUP BY paypal_order_id
+-- HAVING COUNT(*) > 1;
+--
+-- Audit nilai kosong/whitespace:
+-- SELECT COUNT(*) AS invalid_paypal_ids
+-- FROM orders
+-- WHERE paypal_order_id IS NOT NULL
+--   AND btrim(paypal_order_id) = '';
+--
+-- Setelah audit duplikasi = 0 dan invalid_paypal_ids = 0, barulah aman menambahkan:
+-- CREATE UNIQUE INDEX ... ON orders(paypal_order_id)
+-- WHERE paypal_order_id IS NOT NULL;
+--
+-- UNIQUE index sengaja BELUM dibuat otomatis di tahap ini karena schema repo tidak
+-- boleh mengasumsikan kondisi data legacy produksi yang belum diaudit.
