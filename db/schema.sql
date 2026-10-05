@@ -27,14 +27,26 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products USING gin (to_tsvector('simple', name || ' ' || kandungan));
 
 CREATE TABLE IF NOT EXISTS orders (
-  id            SERIAL PRIMARY KEY,
-  customer_name TEXT NOT NULL,
-  note          TEXT DEFAULT '',
-  items         JSONB NOT NULL,
-  total         INTEGER NOT NULL DEFAULT 0,
-  status        TEXT NOT NULL DEFAULT 'baru', -- baru | diproses | selesai | batal
-  created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
+  id              SERIAL PRIMARY KEY,
+  customer_id     INTEGER,
+  customer_name   TEXT NOT NULL,
+  note            TEXT DEFAULT '',
+  items           JSONB NOT NULL,
+  total           INTEGER NOT NULL DEFAULT 0,
+  status          TEXT NOT NULL DEFAULT 'baru', -- baru | diproses | selesai | batal
+  payment_method  TEXT,
+  payment_status  TEXT,
+  paypal_order_id TEXT,
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Produksi Neon terverifikasi: orders sudah memiliki customer_id,
+-- payment_method, payment_status, dan paypal_order_id. ADD COLUMN di bawah
+-- menjaga database lama tetap utuh bila schema.sql dijalankan ulang.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS customer_id INTEGER;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS paypal_order_id TEXT;
 
 CREATE TABLE IF NOT EXISTS admin_users (
   id            SERIAL PRIMARY KEY,
@@ -123,3 +135,29 @@ INSERT INTO settings (key, value) VALUES (
 -- orders secara real-time). Tabel kosong yang tidak pernah diisi hanya
 -- menambah kerumitan skema tanpa manfaat. Bisa ditambahkan nanti kalau
 -- memang mau precompute/agregat harian untuk performa.
+
+
+-- =========================================================
+-- PRODUKSI NEON — inventory/schema compatibility record
+-- =========================================================
+-- Terverifikasi dari database produksi (2026-10-06): tabel berikut sudah ada
+-- dan TIDAK boleh dihapus/recreate:
+-- customers
+-- pelanggan_broadcast
+-- broadcast_campaigns
+-- broadcast_antrian
+-- broadcast_jadwal
+-- broadcast_jadwal_antrean
+-- promos
+-- promo_broadcasts
+-- kontak_customer
+-- pelanggan_klinik
+--
+-- customers juga terverifikasi memiliki customer_type.
+-- Definisi kolom lengkap tabel-tabel tersebut sengaja tidak ditebak di sini;
+-- gunakan schema dump produksi sebagai sumber kebenaran sebelum menambah
+-- CREATE TABLE baru untuk tabel tersebut.
+--
+-- Index yang aman/idempotent untuk query admin/order:
+CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
