@@ -1,0 +1,86 @@
+name: Preview fix-catalog-visible
+
+on:
+  push:
+    branches:
+      - fix-catalog-visible
+  workflow_dispatch:
+
+concurrency:
+  group: preview-fix-catalog-visible
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Build preview config
+        shell: bash
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          config.name = 'ail-labs-katalog-preview';
+          delete config.routes;
+          fs.writeFileSync('wrangler.preview.json', JSON.stringify(config, null, 2) + '\\n');
+          NODE
+
+      - name: Deploy preview Worker
+        id: deploy
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          set -euo pipefail
+          node -e '
+            const required = ["CLOUDFLARE_API_TOKEN","CLOUDFLARE_ACCOUNT_ID","DATABASE_URL","SESSION_SECRET"];
+            for (const key of required) if (!process.env[key]) { console.error(key + " is missing"); process.exit(1); }
+          '
+          printf '{"DATABASE_URL":%s,"SESSION_SECRET":%s}' \
+            "$(node -p 'JSON.stringify(process.env.DATABASE_URL)')" \
+            "$(node -p 'JSON.stringify(process.env.SESSION_SECRET)')" \
+            | npx wrangler@4.86.0 secret bulk --config wrangler.preview.json
+          output=$(npx wrangler@4.86.0 deploy --config wrangler.preview.json --name ail-labs-katalog-preview 2>&1)
+          printf '%s\\n' "$output"
+          preview_url=$(printf '%s\\n' "$output" | grep -Eo 'https://[A-Za-z0-9.-]+\\.workers\\.dev' | tail -1 || true)
+          if [[ -z "$preview_url" ]]; then
+            echo 'Preview URL not found in Wrangler output'
+            exit 1
+          fi
+          echo "PREVIEW_URL=$preview_url" >> "$GITHUB_ENV"
+          echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
+
+      - name: Verify preview HTTP
+        env:
+          PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            code=$(curl -L -sS -o /dev/null -w '%{http_code}' "$PREVIEW_URL/" || true)
+            echo "Preview root HTTP $code"
+            [[ "$code" == "200" ]] && break
+            [[ "$attempt" == "5" ]] && exit 1
+            sleep 5
+          done
+          for path in /api/health /api/products; do
+            code=$(curl -L -sS -o /tmp/preview-response -w '%{http_code}' "$PREVIEW_URL$path" || true)
+            echo "$path HTTP $code"
+            [[ "$code" == "200" ]] || { cat /tmp/preview-response || true; exit 1; }
+          done
+          echo "Preview verified: $PREVIEW_URL"
