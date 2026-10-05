@@ -167,7 +167,7 @@ src="https://www.facebook.com/tr?id=27916556354683462&ev=PageView&noscript=1"
   --spring:cubic-bezier(.22,1,.36,1);--font-main:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-html{background:var(--mm-bg)!important;scroll-behavior:smooth}
+html{background:var(--mm-bg)!important;scroll-behavior:smooth;scroll-padding-top:150px}
 body{
   margin:0!important;min-height:100vh!important;background:var(--mm-bg)!important;color:var(--mm-text)!important;
   font-family:var(--font-main)!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
@@ -215,7 +215,7 @@ button{min-height:44px}
 main.view{
   display:none!important;max-width:1180px!important;margin:0 auto!important;padding:20px 16px 108px!important;
 }
-main.view.active{display:block!important}
+main.view.active{display:block!important;scroll-margin-top:150px}
 .hero-card{
   margin:18px 0 42px!important;padding:clamp(34px,7vw,72px)!important;min-height:390px!important;
   display:flex!important;align-items:center!important;background:var(--mm-surface)!important;color:var(--mm-text)!important;
@@ -647,6 +647,8 @@ function App(){
   const [activeGroup, setActiveGroup] = useState(null);
   const [activeCat, setActiveCat] = useState('Semua');
   const [catalogUnlocked, setCatalogUnlocked] = useState(false);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
   const [cart, setCart] = useState(() => loadJSON(CART_STORAGE_KEY, {}));
@@ -740,21 +742,57 @@ function App(){
 
   /* --- katalog --- */
   async function loadCatalogFromAPI(){
+    setCatalogLoading(true);
+    setCatalogError('');
     try{
-      const res = await fetch('/api/products', { credentials:'include' });
-      if(!res.ok) throw new Error('Gagal memuat produk (HTTP ' + res.status + ')');
-      const data = await res.json();
-      if(!Array.isArray(data)) throw new Error('Format katalog tidak valid');
-      setCatalog(data);
-      const groups = groupsInCatalogFrom(data);
-      if(groups.length){
-        setActiveGroup(g => g === null ? groups[0] : g);
-        setCatalogUnlocked(true);
-      }
+      const res = await fetch('/api/products', { credentials:'include', cache:'no-store' });
+      const raw = await res.json().catch(()=>null);
+      if(!res.ok) throw new Error((raw && raw.error) || 'Gagal memuat katalog (HTTP ' + res.status + ')');
+      if(!Array.isArray(raw)) throw new Error('Format katalog tidak valid.');
+
+      // API produksi mengembalikan grouped rows: [{cat,items:[...]}].
+      // Normalizer ini juga menerima format flat object tanpa mengubah data lama.
+      const normalized = raw.map((entry) => {
+        if(entry && typeof entry === 'object' && Array.isArray(entry.items)){
+          return {
+            cat: String(entry.cat || 'Lainnya'),
+            items: entry.items.filter(Array.isArray).map(item => [
+              item[0] == null ? '' : String(item[0]),
+              item[1] == null ? '' : String(item[1]),
+              item[2] == null ? '' : String(item[2]),
+              item[3] == null ? null : Number(item[3]),
+              item[4] || null
+            ]).filter(item => item[0])
+          };
+        }
+        if(entry && typeof entry === 'object' && entry.name){
+          return {
+            cat: String(entry.cat || entry.category_name || 'Lainnya'),
+            items: [[
+              String(entry.name),
+              String(entry.kandungan || ''),
+              String(entry.kemasan || ''),
+              entry.harga == null ? null : Number(entry.harga),
+              entry.foto || entry.image_url || null
+            ]]
+          };
+        }
+        return null;
+      }).filter(group => group && group.items.length);
+
+      if(!normalized.length) throw new Error('Katalog kosong.');
+      setCatalog(normalized);
+      const nextGroups = groupsInCatalogFrom(normalized);
+      setActiveGroup(current => current && nextGroups.includes(current) ? current : (nextGroups[0] || null));
+      setActiveCat('Semua');
+      setCatalogUnlocked(true);
     } catch(err){
       console.error('Catalog API error:', err);
       setCatalog([]);
       setCatalogUnlocked(false);
+      setCatalogError(err.message || 'Katalog gagal dimuat.');
+    } finally {
+      setCatalogLoading(false);
     }
   }
 
@@ -1043,8 +1081,14 @@ function App(){
           <div><h2>Katalog Produk</h2><span className="section-count">Produk terpilih · AIL LABS</span></div>
         </div>
         <div id="productGroups">
-          {!catalogUnlocked && <div className="empty-state" style={{textAlign:'center', padding:'38px 20px', color:'var(--ink-400)'}}>Pilih kategori untuk melihat produk dan harga.</div>}
-          {catalogUnlocked && (()=>{
+          {catalogLoading && <div className="empty-state" role="status" aria-live="polite" style={{textAlign:'center', padding:'38px 20px', color:'var(--mm-muted)'}}>Memuat katalog produk…</div>}
+          {!catalogLoading && catalogError && <div className="empty-state" role="alert" style={{textAlign:'center', padding:'38px 20px', color:'var(--mm-muted)'}}>
+            <strong style={{display:'block', color:'var(--mm-text)', marginBottom:'6px'}}>Katalog belum dapat dimuat</strong>
+            <span style={{display:'block', marginBottom:'14px'}}>{catalogError}</span>
+            <button type="button" onClick={loadCatalogFromAPI} style={{minHeight:'44px', border:'1px solid var(--mm-teal)', borderRadius:'999px', padding:'9px 16px', background:'#fff', color:'var(--mm-teal)', fontWeight:700, cursor:'pointer'}}>Coba lagi</button>
+          </div>}
+          {!catalogLoading && !catalogError && !catalogUnlocked && catalog.length===0 && <div className="empty-state" style={{textAlign:'center', padding:'38px 20px', color:'var(--mm-muted)'}}>Belum ada produk aktif di katalog.</div>}
+          {!catalogLoading && !catalogError && catalogUnlocked && (()=>{
             let totalMatches = 0;
             const blocks = catalog.map((group, gi)=>{
               if(activeGroup && groupOf(group.cat)!==activeGroup) return null;
