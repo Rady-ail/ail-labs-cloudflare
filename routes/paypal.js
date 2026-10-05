@@ -86,13 +86,27 @@ router.post('/capture-order/:orderID', async (req, res) => {
   }
   try {
     const { customer_name, note, items } = req.body || {};
-    const { totalIDR, verifiedItems } = await verifyAndConvert(items);
+    const { totalIDR, totalUSD, verifiedItems } = await verifyAndConvert(items);
 
     const request = new paypal.orders.OrdersCaptureRequest(req.params.orderID);
     const capture = await client().execute(request);
 
     if (capture.result.status !== 'COMPLETED') {
       return res.status(400).json({ error: 'Pembayaran belum selesai.' });
+    }
+
+    // Jangan percaya total dari browser. Cocokkan capture PayPal dengan total
+    // yang dihitung ulang dari harga produk di server.
+    const captured = capture.result.purchase_units?.[0]?.payments?.captures?.[0]?.amount;
+    if (!captured || captured.currency_code !== 'USD' || captured.value !== totalUSD) {
+      console.error('[PayPal] Capture amount mismatch', {
+        paypalOrderId: req.params.orderID,
+        expectedCurrency: 'USD',
+        expectedValue: totalUSD,
+        capturedCurrency: captured?.currency_code || null,
+        capturedValue: captured?.value || null,
+      });
+      return res.status(400).json({ error: 'Nominal pembayaran PayPal tidak sesuai dengan total pesanan.' });
     }
 
     const { rows } = await pool.query(
