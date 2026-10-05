@@ -1,0 +1,46 @@
+name: Catalog Preview
+
+on:
+  push:
+    branches:
+      - fix-catalog-visible
+
+concurrency:
+  group: catalog-preview
+  cancel-in-progress: true
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci || npm install
+      - name: Deploy isolated preview Worker
+        id: preview
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -euo pipefail
+          npx wrangler deploy --name ail-labs-catalog-preview --outdir /tmp/wrangler-preview
+          echo "Preview Worker deployed. Production Worker was not targeted."
+      - name: Configure preview runtime secrets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+        run: |
+          set -euo pipefail
+          node -e '
+            const secrets = {
+              DATABASE_URL: process.env.DATABASE_URL,
+              SESSION_SECRET: process.env.SESSION_SECRET
+            };
+            if (Object.values(secrets).some(v => !v)) process.exit(1);
+            process.stdout.write(JSON.stringify(secrets));
+          ' | npx wrangler secret bulk --name ail-labs-catalog-preview
