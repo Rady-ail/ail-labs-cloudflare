@@ -58,32 +58,39 @@ jobs:
             "$(node -p 'JSON.stringify(process.env.DATABASE_URL)')" \
             "$(node -p 'JSON.stringify(process.env.SESSION_SECRET)')" \
             | npx wrangler@4.86.0 secret bulk --config wrangler.preview.json
+          set +e
           output=$(npx wrangler@4.86.0 deploy --config wrangler.preview.json --name ail-labs-katalog-preview 2>&1)
-          printf '%s\\n' "$output"
-          preview_url=$(printf '%s\\n' "$output" | grep -Eo 'https://[A-Za-z0-9.-]+\\.workers\\.dev' | tail -1 || true)
+          deploy_status=$?
+          set -e
+          printf '%s\n' "$output"
+          if [[ $deploy_status -ne 0 ]]; then
+            { echo '## Preview deploy — FAILED'; echo; echo '```text'; printf '%s\n' "$output"; echo '```'; echo; echo "**Failure summary:** Wrangler preview deployment exited with code $deploy_status."; } >> "$GITHUB_STEP_SUMMARY"
+            exit "$deploy_status"
+          fi
+          preview_url=$(printf '%s\n' "$output" | grep -Eo 'https://[A-Za-z0-9.-]+\.workers\.dev' | tail -1 || true)
           if [[ -z "$preview_url" ]]; then
-            echo 'Preview URL not found in Wrangler output'
+            { echo '## Preview deploy — FAILED'; echo; echo 'Preview URL was not found in Wrangler output.'; echo; echo '```text'; printf '%s\n' "$output"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
             exit 1
           fi
           echo "PREVIEW_URL=$preview_url" >> "$GITHUB_ENV"
           echo "preview_url=$preview_url" >> "$GITHUB_OUTPUT"
-
+          { echo '## Preview Worker'; echo; echo "**URL:** $preview_url"; echo; echo 'Secrets forwarded: `DATABASE_URL`, `SESSION_SECRET`.'; } >> "$GITHUB_STEP_SUMMARY"
       - name: Verify preview HTTP
         env:
           PREVIEW_URL: ${{ steps.deploy.outputs.preview_url }}
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in 1 2 3 4 5; do
-            code=$(curl -L -sS -o /dev/null -w '%{http_code}' "$PREVIEW_URL/" || true)
-            echo "Preview root HTTP $code"
-            [[ "$code" == "200" ]] && break
-            [[ "$attempt" == "5" ]] && exit 1
-            sleep 5
-          done
-          for path in /api/health /api/products; do
-            code=$(curl -L -sS -o /tmp/preview-response -w '%{http_code}' "$PREVIEW_URL$path" || true)
-            echo "$path HTTP $code"
-            [[ "$code" == "200" ]] || { cat /tmp/preview-response || true; exit 1; }
-          done
+          root_code=$(curl -L -s -o /dev/null -w '%{http_code}' "$PREVIEW_URL/")
+          health_code=$(curl -L -s -o /dev/null -w '%{http_code}' "$PREVIEW_URL/api/health")
+          products_code=$(curl -L -s -o /dev/null -w '%{http_code}' "$PREVIEW_URL/api/products")
+          echo "Preview URL: $PREVIEW_URL"
+          echo "curl $PREVIEW_URL/ -> HTTP $root_code"
+          echo "curl $PREVIEW_URL/api/health -> HTTP $health_code"
+          echo "curl $PREVIEW_URL/api/products -> HTTP $products_code"
+          { echo; echo '### HTTP verification'; echo; echo '| URL | HTTP |'; echo '|---|---:|'; echo "| \`$PREVIEW_URL/\` | $root_code |"; echo "| \`$PREVIEW_URL/api/health\` | $health_code |"; echo "| \`$PREVIEW_URL/api/products\` | $products_code |"; } >> "$GITHUB_STEP_SUMMARY"
+          if [[ "$root_code" != "200" || "$health_code" != "200" || "$products_code" != "200" ]]; then
+            { echo; echo '## Preview verification — FAILED'; echo; echo '**Failure summary:** One or more preview endpoints did not return HTTP 200.'; } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
           echo "Preview verified: $PREVIEW_URL"
