@@ -13,7 +13,7 @@
 Production admin login uses:
 - ADMIN_USERNAME
 - ADMIN_PASSWORD
-- SESSION_SECRET
+- ADMIN_SESSION_SECRET
 
 Never commit the values of these variables to GitHub, documentation, screenshots, chat, or client-side JavaScript.
 
@@ -21,10 +21,10 @@ Login flow:
 1. Open /admin/.
 2. Submit the runtime admin username/password.
 3. POST /api/auth/login validates the credentials.
-4. A signed, HttpOnly session cookie is created.
+4. A signed, HttpOnly session cookie is created using ADMIN_SESSION_SECRET.
 5. Protected admin endpoints require req.session.isAdmin.
 
-There is no database password-reset flow. To rotate the admin password, update the Cloudflare runtime secret ADMIN_PASSWORD and redeploy/restart the Worker.
+There is no database password-reset flow. To rotate the admin password, update the Cloudflare runtime secret ADMIN_PASSWORD and redeploy/restart the Worker. To rotate the session signing secret, update ADMIN_SESSION_SECRET; this intentionally invalidates existing admin sessions.
 
 ## Security rules
 - Do not store database URLs, API keys, admin passwords, or session secrets in source control.
@@ -37,7 +37,7 @@ There is no database password-reset flow. To rotate the admin password, update t
 ## Production validation checklist
 - [ ] ADMIN_USERNAME configured in Cloudflare.
 - [ ] ADMIN_PASSWORD configured in Cloudflare.
-- [ ] SESSION_SECRET configured in Cloudflare.
+- [ ] ADMIN_SESSION_SECRET configured in Cloudflare.
 - [ ] OPENAI_API_KEY configured in Cloudflare.
 - [ ] No real secret values exist in tracked files.
 - [ ] Admin login succeeds.
