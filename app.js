@@ -18,7 +18,7 @@ app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=(self)');
   res.setHeader('Content-Security-Policy', [
     "default-src 'self'",
     "base-uri 'self'",
@@ -67,7 +67,6 @@ app.use(cors({
 }));
 if (!isCloudflareWorker) app.use(compression());
 app.use(express.json({
-  limit: '400kb',
   verify: (req, res, buf) => { req.rawBody = Buffer.from(buf); }
 }));
 const passport = require('passport');
