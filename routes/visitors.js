@@ -316,7 +316,7 @@ router.post('/identity', async (req,res)=>{
     if(!session_id||consent!==true||typeof photo_data!=='string') return res.status(400).json({error:'Persetujuan dan foto wajib diisi.'});
     const session=await pool.query('SELECT session_id FROM visitors WHERE session_id=$1',[session_id]);
     if(!session.rows[0]) return res.status(404).json({error:'Session pengunjung belum tercatat.'});
-    if(!/^data:image\\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo_data)||photo_data.length>450000) return res.status(400).json({error:'Format atau ukuran foto tidak valid.'});
+    if(!/^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo_data)||photo_data.length>450000) return res.status(400).json({error:'Format atau ukuran foto tidak valid.'});
     const result=await pool.query(`INSERT INTO visitor_identities(session_id,photo_data,consent,page)
       VALUES($1,$2,true,$3)
       ON CONFLICT(session_id) DO UPDATE SET photo_data=EXCLUDED.photo_data,consent=true,page=EXCLUDED.page,created_at=now()
