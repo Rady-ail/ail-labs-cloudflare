@@ -45,7 +45,7 @@ function pills(){document.getElementById("categoryPills").innerHTML=[...new Set(
 function card(i,c){
   const n=i?.[0]??"",k=i?.[1]??"",p=i?.[2]??"";
   return '<article data-product="'+esc(n)+'" class="rounded-2xl border border-slate-200 bg-white p-4 card">'+
-    '<div class="relative overflow-hidden rounded-xl bg-ail-clinical">'+
+    '<div class="relative aspect-[4/3] overflow-hidden rounded-xl bg-ail-clinical">'+
       '<img src="/images/ref-mockup-skincare-varian.jpg" alt="Visual mockup produk AIL LABS — '+esc(c)+'" loading="lazy" decoding="async" class="h-full w-full object-cover" onerror="this.style.display=\'none\'">'+
       '<div class="pointer-events-none absolute bottom-2 left-2 rounded-lg bg-white/90 px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-ail-teal">Visual Mockup</div>'+
     '</div>'+
