@@ -32,6 +32,12 @@ check_2xx() {
 check_2xx 'home' '/'
 check_2xx 'admin' '/admin/'
 check_2xx 'thalacXail' '/thalacXail'
+check_2xx 'catalog-page' '/catalog.html'
+check_2xx 'private-label' '/private-label.html'
+check_2xx 'procurement' '/procurement.html'
+check_2xx 'compliance' '/compliance.html'
+check_2xx 'about' '/about.html'
+check_2xx 'contact' '/contact.html'
 
 request '/api/products'
 if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
