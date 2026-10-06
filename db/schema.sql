@@ -178,6 +178,33 @@ CREATE INDEX IF NOT EXISTS idx_user_events_type_timestamp
   ON user_events(event_type, timestamp DESC);
 
 -- =========================================================
+-- VISITOR CONSENT & IDENTITY (Neon PostgreSQL)
+-- Foto hanya disimpan setelah tindakan capture + consent eksplisit.
+-- =========================================================
+CREATE TABLE IF NOT EXISTS visitor_permissions (
+  id SERIAL PRIMARY KEY,
+  session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+  camera_status TEXT NOT NULL DEFAULT 'not-requested',
+  location_status TEXT NOT NULL DEFAULT 'not-requested',
+  latitude DOUBLE PRECISION,
+  longitude DOUBLE PRECISION,
+  accuracy DOUBLE PRECISION,
+  page TEXT,
+  consent_at TIMESTAMPTZ,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_visitor_permissions_updated ON visitor_permissions(updated_at DESC);
+
+CREATE TABLE IF NOT EXISTS visitor_identities (
+  id SERIAL PRIMARY KEY,
+  session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+  photo_data TEXT NOT NULL,
+  consent BOOLEAN NOT NULL DEFAULT false,
+  page TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- =========================================================
 -- INTEGRITY — tahap 2
 -- =========================================================
 -- Constraint memakai NOT VALID agar data legacy yang belum diaudit tidak
