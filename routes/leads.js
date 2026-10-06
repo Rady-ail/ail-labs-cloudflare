@@ -9,6 +9,9 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[1-9]\d{7,14}$/;
 const OTP_TTL_MINUTES = 10;
 const MAX_ATTEMPTS = 5;
+const STATUS_VALUES = ['New','Contacted','Qualified','Proposal','Won','Lost'];
+function inferInterest(page='/', events=[]) { const s=[page,...events.map(e=>`${e.event_type} ${JSON.stringify(e.event_data||{})}`)].join(' ').toLowerCase(); if(s.includes('private-label')) return 'Private Label / OEM'; if(s.includes('procurement')) return 'Procurement'; if(s.includes('catalog')) return 'Catalog / Products'; if(s.includes('contact')) return 'Business Inquiry'; return 'General B2B'; }
+function scoreLead({company,phone,marketingConsent,interest,repeatVisit=false}) { let score=20; if(company)score+=10; if(phone)score+=10; if(marketingConsent)score+=5; if(interest==='Catalog / Products')score+=10; if(interest==='Procurement')score+=20; if(interest==='Private Label / OEM')score+=25; if(interest==='Business Inquiry')score+=30; if(repeatVisit)score+=10; return Math.min(score,100); }
 let tablesReady = false;
 
 function clean(value, max = 255) {
@@ -39,7 +42,7 @@ async function ensureTables() {
       consent_at TIMESTAMPTZ NOT NULL, marketing_consent BOOLEAN NOT NULL DEFAULT false,
       lead_token_hash TEXT UNIQUE NOT NULL, ip_address TEXT, country TEXT, region TEXT, city TEXT,
       user_agent TEXT, first_page TEXT, referrer TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now()
+      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(), business_type TEXT, interest_category TEXT, lead_source TEXT, landing_page TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, lead_score INTEGER NOT NULL DEFAULT 20, status TEXT NOT NULL DEFAULT 'New', notes TEXT, last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS idx_lead_captures_email ON lead_captures(email);
     CREATE INDEX IF NOT EXISTS idx_lead_captures_created_at ON lead_captures(created_at DESC);
@@ -153,18 +156,21 @@ router.post('/verify-otp', async (req, res) => {
     const country = clean(req.get('cf-ipcountry'), 20), region = clean(req.get('cf-region'), 120);
     const city = clean(req.get('cf-ipcity'), 120), userAgent = clean(req.get('user-agent'), 500);
     const referrer = clean(req.get('referer'), 1000);
+    const businessType = clean(body.business_type, 80), landingPage = clean(body.landing_page || body.first_page, 500), leadSource = clean(body.lead_source || 'direct', 120);
+    const utmSource=clean(body.utm_source,120), utmMedium=clean(body.utm_medium,120), utmCampaign=clean(body.utm_campaign,160);
     let firstPage = '/';
     if (sessionId) {
       const session = await pool.query('SELECT page_visited FROM visitors WHERE session_id = $1 LIMIT 1', [sessionId]);
       if (session.rows[0]) firstPage = clean(session.rows[0].page_visited || '/', 500);
     }
 
+    const eventRows = sessionId ? (await pool.query('SELECT event_type,event_data FROM user_events WHERE session_id=$1 ORDER BY timestamp DESC LIMIT 100',[sessionId])).rows : [];
+    const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
     const result = await pool.query(
-      `INSERT INTO lead_captures
-       (session_id,name,company,phone,email,email_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer)
-       VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14)
-       RETURNING id,name,company,email,phone,city,region,country`,
-      [sessionId || null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null]
+      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
+       VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
+       RETURNING id,name,company,email,phone,city,region,country,interest_category,lead_score,status`,
+      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score]
     );
     res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
   } catch (err) {
@@ -173,6 +179,8 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
+router.get('/admin/intelligence', requireAdmin, async (req,res)=>{ try{await ensureTables();const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);const {rows}=await pool.query(`SELECT id,created_at,last_activity_at,name,company,email,phone,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,city,region,country,first_page,referrer,marketing_consent FROM lead_captures ORDER BY lead_score DESC,created_at DESC LIMIT $1`,[limit]);res.json({count:rows.length,leads:rows});}catch(err){console.error('[lead/admin/intelligence]',err);res.status(500).json({error:'Gagal mengambil lead intelligence.'});} });
+router.patch('/admin/:id', requireAdmin, async (req,res)=>{try{await ensureTables();const id=parseInt(req.params.id,10),status=clean(req.body?.status,30);if(!id||!STATUS_VALUES.includes(status))return res.status(400).json({error:'Status tidak valid.'});const {rows}=await pool.query(`UPDATE lead_captures SET status=$1,last_activity_at=now() WHERE id=$2 RETURNING id,status,last_activity_at`,[status,id]);if(!rows[0])return res.status(404).json({error:'Lead tidak ditemukan.'});res.json(rows[0]);}catch(err){console.error('[lead/admin/status]',err);res.status(500).json({error:'Gagal memperbarui status lead.'});} });
 router.get('/admin', requireAdmin, async (req, res) => {
   try {
     await ensureTables();
