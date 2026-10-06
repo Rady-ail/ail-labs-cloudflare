@@ -104,6 +104,7 @@ app.use('/api/customer/auth', require('./routes/customerAuth'));
 app.use('/api/broadcast', require('./routes/broadcast'));
 app.use('/api/whatsapp', require('./routes/whatsapp-webhook'));
 app.use('/api/settings', require('./routes/settings'));
+app.use('/api/procurement-ai', require('./routes/procurement-ai'));
 app.use('/api/admin', require('./routes/promoKategori'));
 
 // ---------- File statis (katalog publik + panel admin) ----------
