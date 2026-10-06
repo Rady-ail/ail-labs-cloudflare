@@ -8,6 +8,19 @@ const { requireAdmin } = require('./authMiddleware');
 // pernah kadaluarsa kalau browser ditutup paksa (endSession via sendBeacon
 // tidak selalu terkirim, mis. koneksi mati / app di-kill di HP).
 const ACTIVE_WINDOW = "last_activity > now() - interval '5 minutes'";
+let permissionColumnsReady = false;
+(async () => {
+  try {
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS camera_permission TEXT');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS camera_permission_at TIMESTAMPTZ');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS location_permission TEXT');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS location_permission_at TIMESTAMPTZ');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS location_accuracy_m DOUBLE PRECISION');
+    permissionColumnsReady = true;
+  } catch (err) { console.error('Visitor permission migration failed:', err.message); }
+})();
 
 // ============ GET CURRENT ACTIVE VISITORS (admin) ============
 router.get('/active', requireAdmin, async (req, res) => {
@@ -15,6 +28,8 @@ router.get('/active', requireAdmin, async (req, res) => {
     const result = await pool.query(
       `SELECT
         id, session_id, ip_address, page_visited, entry_time,
+        camera_permission, camera_permission_at, location_permission, location_permission_at,
+        latitude, longitude, location_accuracy_m,
         EXTRACT(EPOCH FROM (now() - entry_time))::int as duration_seconds
        FROM visitors
        WHERE is_active = true AND ${ACTIVE_WINDOW}
@@ -202,6 +217,39 @@ router.get('/history/days', requireAdmin, async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Gagal mengambil riwayat pengunjung.' });
+  }
+});
+
+
+router.post('/permissions', async (req, res) => {
+  try {
+    const { session_id, camera_status, location_status, latitude, longitude, accuracy_m } = req.body || {};
+    if (!session_id) return res.status(400).json({ error: 'session_id wajib diisi.' });
+    if (!permissionColumnsReady) return res.status(503).json({ error: 'Permission storage belum siap.' });
+    const allowed = new Set(['granted','denied','unsupported']);
+    if (camera_status && !allowed.has(camera_status)) return res.status(400).json({ error: 'camera_status tidak valid.' });
+    if (location_status && !allowed.has(location_status)) return res.status(400).json({ error: 'location_status tidak valid.' });
+    const lat = Number(latitude), lon = Number(longitude), acc = Number(accuracy_m);
+    const hasLocation = location_status === 'granted' && Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    const result = await pool.query(
+      `UPDATE visitors SET
+        camera_permission = COALESCE($2, camera_permission),
+        camera_permission_at = CASE WHEN $2 IS NOT NULL THEN now() ELSE camera_permission_at END,
+        location_permission = COALESCE($3, location_permission),
+        location_permission_at = CASE WHEN $3 IS NOT NULL THEN now() ELSE location_permission_at END,
+        latitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $5 ELSE latitude END,
+        longitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $6 ELSE longitude END,
+        location_accuracy_m = CASE WHEN $3 = 'granted' AND $4::boolean THEN $7 ELSE location_accuracy_m END,
+        last_activity = now()
+       WHERE session_id = $1
+       RETURNING session_id, camera_permission, camera_permission_at, location_permission, location_permission_at, latitude, longitude, location_accuracy_m`,
+      [session_id, camera_status || null, location_status || null, hasLocation, hasLocation ? lat : null, hasLocation ? lon : null, hasLocation && Number.isFinite(acc) ? acc : null]
+    );
+    if (!result.rows[0]) return res.status(404).json({ error: 'Session tidak ditemukan.' });
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Gagal menyimpan status izin.' });
   }
 });
 
