@@ -221,38 +221,6 @@ router.get('/history/days', requireAdmin, async (req, res) => {
 });
 
 
-router.post('/permissions', async (req, res) => {
-  try {
-    const { session_id, camera_status, location_status, latitude, longitude, accuracy_m } = req.body || {};
-    if (!session_id) return res.status(400).json({ error: 'session_id wajib diisi.' });
-    if (!permissionColumnsReady) return res.status(503).json({ error: 'Permission storage belum siap.' });
-    const allowed = new Set(['granted','denied','unsupported']);
-    if (camera_status && !allowed.has(camera_status)) return res.status(400).json({ error: 'camera_status tidak valid.' });
-    if (location_status && !allowed.has(location_status)) return res.status(400).json({ error: 'location_status tidak valid.' });
-    const lat = Number(latitude), lon = Number(longitude), acc = Number(accuracy_m);
-    const hasLocation = location_status === 'granted' && Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-    const result = await pool.query(
-      `UPDATE visitors SET
-        camera_permission = COALESCE($2, camera_permission),
-        camera_permission_at = CASE WHEN $2 IS NOT NULL THEN now() ELSE camera_permission_at END,
-        location_permission = COALESCE($3, location_permission),
-        location_permission_at = CASE WHEN $3 IS NOT NULL THEN now() ELSE location_permission_at END,
-        latitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $5 ELSE latitude END,
-        longitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $6 ELSE longitude END,
-        location_accuracy_m = CASE WHEN $3 = 'granted' AND $4::boolean THEN $7 ELSE location_accuracy_m END,
-        last_activity = now()
-       WHERE session_id = $1
-       RETURNING session_id, camera_permission, camera_permission_at, location_permission, location_permission_at, latitude, longitude, location_accuracy_m`,
-      [session_id, camera_status || null, location_status || null, hasLocation, hasLocation ? lat : null, hasLocation ? lon : null, hasLocation && Number.isFinite(acc) ? acc : null]
-    );
-    if (!result.rows[0]) return res.status(404).json({ error: 'Session tidak ditemukan.' });
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Gagal menyimpan status izin.' });
-  }
-});
-
 
 // ============ CONSENT-BASED CAMERA / LOCATION / IDENTITY ============
 let permissionTablesReady = false;
@@ -279,6 +247,22 @@ async function ensurePermissionTables(){
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
   )`);
   await pool.query('CREATE INDEX IF NOT EXISTS idx_visitor_permissions_updated ON visitor_permissions(updated_at DESC)');
+  await pool.query(`CREATE TABLE IF NOT EXISTS visitor_human_verifications (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+    status TEXT NOT NULL DEFAULT 'not-started',
+    camera_status TEXT,
+    check_method TEXT,
+    human_verified BOOLEAN,
+    frame_check BOOLEAN,
+    liveness_status TEXT,
+    started_at TIMESTAMPTZ,
+    completed_at TIMESTAMPTZ,
+    duration_ms INTEGER,
+    failure_reason TEXT,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_human_verifications_updated ON visitor_human_verifications(updated_at DESC)');
   permissionTablesReady=true;
 }
 
@@ -326,12 +310,39 @@ router.post('/identity', async (req,res)=>{
   }catch(err){console.error('[visitor/identity]',err);res.status(500).json({error:'Gagal menyimpan foto profil.'});}
 });
 
+router.post('/human-verification', async (req,res)=>{
+  try{
+    await ensurePermissionTables();
+    const {session_id,status,camera_status,check_method,human_verified,frame_check,liveness_status,started_at,completed_at,duration_ms,failure_reason}=req.body||{};
+    if(!session_id) return res.status(400).json({error:'session_id wajib diisi.'});
+    const session=await pool.query('SELECT session_id FROM visitors WHERE session_id=$1',[session_id]);
+    if(!session.rows[0]) return res.status(404).json({error:'Session pengunjung belum tercatat.'});
+    const statuses=['started','camera-granted','checking','verified','failed','camera-denied','unsupported'];
+    const st=statuses.includes(status)?status:'failed';
+    const cam=['granted','denied','not-available','unsupported','not-requested'].includes(camera_status)?camera_status:null;
+    const method=typeof check_method==='string'?String(check_method).slice(0,80):'client-basic';
+    const live=['not-checked','basic-pass','basic-fail'].includes(liveness_status)?liveness_status:'not-checked';
+    const hv=typeof human_verified==='boolean'?human_verified:null;
+    const fc=typeof frame_check==='boolean'?frame_check:null;
+    const dur=Number.isFinite(Number(duration_ms))?Math.min(Math.max(Math.round(Number(duration_ms)),0),60000):null;
+    const reason=typeof failure_reason==='string'?String(failure_reason).slice(0,300):null;
+    const result=await pool.query(`INSERT INTO visitor_human_verifications(session_id,status,camera_status,check_method,human_verified,frame_check,liveness_status,started_at,completed_at,duration_ms,failure_reason,updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,now())
+      ON CONFLICT(session_id) DO UPDATE SET status=$2,camera_status=COALESCE($3,visitor_human_verifications.camera_status),check_method=$4,human_verified=$5,frame_check=$6,liveness_status=$7,started_at=COALESCE(visitor_human_verifications.started_at,$8),completed_at=$9,duration_ms=$10,failure_reason=$11,updated_at=now()
+      RETURNING *`,[session_id,st,cam,method,hv,fc,live,started_at?new Date(started_at):null,completed_at?new Date(completed_at):null,dur,reason]);
+    await pool.query('UPDATE visitors SET last_activity=now() WHERE session_id=$1',[session_id]);
+    res.json({ok:true,verification:result.rows[0]});
+  }catch(err){console.error('[visitor/human-verification]',err);res.status(500).json({error:'Gagal menyimpan audit verifikasi human.'});}
+});
+
 router.get('/permission-monitor', requireAdmin, async (req,res)=>{
   try{
     await ensurePermissionTables();
     const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);
-    const result=await pool.query(`SELECT p.session_id,p.camera_status,p.location_status,p.latitude,p.longitude,p.accuracy,p.page,p.consent_at,p.updated_at,i.photo_data,i.created_at
-      FROM visitor_permissions p LEFT JOIN visitor_identities i ON i.session_id=p.session_id
+    const result=await pool.query(`SELECT p.session_id,p.camera_status,p.location_status,p.latitude,p.longitude,p.accuracy,p.page,p.consent_at,p.updated_at,
+             h.status as human_status,h.check_method as human_check_method,h.human_verified,h.frame_check,h.liveness_status,h.started_at as human_started_at,h.completed_at as human_completed_at,h.duration_ms as human_duration_ms,h.failure_reason as human_failure_reason,
+             i.photo_data,i.created_at
+      FROM visitor_permissions p LEFT JOIN visitor_human_verifications h ON h.session_id=p.session_id LEFT JOIN visitor_identities i ON i.session_id=p.session_id
       ORDER BY p.updated_at DESC LIMIT $1`,[limit]);
     res.json({count:result.rows.length,visitors:result.rows});
   }catch(err){console.error('[visitor/permission-monitor]',err);res.status(500).json({error:'Gagal mengambil monitor pengunjung.'});}
