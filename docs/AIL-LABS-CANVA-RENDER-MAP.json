@@ -1,0 +1,47 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Mapping verified Canva-generated AIL LABS product mockups to catalog SKUs.",
+  "source": "Canva generate-image jobs + get-assets verification",
+  "production_policy": {
+    "update_neon_foto_url": false,
+    "reason": "Canva asset links are not yet proven to be permanent public browser URLs; keep production foto_url unchanged until stable public hosting is verified."
+  },
+  "assets": [
+    {
+      "product_id": 3,
+      "product_name": "ClearSkin Spot Cream",
+      "kandungan": "Acne Cream Totol (Resorsinol 2, Sulfur 2, Clindamycin 2)",
+      "kemasan": "Pot 10gr",
+      "canva_asset_id": "MAHXQY4G3r8",
+      "canva_asset_url": "https://www.canva.com/M/MAHXQY4G3r8",
+      "status": "VERIFIED_ASSET",
+      "resolution": "1264x1264"
+    },
+    {
+      "product_id": 7,
+      "product_name": "ClearSkin Scar Fix Clinda",
+      "kandungan": "Azelaic Acid 20, Clinda 1 Cream (Bekas Jerawat)",
+      "kemasan": "Pot 10gr",
+      "canva_asset_id": "MAHXQQVopzc",
+      "canva_asset_url": "https://www.canva.com/M/MAHXQQVopzc",
+      "status": "VERIFIED_ASSET",
+      "resolution": "1264x1264"
+    },
+    {
+      "product_id": 18,
+      "product_name": "ClearSkin Strongest",
+      "kandungan": "Acnestrongest",
+      "kemasan": "Tube 10gr",
+      "canva_asset_id": "MAHXQZQZtH4",
+      "canva_asset_url": "https://www.canva.com/M/MAHXQZQZtH4",
+      "status": "VERIFIED_ASSET",
+      "resolution": "1264x1264"
+    }
+  ],
+  "notes": [
+    "Only assets whose generation job reached SUCCESS and whose Canva asset metadata returned import_status=success are included.",
+    "Canva connector exposes asset IDs and thumbnails, but not a permanent public CDN URL suitable for production foto_url.",
+    "The canva_asset_url uses the Canva asset-open URL pattern previously returned in this workflow; production should not depend on it until public persistence is verified.",
+    "Failed/unverifiable generation jobs are intentionally excluded rather than mapped speculatively."
+  ]
+}
