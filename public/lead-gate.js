@@ -17,7 +17,7 @@
     const wrap=document.createElement('div'); wrap.id='ailLeadGate';
     wrap.innerHTML=`<div class="ail-card" role="dialog" aria-modal="true" aria-labelledby="ailLeadTitle">
       <div class="ail-brand">AIL LABS · B2B ACCESS</div><h2 id="ailLeadTitle">Verifikasi kontak untuk melanjutkan.</h2>
-      <p>Akses website AIL LABS memerlukan data kontak B2B yang dapat dihubungi. Email diverifikasi dengan kode sekali pakai sebelum akses diberikan.</p>
+      <p>Akses website AIL LABS memerlukan data kontak B2B yang dapat dihubungi. Email diverifikasi dengan kode sekali pakai dan nomor WhatsApp diperiksa melalui WhatsApp Business Platform sebelum akses diberikan.</p>
       <div class="ail-step active"><div class="ail-grid">
         <label>Nama lengkap<input id="ailName" autocomplete="name" maxlength="120" required></label>
         <label>Perusahaan / Institusi<input id="ailCompany" autocomplete="organization" maxlength="160" required></label><label>Jenis bisnis<select id="ailBusiness"><option value="">Pilih</option><option>Clinic</option><option>Doctor</option><option>Distributor</option><option>Importer</option><option>Manufacturer</option><option>Aesthetic professional</option><option>Other</option></select></label>
@@ -27,10 +27,10 @@
       <label class="ail-check"><input id="ailConsent" type="checkbox"><span>Saya setuju AIL LABS memproses data ini untuk verifikasi identitas kontak, komunikasi bisnis, dan keamanan website. Lihat <a href="/compliance.html" target="_blank" rel="noopener">compliance</a>.</span></label>
       <label class="ail-check"><input id="ailMarketing" type="checkbox"><span>Saya bersedia menerima informasi produk/promosi AIL LABS. (Opsional)</span></label>
       <div class="ail-error" id="ailError"></div><button id="ailSend" type="button">Kirim kode verifikasi email</button>
-      <div class="ail-note">Email wajib diverifikasi. Nomor telepon divalidasi format; kepemilikan nomor belum diverifikasi.</div></div>
+      <div class="ail-note">Email wajib diverifikasi. Nomor WhatsApp juga harus terdeteksi sebagai akun WhatsApp yang valid.</div></div>
       <div class="ail-step"><p>Kode 6 digit telah dikirim ke <strong id="ailEmailPreview"></strong>. Berlaku 10 menit.</p>
         <div class="ail-grid"><label>Kode verifikasi<input id="ailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label></div>
-        <div class="ail-error" id="ailError2"></div><button id="ailVerify" type="button">Verifikasi & buka website</button>
+        <div class="ail-error" id="ailError2"></div><button id="ailVerify" type="button">Verifikasi email + WhatsApp & buka website</button>
         <button id="ailBack" type="button" style="margin-top:8px;background:#eaf4f3;color:#082f32">Kembali</button></div></div>`;
     document.body.appendChild(wrap); document.body.classList.add('ail-lead-locked');
     const $=id=>document.getElementById(id), steps=()=>wrap.querySelectorAll('.ail-step'), show=n=>steps().forEach((x,i)=>x.classList.toggle('active',i===n)), err=(id,msg)=>$(id).textContent=msg||'';
