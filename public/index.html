@@ -159,6 +159,13 @@ main.view.active{display:block}
 .contact-card a{color:#fff!important}
 .hero-badge,.cert-pill{border-radius:999px}
 
+/* PAGE — KATALOG */
+#view-katalog .hero-card{position:relative;overflow:hidden}
+#view-katalog .hero-card:after{content:"";position:absolute;width:220px;height:220px;right:-90px;bottom:-120px;border:1px solid rgba(8,145,178,.16);border-radius:50%;pointer-events:none}
+#view-katalog .hero-body{position:relative;z-index:1}
+#view-katalog .group{align-items:stretch}
+#view-katalog .row-thumb{background:var(--surface-soft)}
+
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.row,.hero-actions button,.tab,.chip,.icon-btn,.modal-overlay,.modal-card{transition:none!important}.row:hover,.hero-actions button:hover,.icon-btn:hover,.wish-btn:hover{transform:none!important}}
 </style>
 </head>
