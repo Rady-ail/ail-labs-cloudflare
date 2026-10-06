@@ -236,4 +236,72 @@ router.get('/:session_id', requireAdmin, async (req, res) => {
   }
 });
 
+// ============ CONSENT-BASED CAMERA / LOCATION / IDENTITY ============
+let permissionTablesReady = false;
+async function ensurePermissionTables(){
+  if(permissionTablesReady) return;
+  await pool.query(`CREATE TABLE IF NOT EXISTS visitor_permissions (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+    camera_status TEXT NOT NULL DEFAULT 'not-requested',
+    location_status TEXT NOT NULL DEFAULT 'not-requested',
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    accuracy DOUBLE PRECISION,
+    page TEXT,
+    consent_at TIMESTAMPTZ,
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS visitor_identities (
+    id SERIAL PRIMARY KEY,
+    session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
+    photo_data TEXT NOT NULL,
+    consent BOOLEAN NOT NULL DEFAULT false,
+    page TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  )`);
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_visitor_permissions_updated ON visitor_permissions(updated_at DESC)');
+  permissionTablesReady=true;
+}
+
+router.post('/permissions', async (req,res)=>{
+  try{
+    await ensurePermissionTables();
+    const {session_id,camera_status,location_status,latitude,longitude,accuracy,page}=req.body||{};
+    if(!session_id) return res.status(400).json({error:'session_id wajib diisi.'});
+    const cleanCamera=['granted','denied','prompt','not-requested','not-available','unsupported'].includes(camera_status)?camera_status:'not-requested';
+    const cleanLocation=['granted','denied','prompt','not-requested','unsupported'].includes(location_status)?location_status:'not-requested';
+    const lat=cleanLocation==='granted'&&Number.isFinite(Number(latitude))?Number(latitude):null;
+    const lon=cleanLocation==='granted'&&Number.isFinite(Number(longitude))?Number(longitude):null;
+    const acc=cleanLocation==='granted'&&Number.isFinite(Number(accuracy))?Math.min(Math.max(Number(accuracy),0),100000):null;
+    const result=await pool.query(`INSERT INTO visitor_permissions(session_id,camera_status,location_status,latitude,longitude,accuracy,page,consent_at,updated_at)
+      VALUES($1,$2,$3,$4,$5,$6,$7,CASE WHEN $3='granted' OR $2='granted' THEN now() ELSE NULL END,now())
+      ON CONFLICT(session_id) DO UPDATE SET camera_status=COALESCE($2,visitor_permissions.camera_status),location_status=COALESCE($3,visitor_permissions.location_status),latitude=CASE WHEN $3='granted' THEN $4 ELSE visitor_permissions.latitude END,longitude=CASE WHEN $3='granted' THEN $5 ELSE visitor_permissions.longitude END,accuracy=CASE WHEN $3='granted' THEN $6 ELSE visitor_permissions.accuracy END,page=COALESCE($7,visitor_permissions.page),updated_at=now(),consent_at=CASE WHEN $3='granted' OR $2='granted' THEN COALESCE(visitor_permissions.consent_at,now()) ELSE visitor_permissions.consent_at END
+      RETURNING id,session_id,camera_status,location_status,latitude,longitude,accuracy,page,consent_at,updated_at`,[session_id,cleanCamera,cleanLocation,lat,lon,acc,String(page||'').slice(0,500)||null]);
+    res.json(result.rows[0]);
+  }catch(err){console.error('[visitor/permissions]',err);res.status(500).json({error:'Gagal menyimpan status izin.'});}
+});
+
+router.post('/identity', async (req,res)=>{
+  try{
+    await ensurePermissionTables();
+    const {session_id,photo_data,consent,page}=req.body||{};
+    if(!session_id||consent!==true||typeof photo_data!=='string') return res.status(400).json({error:'Persetujuan dan foto wajib diisi.'});
+    if(!/^data:image\\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(photo_data)||photo_data.length>450000) return res.status(400).json({error:'Format atau ukuran foto tidak valid.'});
+    const result=await pool.query(`INSERT INTO visitor_identities(session_id,photo_data,consent,page) VALUES($1,$2,true,$3)
+      ON CONFLICT(session_id) DO UPDATE SET photo_data=EXCLUDED.photo_data,consent=true,page=EXCLUDED.page,created_at=now() RETURNING id,session_id,created_at`,[session_id,photo_data,String(page||'').slice(0,500)||null]);
+    res.json({ok:true,identity:result.rows[0]});
+  }catch(err){console.error('[visitor/identity]',err);res.status(500).json({error:'Gagal menyimpan foto profil.'});}
+});
+
+router.get('/permission-monitor', requireAdmin, async (req,res)=>{
+  try{
+    await ensurePermissionTables();
+    const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);
+    const result=await pool.query(`SELECT p.session_id,p.camera_status,p.location_status,p.latitude,p.longitude,p.accuracy,p.page,p.consent_at,p.updated_at,i.photo_data,i.created_at
+      FROM visitor_permissions p LEFT JOIN visitor_identities i ON i.session_id=p.session_id ORDER BY p.updated_at DESC LIMIT $1`,[limit]);
+    res.json({count:result.rows.length,visitors:result.rows});
+  }catch(err){console.error('[visitor/permission-monitor]',err);res.status(500).json({error:'Gagal mengambil monitor pengunjung.'});}
+});
+
 module.exports = router;
