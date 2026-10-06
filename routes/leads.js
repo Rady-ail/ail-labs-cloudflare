@@ -5,6 +5,8 @@ const pool = require('../db/pool');
 const { transporter } = require('../db/mailer');
 const { requireAdmin } = require('./authMiddleware');
 
+const WA_GRAPH_VERSION = process.env.WHATSAPP_GRAPH_VERSION || 'v25.0';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[1-9]\d{7,14}$/;
 const OTP_TTL_MINUTES = 10;
@@ -29,6 +31,22 @@ function sameOrigin(req) {
   const allow = String(process.env.ALLOWED_ORIGIN || 'https://ail-aesthetic-labs.my.id').split(',').map(v => v.trim().replace(/\/$/, '')).filter(Boolean);
   const origin = clean(req.get('origin'), 300).replace(/\/$/, '');
   return !origin || allow.includes(origin);
+}
+async function verifyWhatsAppNumber(phone) {
+  const token = clean(process.env.WHATSAPP_TOKEN, 500);
+  const phoneNumberId = clean(process.env.WHATSAPP_PHONE_NUMBER_ID, 100);
+  if (!token || !phoneNumberId) return { configured: false, valid: false, status: 'not_configured' };
+  const response = await fetch(`https://graph.facebook.com/${WA_GRAPH_VERSION}/${phoneNumberId}/contacts`, {
+    method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ messaging_product: 'whatsapp', blocking: 'wait', contacts: [phone.replace(/^\\+/, '')] })
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    console.error('[lead/whatsapp-verify]', JSON.stringify(data));
+    return { configured: true, valid: false, status: 'provider_error' };
+  }
+  const result = data.contacts?.[0];
+  return { configured: true, valid: result?.status === 'valid', status: result?.status || 'unknown', wa_id: result?.wa_id || null };
 }
 function requestIp(req) {
   return clean((req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '').split(',')[0], 100);
@@ -58,6 +76,9 @@ async function ensureTables() {
     ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'New';
     ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS notes TEXT;
     ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS whatsapp_verified_at TIMESTAMPTZ;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS whatsapp_status TEXT NOT NULL DEFAULT 'unverified';
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS whatsapp_wa_id TEXT;
     CREATE INDEX IF NOT EXISTS idx_lead_captures_score ON lead_captures(lead_score DESC);
     CREATE INDEX IF NOT EXISTS idx_lead_captures_status ON lead_captures(status);
     CREATE TABLE IF NOT EXISTS lead_email_otps (
@@ -76,7 +97,7 @@ router.get('/status', async (req, res) => {
     const token = clean(req.get('x-lead-token'), 200);
     if (!token) return res.json({ verified: false });
     const { rows } = await pool.query(
-      `SELECT id, name, company, email, phone, city, region, country FROM lead_captures WHERE lead_token_hash = $1 LIMIT 1`,
+      `SELECT id, name, company, email, phone, whatsapp_verified_at, whatsapp_status, city, region, country FROM lead_captures WHERE lead_token_hash = $1 LIMIT 1`,
       [hash(token)]
     );
     if (!rows[0]) return res.json({ verified: false });
@@ -162,6 +183,10 @@ router.post('/verify-otp', async (req, res) => {
       await pool.query('UPDATE lead_email_otps SET attempts = attempts + 1 WHERE id = $1', [challenge.id]);
       return res.status(400).json({ ok: false, error: 'Kode verifikasi salah.' });
     }
+    const wa = await verifyWhatsAppNumber(phone);
+    if (!wa.configured) return res.status(503).json({ ok: false, error: 'Verifikasi WhatsApp belum aktif di server. Hubungi administrator.' });
+    if (!wa.valid) return res.status(400).json({ ok: false, error: 'Nomor tersebut tidak terdeteksi sebagai akun WhatsApp yang valid. Periksa nomor dan coba lagi.' });
+
     await pool.query('UPDATE lead_email_otps SET consumed_at = now() WHERE id = $1', [challenge.id]);
 
     const token = crypto.randomBytes(32).toString('hex');
@@ -180,10 +205,10 @@ router.post('/verify-otp', async (req, res) => {
     const eventRows = sessionId ? (await pool.query('SELECT event_type,event_data FROM user_events WHERE session_id=$1 ORDER BY timestamp DESC LIMIT 100',[sessionId])).rows : [];
     const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
     const result = await pool.query(
-      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
-       VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
+      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at,whatsapp_verified_at,whatsapp_status,whatsapp_wa_id)
+       VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now(),now(),'valid',$23)
        RETURNING id,name,company,email,phone,city,region,country,interest_category,lead_score,status`,
-      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score]
+      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score,wa.wa_id||null]
     );
     res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
   } catch (err) {
@@ -192,7 +217,7 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-router.get('/admin/intelligence', requireAdmin, async (req,res)=>{ try{await ensureTables();const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);const {rows}=await pool.query(`SELECT id,created_at,last_activity_at,name,company,email,phone,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,city,region,country,first_page,referrer,marketing_consent FROM lead_captures ORDER BY lead_score DESC,created_at DESC LIMIT $1`,[limit]);res.json({count:rows.length,leads:rows});}catch(err){console.error('[lead/admin/intelligence]',err);res.status(500).json({error:'Gagal mengambil lead intelligence.'});} });
+router.get('/admin/intelligence', requireAdmin, async (req,res)=>{ try{await ensureTables();const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);const {rows}=await pool.query(`SELECT id,created_at,last_activity_at,name,company,email,phone,whatsapp_verified_at,whatsapp_status,whatsapp_wa_id,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,city,region,country,first_page,referrer,marketing_consent FROM lead_captures ORDER BY lead_score DESC,created_at DESC LIMIT $1`,[limit]);res.json({count:rows.length,leads:rows});}catch(err){console.error('[lead/admin/intelligence]',err);res.status(500).json({error:'Gagal mengambil lead intelligence.'});} });
 router.patch('/admin/:id', requireAdmin, async (req,res)=>{try{await ensureTables();const id=parseInt(req.params.id,10),status=clean(req.body?.status,30);if(!id||!STATUS_VALUES.includes(status))return res.status(400).json({error:'Status tidak valid.'});const {rows}=await pool.query(`UPDATE lead_captures SET status=$1,last_activity_at=now() WHERE id=$2 RETURNING id,status,last_activity_at`,[status,id]);if(!rows[0])return res.status(404).json({error:'Lead tidak ditemukan.'});res.json(rows[0]);}catch(err){console.error('[lead/admin/status]',err);res.status(500).json({error:'Gagal memperbarui status lead.'});} });
 router.get('/admin', requireAdmin, async (req, res) => {
   try {
