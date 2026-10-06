@@ -205,36 +205,6 @@ router.get('/history/days', requireAdmin, async (req, res) => {
   }
 });
 
-// ============ GET VISITOR DETAILS (admin) ============
-// Catatan: rute parameter ':session_id' sengaja diletakkan PALING BAWAH
-// supaya tidak "menangkap" path literal seperti /active, /today, /history
-// di atasnya (urutan route di Express itu penting).
-router.get('/:session_id', requireAdmin, async (req, res) => {
-  try {
-    const { session_id } = req.params;
-
-    const visitor = await pool.query('SELECT * FROM visitors WHERE session_id = $1', [session_id]);
-    const pageviews = await pool.query(
-      'SELECT * FROM page_views WHERE session_id = $1 ORDER BY timestamp DESC',
-      [session_id]
-    );
-    const events = await pool.query(
-      'SELECT * FROM user_events WHERE session_id = $1 ORDER BY timestamp DESC',
-      [session_id]
-    );
-
-    if (!visitor.rows[0]) return res.status(404).json({ error: 'Pengunjung tidak ditemukan.' });
-
-    res.json({
-      visitor: visitor.rows[0],
-      pageviews: pageviews.rows,
-      events: events.rows
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Gagal mengambil detail pengunjung.' });
-  }
-});
 
 // ============ CONSENT-BASED CAMERA / LOCATION / IDENTITY ============
 let permissionTablesReady = false;
@@ -302,6 +272,38 @@ router.get('/permission-monitor', requireAdmin, async (req,res)=>{
       FROM visitor_permissions p LEFT JOIN visitor_identities i ON i.session_id=p.session_id ORDER BY p.updated_at DESC LIMIT $1`,[limit]);
     res.json({count:result.rows.length,visitors:result.rows});
   }catch(err){console.error('[visitor/permission-monitor]',err);res.status(500).json({error:'Gagal mengambil monitor pengunjung.'});}
+});
+
+
+// ============ GET VISITOR DETAILS (admin) ============
+// Catatan: rute parameter ':session_id' sengaja diletakkan PALING BAWAH
+// supaya tidak "menangkap" path literal seperti /active, /today, /history
+// di atasnya (urutan route di Express itu penting).
+router.get('/:session_id', requireAdmin, async (req, res) => {
+  try {
+    const { session_id } = req.params;
+
+    const visitor = await pool.query('SELECT * FROM visitors WHERE session_id = $1', [session_id]);
+    const pageviews = await pool.query(
+      'SELECT * FROM page_views WHERE session_id = $1 ORDER BY timestamp DESC',
+      [session_id]
+    );
+    const events = await pool.query(
+      'SELECT * FROM user_events WHERE session_id = $1 ORDER BY timestamp DESC',
+      [session_id]
+    );
+
+    if (!visitor.rows[0]) return res.status(404).json({ error: 'Pengunjung tidak ditemukan.' });
+
+    res.json({
+      visitor: visitor.rows[0],
+      pageviews: pageviews.rows,
+      events: events.rows
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Gagal mengambil detail pengunjung.' });
+  }
 });
 
 module.exports = router;
