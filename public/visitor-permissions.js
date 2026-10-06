@@ -1,7 +1,8 @@
 (()=>{
   const sessionId=()=>localStorage.getItem('ail_session_id')||'';
   const api=async(path,body)=>{try{await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),keepalive:true});}catch(e){}};
-  const state={camera:'not-requested',location:'not-requested',stream:null,photo:null};
+  const state={camera:'not-requested',location:'not-requested',stream:null,photo:null,redirecting:false};
+  function returnToPreviousPage(){if(state.redirecting)return;state.redirecting=true;stopCamera();setTimeout(()=>{if(history.length>1){history.back();}else if(document.referrer){try{const u=new URL(document.referrer);if(u.origin===location.origin){location.replace(document.referrer);return;}}catch(e){}}location.replace('/');},350);}
   function mount(){
     if(document.getElementById('ailPermissionCenter'))return;
     const wrap=document.createElement('section'); wrap.id='ailPermissionCenter'; wrap.className='ail-permission-center';
@@ -19,16 +20,16 @@
   async function query(name){try{return (await navigator.permissions.query({name})).state;}catch(e){return 'unsupported';}}
   async function updateStatus(){state.location=await query('geolocation');state.camera=await query('camera');statusText();await api('/api/visitors/permissions',{session_id:sessionId(),camera_status:state.camera,location_status:state.location,page:location.pathname});}
   async function requestLocation(){
-    if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(async p=>{state.location='granted';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),location_status:'granted',camera_status:state.camera,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy,page:location.pathname});},async()=>{state.location='denied';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),location_status:'denied',camera_status:state.camera,page:location.pathname});},{enableHighAccuracy:false,maximumAge:300000,timeout:10000});}
+    if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(async p=>{state.location='granted';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),location_status:'granted',camera_status:state.camera,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy,page:location.pathname});},async(err)=>{state.location=err&&err.code===1?'denied':'not-available';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),location_status:state.location,camera_status:state.camera,page:location.pathname});if(state.location==='denied')returnToPreviousPage();},{enableHighAccuracy:false,maximumAge:300000,timeout:10000});}
   async function requestCamera(){
     if(!navigator.mediaDevices?.getUserMedia){state.camera='unsupported';statusText();return;}
     try{const s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});state.camera='granted';s.getTracks().forEach(t=>t.stop());state.stream=null;statusText();await api('/api/visitors/permissions',{session_id:sessionId(),camera_status:'granted',location_status:state.location,page:location.pathname});}
-    catch(e){state.camera=e.name==='NotAllowedError'?'denied':'not-available';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),camera_status:'denied',location_status:state.location,page:location.pathname});}
+    catch(e){state.camera=e.name==='NotAllowedError'?'denied':'not-available';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),camera_status:state.camera,location_status:state.location,page:location.pathname});if(state.camera==='denied')returnToPreviousPage();}
   }
   async function requestSelfie(){
     if(!navigator.mediaDevices?.getUserMedia)return;
     try{state.stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});state.camera='granted';const v=document.getElementById('ailCameraPreview');v.srcObject=state.stream;v.style.display='block';await v.play();document.getElementById('ailSelfieActions').style.display='flex';statusText();await api('/api/visitors/permissions',{session_id:sessionId(),camera_status:'granted',location_status:state.location,page:location.pathname});}
-    catch(e){state.camera='denied';statusText();}
+    catch(e){state.camera=e.name==='NotAllowedError'?'denied':'not-available';statusText();if(state.camera==='denied')returnToPreviousPage();}
   }
   async function captureSelfie(){
     const v=document.getElementById('ailCameraPreview'),c=document.getElementById('ailSelfieCanvas'); if(!state.stream||!v.videoWidth)return;
