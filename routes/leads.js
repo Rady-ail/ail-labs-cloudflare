@@ -47,6 +47,19 @@ async function ensureTables() {
     CREATE INDEX IF NOT EXISTS idx_lead_captures_email ON lead_captures(email);
     CREATE INDEX IF NOT EXISTS idx_lead_captures_created_at ON lead_captures(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_lead_captures_country ON lead_captures(country);
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS business_type TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS interest_category TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_source TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS landing_page TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_source TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_medium TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_campaign TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_score INTEGER NOT NULL DEFAULT 20;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'New';
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS notes TEXT;
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now();
+    CREATE INDEX IF NOT EXISTS idx_lead_captures_score ON lead_captures(lead_score DESC);
+    CREATE INDEX IF NOT EXISTS idx_lead_captures_status ON lead_captures(status);
     CREATE TABLE IF NOT EXISTS lead_email_otps (
       id SERIAL PRIMARY KEY, email TEXT NOT NULL, otp_hash TEXT NOT NULL,
       expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
