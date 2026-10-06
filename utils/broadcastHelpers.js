@@ -18,12 +18,13 @@ function normalisasiNoHp(noHp) {
   if (!digits) return null;
 
   let hasil;
+  // Simpan nomor dalam format internasional E.164 tanpa tanda "+".
+  // Indonesia 08xx otomatis menjadi 62xx; nomor luar negeri dipertahankan.
   if (digits.startsWith('0')) hasil = '62' + digits.slice(1);
-  else if (digits.startsWith('62')) hasil = digits;
-  else hasil = '62' + digits;
+  else hasil = digits;
 
-  // Nomor HP Indonesia setelah prefix 62: umumnya 9-13 digit (total 11-15 digit termasuk '62')
-  if (hasil.length < 11 || hasil.length > 15) return null;
+  // E.164: maksimal 15 digit; tolak nomor yang terlalu pendek.
+  if (hasil.length < 10 || hasil.length > 15) return null;
 
   return hasil;
 }

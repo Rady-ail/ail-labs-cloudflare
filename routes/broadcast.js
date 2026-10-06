@@ -213,9 +213,12 @@ async function ambilKontakValid({ kategori, ids }) {
 // POST /api/broadcast/jadwal sebagai gantinya — lihat di bawah.
 router.post('/send', async (req, res) => {
   try {
-    const { kategori, ids, message, delay } = req.body;
+    const { kategori, ids, message, delay, confirm_opt_in } = req.body;
     if (!message || !String(message).trim()) {
       return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
+    }
+    if (confirm_opt_in !== true) {
+      return res.status(400).json({ error: 'Konfirmasi opt-in wajib. Pastikan setiap penerima telah memberi izin menerima pesan WhatsApp AIL LABS.' });
     }
 
     const { kontakValid, dilewati, error } = await ambilKontakValid({ kategori, ids });
@@ -226,7 +229,8 @@ router.post('/send', async (req, res) => {
 
     // Jeda antar pesan (detik) — dibuat cukup lama (default 100 dtk) supaya pengiriman
     // terlihat manusiawi/bertahap, bukan blast massal dalam sekejap.
-    const jedaDetik = Number(delay) > 0 ? Number(delay) : 100;
+    const jedaInput = Number(delay) > 0 ? Number(delay) : 100;
+    const jedaDetik = Math.max(10, Math.min(jedaInput, 3600));
 
     // Catat campaign 'langsung' + seluruh antrian kontak ke DB dulu (status 'pending'),
     // supaya progres bisa dipantau real-time walau baru mulai kirim.
@@ -317,9 +321,12 @@ router.post('/send', async (req, res) => {
 // jam 08:00 WITA, sampai antrian habis, lalu campaign ditandai selesai.
 router.post('/jadwal', async (req, res) => {
   try {
-    const { kategori, ids, message, per_hari, jeda_detik } = req.body;
+    const { kategori, ids, message, per_hari, jeda_detik, confirm_opt_in } = req.body;
     if (!message || !String(message).trim()) {
       return res.status(400).json({ error: 'Pesan tidak boleh kosong' });
+    }
+    if (confirm_opt_in !== true) {
+      return res.status(400).json({ error: 'Konfirmasi opt-in wajib. Pastikan setiap penerima telah memberi izin menerima pesan WhatsApp AIL LABS.' });
     }
 
     const { kontakValid, dilewati, error } = await ambilKontakValid({ kategori, ids });
@@ -329,7 +336,8 @@ router.post('/jadwal', async (req, res) => {
     }
 
     const perHariFinal = Number(per_hari) > 0 ? Number(per_hari) : 40;
-    const jedaFinal = Number(jeda_detik) > 0 ? Number(jeda_detik) : 60;
+    const jedaInput = Number(jeda_detik) > 0 ? Number(jeda_detik) : 60;
+    const jedaFinal = Math.max(30, Math.min(jedaInput, 3600));
 
     const client = await pool.connect();
     try {
