@@ -144,6 +144,21 @@ main.view.active{display:block}
 @media(min-width:760px){.group{grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-3)}.hero-card{padding:var(--space-7)}main.view{padding-left:24px;padding-right:24px}}
 @media(max-width:759px){main.view{padding-left:12px;padding-right:12px;padding-top:var(--space-3)}.hero-card{min-height:360px;padding:28px 22px;border-radius:var(--radius-md)}.hero-card h1{font-size:34px}.hero-actions{display:grid;grid-template-columns:1fr}.hero-actions button{width:100%}.group{gap:10px}.row{border-radius:var(--radius-sm)}.row-body{padding:0 11px}.row-name{font-size:13.5px}.row-sub{font-size:11px}.row-kemasan{font-size:10.5px}.row-price{font-size:12.5px}.wish-btn{min-width:40px;min-height:40px}.tabbar{bottom:max(8px,env(safe-area-inset-bottom));width:calc(100% - 20px)}}
 @media(max-width:380px){.group{gap:8px}.row-body{padding:0 9px}.row-name{font-size:13px}.row-sub{font-size:10.5px}.tab{font-size:9.5px}}
+/* COMPONENT BASE — consistent clinical surfaces and controls */
+.topbar,.section-head,.search-bar,.tabbar,.info-card,.cart-summary,.order-card,.bank-card{min-width:0}
+.topbar-inner{max-width:100%}
+.section-block{opacity:1;visibility:visible;transform:none}
+.section-block.is-visible{opacity:1;transform:none}
+.view-title{font-size:clamp(28px,4vw,40px);line-height:1.2;margin:0 0 var(--space-4)}
+.back-chip{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--text);cursor:pointer}
+.back-chip:hover{border-color:#D1D5DB;background:var(--surface-soft)}
+.wish-add-btn{min-height:40px;padding:8px 12px;border:1px solid var(--cyan);border-radius:999px;background:var(--cyan-soft);color:var(--cyan-text);font-weight:700;cursor:pointer}
+.copy-btn{color:var(--cyan-text)!important;border:1px solid var(--line)!important}
+.paypal-divider{color:var(--text-muted)!important}
+.contact-card{background:var(--text)!important;color:#fff!important;border:1px solid var(--text)!important;border-radius:var(--radius-md)!important}
+.contact-card a{color:#fff!important}
+.hero-badge,.cert-pill{border-radius:999px}
+
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.row,.hero-actions button,.tab,.chip,.icon-btn,.modal-overlay,.modal-card{transition:none!important}.row:hover,.hero-actions button:hover,.icon-btn:hover,.wish-btn:hover{transform:none!important}}
 </style>
 </head>
