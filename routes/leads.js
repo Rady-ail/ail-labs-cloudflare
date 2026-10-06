@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const router = express.Router();
 const pool = require('../db/pool');
 const { transporter } = require('../db/mailer');
+const { sendWhatsAppTemplate } = require('../lib/whatsapp');
 const { requireAdmin } = require('./authMiddleware');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -39,12 +40,14 @@ async function ensureTables() {
     CREATE TABLE IF NOT EXISTS lead_captures (
       id SERIAL PRIMARY KEY, session_id TEXT, name TEXT NOT NULL, company TEXT NOT NULL,
       phone TEXT NOT NULL, email TEXT NOT NULL, email_verified_at TIMESTAMPTZ NOT NULL,
+      phone_verified_at TIMESTAMPTZ,
       consent_at TIMESTAMPTZ NOT NULL, marketing_consent BOOLEAN NOT NULL DEFAULT false,
       lead_token_hash TEXT UNIQUE NOT NULL, ip_address TEXT, country TEXT, region TEXT, city TEXT,
       user_agent TEXT, first_page TEXT, referrer TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
       last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(), business_type TEXT, interest_category TEXT, lead_source TEXT, landing_page TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, lead_score INTEGER NOT NULL DEFAULT 20, status TEXT NOT NULL DEFAULT 'New', notes TEXT, last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now()
     );
     CREATE INDEX IF NOT EXISTS idx_lead_captures_email ON lead_captures(email);
+    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS phone_verified_at TIMESTAMPTZ;
     CREATE INDEX IF NOT EXISTS idx_lead_captures_created_at ON lead_captures(created_at DESC);
     CREATE INDEX IF NOT EXISTS idx_lead_captures_country ON lead_captures(country);
     ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS business_type TEXT;
@@ -66,6 +69,12 @@ async function ensureTables() {
       request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ
     );
     CREATE INDEX IF NOT EXISTS idx_lead_otps_email_created ON lead_email_otps(email, created_at DESC);
+    CREATE TABLE IF NOT EXISTS lead_whatsapp_otps (
+      id SERIAL PRIMARY KEY, phone TEXT NOT NULL, otp_hash TEXT NOT NULL,
+      expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
+      request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ
+    );
+    CREATE INDEX IF NOT EXISTS idx_lead_wa_otps_phone_created ON lead_whatsapp_otps(phone, created_at DESC);
   `);
   tablesReady = true;
 }
@@ -76,7 +85,7 @@ router.get('/status', async (req, res) => {
     const token = clean(req.get('x-lead-token'), 200);
     if (!token) return res.json({ verified: false });
     const { rows } = await pool.query(
-      `SELECT id, name, company, email, phone, city, region, country FROM lead_captures WHERE lead_token_hash = $1 LIMIT 1`,
+      `SELECT id, name, company, email, phone, phone_verified_at, city, region, country FROM lead_captures WHERE lead_token_hash = $1 LIMIT 1`,
       [hash(token)]
     );
     if (!rows[0]) return res.json({ verified: false });
@@ -115,9 +124,25 @@ router.post('/request-otp', async (req, res) => {
     if (recent.rows[0].count >= 3) return res.status(429).json({ ok: false, error: 'Terlalu banyak permintaan kode. Coba lagi dalam beberapa menit.' });
 
     const otp = String(crypto.randomInt(100000, 1000000));
+    const waOtp = String(crypto.randomInt(100000, 1000000));
+    const waTemplate = clean(process.env.WHATSAPP_OTP_TEMPLATE_NAME, 120);
+    const waLanguage = clean(process.env.WHATSAPP_OTP_TEMPLATE_LANGUAGE || 'en_US', 20);
+    if (!process.env.WHATSAPP_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID || !waTemplate)
+      return res.status(503).json({ ok: false, error: 'Verifikasi WhatsApp sedang dikonfigurasi. Silakan coba lagi nanti.' });
+
+    const recentWa = await pool.query(
+      `SELECT COUNT(*)::int AS count FROM lead_whatsapp_otps WHERE (phone = $1 OR request_ip = $2) AND created_at > now() - interval '15 minutes'`,
+      [phone, ip]
+    );
+    if (recentWa.rows[0].count >= 3) return res.status(429).json({ ok: false, error: 'Terlalu banyak permintaan kode WhatsApp. Coba lagi dalam beberapa menit.' });
+
     await pool.query(
       `INSERT INTO lead_email_otps (email, otp_hash, expires_at, request_ip) VALUES ($1, $2, now() + interval '10 minutes', $3)`,
       [email, hash(otp), ip]
+    );
+    await pool.query(
+      `INSERT INTO lead_whatsapp_otps (phone, otp_hash, expires_at, request_ip) VALUES ($1, $2, now() + interval '10 minutes', $3)`,
+      [phone, hash(waOtp), ip]
     );
 
     const from = clean(process.env.MAIL_FROM || process.env.RESEND_FROM, 254);
@@ -127,7 +152,17 @@ router.post('/request-otp', async (req, res) => {
       from, to: email, subject: 'Kode verifikasi AIL LABS',
       text: `Kode verifikasi AIL LABS Anda: ${otp}\n\nKode berlaku 10 menit. Jangan bagikan kode ini kepada siapa pun.`,
     });
-    res.status(201).json({ ok: true, message: 'Kode verifikasi telah dikirim ke email Anda.', expires_in: 600 });
+    const waResult = await sendWhatsAppTemplate(
+      phone.replace(/^\+/, ''),
+      waTemplate,
+      waLanguage,
+      [waOtp]
+    );
+    if (!waResult.success) {
+      console.error('[lead/request-otp] WhatsApp OTP gagal:', waResult.reason || waResult.error);
+      return res.status(502).json({ ok: false, error: 'Kode WhatsApp belum dapat dikirim. Pastikan template OTP WhatsApp sudah aktif.' });
+    }
+    res.status(201).json({ ok: true, message: 'Kode verifikasi telah dikirim ke email dan WhatsApp Anda.', expires_in: 600 });
   } catch (err) {
     console.error('[lead/request-otp]', err);
     res.status(502).json({ ok: false, error: 'Kode verifikasi belum dapat dikirim. Silakan coba lagi.' });
@@ -142,12 +177,12 @@ router.post('/verify-otp', async (req, res) => {
     const body = req.body && typeof req.body === 'object' ? req.body : {};
     const name = clean(body.name, 120), company = clean(body.company, 160);
     const email = clean(body.email, 180).toLowerCase(), phone = normalizePhone(body.phone);
-    const sessionId = clean(body.session_id, 120), otp = clean(body.otp, 12);
+    const sessionId = clean(body.session_id, 120), otp = clean(body.otp, 12), waOtp = clean(body.wa_otp, 12);
     const consent = body.consent === true, marketingConsent = body.marketing_consent === true;
 
-    if (!name || !company || !email || !phone || !otp || !consent)
+    if (!name || !company || !email || !phone || !otp || !waOtp || !consent)
       return res.status(400).json({ ok: false, error: 'Data verifikasi belum lengkap.' });
-    if (!EMAIL_RE.test(email) || !PHONE_RE.test(phone) || !/^\d{6}$/.test(otp))
+    if (!EMAIL_RE.test(email) || !PHONE_RE.test(phone) || !/^\d{6}$/.test(otp) || !/^\d{6}$/.test(waOtp))
       return res.status(400).json({ ok: false, error: 'Data verifikasi tidak valid.' });
 
     const { rows } = await pool.query(
@@ -162,7 +197,19 @@ router.post('/verify-otp', async (req, res) => {
       await pool.query('UPDATE lead_email_otps SET attempts = attempts + 1 WHERE id = $1', [challenge.id]);
       return res.status(400).json({ ok: false, error: 'Kode verifikasi salah.' });
     }
+    const waRows = await pool.query(
+      `SELECT * FROM lead_whatsapp_otps WHERE phone = $1 AND consumed_at IS NULL AND expires_at > now() ORDER BY created_at DESC LIMIT 1`,
+      [phone]
+    );
+    const waChallenge = waRows.rows[0];
+    if (!waChallenge) return res.status(400).json({ ok: false, error: 'Kode WhatsApp tidak ditemukan atau sudah kedaluwarsa.' });
+    if (waChallenge.attempts >= MAX_ATTEMPTS) return res.status(429).json({ ok: false, error: 'Terlalu banyak percobaan kode WhatsApp.' });
+    if (hash(waOtp) !== waChallenge.otp_hash) {
+      await pool.query('UPDATE lead_whatsapp_otps SET attempts = attempts + 1 WHERE id = $1', [waChallenge.id]);
+      return res.status(400).json({ ok: false, error: 'Kode WhatsApp salah.' });
+    }
     await pool.query('UPDATE lead_email_otps SET consumed_at = now() WHERE id = $1', [challenge.id]);
+    await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = now() WHERE id = $1', [waChallenge.id]);
 
     const token = crypto.randomBytes(32).toString('hex');
     const ip = requestIp(req);
@@ -180,9 +227,9 @@ router.post('/verify-otp', async (req, res) => {
     const eventRows = sessionId ? (await pool.query('SELECT event_type,event_data FROM user_events WHERE session_id=$1 ORDER BY timestamp DESC LIMIT 100',[sessionId])).rows : [];
     const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
     const result = await pool.query(
-      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
+      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,phone_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
        VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
-       RETURNING id,name,company,email,phone,city,region,country,interest_category,lead_score,status`,
+       RETURNING id,name,company,email,phone,phone_verified_at,city,region,country,interest_category,lead_score,status`,
       [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score]
     );
     res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
@@ -192,7 +239,7 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-router.get('/admin/intelligence', requireAdmin, async (req,res)=>{ try{await ensureTables();const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);const {rows}=await pool.query(`SELECT id,created_at,last_activity_at,name,company,email,phone,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,city,region,country,first_page,referrer,marketing_consent FROM lead_captures ORDER BY lead_score DESC,created_at DESC LIMIT $1`,[limit]);res.json({count:rows.length,leads:rows});}catch(err){console.error('[lead/admin/intelligence]',err);res.status(500).json({error:'Gagal mengambil lead intelligence.'});} });
+router.get('/admin/intelligence', requireAdmin, async (req,res)=>{ try{await ensureTables();const limit=Math.min(Math.max(parseInt(req.query.limit,10)||100,1),500);const {rows}=await pool.query(`SELECT id,created_at,last_activity_at,name,company,email,phone,phone_verified_at,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,city,region,country,first_page,referrer,marketing_consent FROM lead_captures ORDER BY lead_score DESC,created_at DESC LIMIT $1`,[limit]);res.json({count:rows.length,leads:rows});}catch(err){console.error('[lead/admin/intelligence]',err);res.status(500).json({error:'Gagal mengambil lead intelligence.'});} });
 router.patch('/admin/:id', requireAdmin, async (req,res)=>{try{await ensureTables();const id=parseInt(req.params.id,10),status=clean(req.body?.status,30);if(!id||!STATUS_VALUES.includes(status))return res.status(400).json({error:'Status tidak valid.'});const {rows}=await pool.query(`UPDATE lead_captures SET status=$1,last_activity_at=now() WHERE id=$2 RETURNING id,status,last_activity_at`,[status,id]);if(!rows[0])return res.status(404).json({error:'Lead tidak ditemukan.'});res.json(rows[0]);}catch(err){console.error('[lead/admin/status]',err);res.status(500).json({error:'Gagal memperbarui status lead.'});} });
 router.get('/admin', requireAdmin, async (req, res) => {
   try {
