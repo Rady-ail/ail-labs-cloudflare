@@ -76,10 +76,16 @@ if (sessionSecret) {
     name: 'ail_session',
     secret: sessionSecret,
     maxAge: 24 * 60 * 60 * 1000, // 24 jam
+    httpOnly: true,
     sameSite: 'lax',
     secure: isCloudflareWorker || process.env.NODE_ENV === 'production',
+    overwrite: true,
   }));
 } else {
+  // Keep the public site available, but do not pretend admin sessions are healthy.
+  if (process.env.NODE_ENV === 'production' || isCloudflareWorker) {
+    console.error('[auth] SESSION_SECRET is missing in production; admin sessions are disabled.');
+  }
   app.use((req, res, next) => {
     req.session = {};
     next();
