@@ -104,6 +104,7 @@ app.use('/api/payment-confirmation', require('./routes/payment-confirmation'));
 app.use('/api/paypal', require('./routes/paypal'));
 app.use('/api/promo', require('./routes/promo'));
 app.use('/api/visitors', require('./routes/visitors'));
+app.use('/api/leads', require('./routes/leads'));
 app.use('/api/analytics', require('./routes/analytics'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/customer/auth', require('./routes/customerAuth'));
