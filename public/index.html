@@ -174,7 +174,6 @@ const steps=[['1. Add to Quotation','Pilih kebutuhan produk dan estimasi quantit
 function renderSteps(){document.getElementById('quoteSteps').innerHTML=steps.map((s,i)=>'<div class="rounded-2xl border '+(i+1===quoteStep?'border-ail-teal bg-[#F3F8F7]':'border-slate-200')+' p-4"><div class="font-bold">'+s[0]+'</div><div class="mt-1 text-xs leading-5 text-slate-500">'+s[1]+'</div></div>').join('')}
 function openQuote(){document.body.classList.add('modal-open');document.getElementById('quoteModal').classList.remove('hidden');document.getElementById('quoteModal').classList.add('flex');renderSteps()}
 function closeQuote(){document.body.classList.remove('modal-open');document.getElementById('quoteModal').classList.add('hidden');document.getElementById('quoteModal').classList.remove('flex')}
-function nextQuoteStep(){if(quoteStep<5){quoteStep++;renderSteps();return}window.location.href='mailto:info@ail-aesthetic-labs.my.id?subject='+encodeURIComponent('AIL LABS B2B Request Quotation')+'&body='+encodeURIComponent('Thank you, our team will contact you via official WhatsApp within 1x24h after NIB verification.\n\nMohon lengkapi detail customer, perusahaan, NIB, produk, quantity, dan catatan.')}
 let activeCategory='Semua', catalogData=[];
 const categoryAliases={
   'Body Care & Slimming':['Body Care & Slimming','Body Lotion','Slimming'],
