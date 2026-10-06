@@ -20,7 +20,7 @@
       <p>Akses website AIL LABS memerlukan data kontak B2B yang dapat dihubungi. Email diverifikasi dengan kode sekali pakai sebelum akses diberikan.</p>
       <div class="ail-step active"><div class="ail-grid">
         <label>Nama lengkap<input id="ailName" autocomplete="name" maxlength="120" required></label>
-        <label>Perusahaan / Institusi<input id="ailCompany" autocomplete="organization" maxlength="160" required></label>
+        <label>Perusahaan / Institusi<input id="ailCompany" autocomplete="organization" maxlength="160" required></label><label>Jenis bisnis<select id="ailBusiness"><option value="">Pilih</option><option>Clinic</option><option>Doctor</option><option>Distributor</option><option>Importer</option><option>Manufacturer</option><option>Aesthetic professional</option><option>Other</option></select></label>
         <label>Email bisnis<input id="ailEmail" type="email" autocomplete="email" maxlength="180" required></label>
         <label>No. telepon / WhatsApp<input id="ailPhone" inputmode="tel" autocomplete="tel" placeholder="+628123456789" maxlength="20" required></label>
       </div>
@@ -35,15 +35,15 @@
     document.body.appendChild(wrap); document.body.classList.add('ail-lead-locked');
     const $=id=>document.getElementById(id), steps=()=>wrap.querySelectorAll('.ail-step'), show=n=>steps().forEach((x,i)=>x.classList.toggle('active',i===n)), err=(id,msg)=>$(id).textContent=msg||'';
     $('ailSend').onclick=async()=>{
-      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim();
-      if(!name||!company||!email||!phone||!$('ailConsent').checked){err('ailError','Lengkapi data dan centang persetujuan pemrosesan data.');return}
+      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim();
+      if(!name||!company||!businessType||!email||!phone||!$('ailConsent').checked){err('ailError','Lengkapi data dan centang persetujuan pemrosesan data.');return}
       $('ailSend').disabled=true;err('ailError','Mengirim kode verifikasi…');
-      try{const r=await fetch('/api/leads/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,email,phone,session_id:getSessionId(),consent:true,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'Kode verifikasi gagal dikirim.');$('ailEmailPreview').textContent=email;err('ailError','Kode terkirim. Cek inbox/spam.');show(1)}catch(e){err('ailError',e.message||'Terjadi kesalahan.')}finally{$('ailSend').disabled=false}
+      try{const r=await fetch('/api/leads/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||(document.referrer?'referral':'direct'),utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:true,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'Kode verifikasi gagal dikirim.');$('ailEmailPreview').textContent=email;err('ailError','Kode terkirim. Cek inbox/spam.');show(1)}catch(e){err('ailError',e.message||'Terjadi kesalahan.')}finally{$('ailSend').disabled=false}
     };
     $('ailVerify').onclick=async()=>{
-      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim(),otp=$('ailOtp').value.trim();
+      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim(),otp=$('ailOtp').value.trim();
       $('ailVerify').disabled=true;err('ailError2','Memverifikasi…');
-      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,email,phone,otp,session_id:getSessionId(),consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{$('ailVerify').disabled=false}
+      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,otp,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||'direct',utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{$('ailVerify').disabled=false}
     };
     $('ailBack').onclick=()=>{err('ailError2','');show(0)};
   }
