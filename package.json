@@ -6,9 +6,10 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server.js",
-    "seed": "node scripts/seed.js",
     "dev": "npx wrangler dev",
+    "build": "node scripts/validate-build.js",
     "deploy": "npx wrangler deploy",
+    "seed": "node scripts/seed.js",
     "postinstall": "node scripts/patch-workers-express.js"
   },
   "dependencies": {
