@@ -26,7 +26,7 @@
       </div>
       <label class="ail-check"><input id="ailConsent" type="checkbox"><span>Saya setuju AIL LABS memproses data ini untuk verifikasi identitas kontak, komunikasi bisnis, dan keamanan website. Lihat <a href="/compliance.html" target="_blank" rel="noopener">compliance</a>.</span></label>
       <label class="ail-check"><input id="ailMarketing" type="checkbox"><span>Saya bersedia menerima informasi produk/promosi AIL LABS. (Opsional)</span></label>
-      <div class="ail-error" id="ailError"></div><button id="ailSend" type="button">Kirim kode verifikasi email</button>
+      <div class="ail-error" id="ailError"></div><button id="ailSend" type="button">Kirim kode ke Email + WhatsApp</button>
       <div class="ail-note">Email wajib diverifikasi. Nomor WhatsApp wajib diverifikasi dengan kode OTP. Nomor hanya dapat lolos jika kode diterima pada nomor tersebut.</div></div>
       <div class="ail-step"><p>Kode 6 digit telah dikirim ke <strong id="ailEmailPreview"></strong> dan WhatsApp Anda. Berlaku 10 menit.</p>
         <div class="ail-grid"><label>Kode verifikasi email<input id="ailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label><label>Kode verifikasi WhatsApp<input id="ailWaOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label></div>
