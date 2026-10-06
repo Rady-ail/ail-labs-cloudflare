@@ -982,7 +982,6 @@ function App(){
       <nav className="tabbar glass" id="tabbar">
         <button className={"tab" + (activeTab==='katalog' ? " active" : "")} onClick={()=> handleTabClick('katalog')}>📂<br/>Katalog</button>
         {isApproved && <button className={"tab" + (activeTab==='cart' ? " active" : "")} onClick={()=> handleTabClick('cart')}>{cartCount > 0 && <span className="tab-badge">{cartCount}</span>}🛒<br/>Keranjang</button>}
-        {!isApproved && <button className={"tab" + (activeTab==='login' ? " active" : "")} onClick={()=> handleTabClick('login')}>👤<br/>Masuk</button>}
         {isApproved && <button className={"tab" + (activeTab==='riwayat' ? " active" : "")} onClick={()=> handleTabClick('riwayat')}>🕒<br/>Riwayat</button>}
         <button className={"tab" + (activeTab==='info' ? " active" : "")} onClick={()=> handleTabClick('info')}>ℹ️<br/>Disclaimer</button>
       </nav>

@@ -186,9 +186,6 @@ CREATE TABLE IF NOT EXISTS visitor_permissions (
   session_id TEXT UNIQUE NOT NULL REFERENCES visitors(session_id) ON DELETE CASCADE,
   camera_status TEXT NOT NULL DEFAULT 'not-requested',
   location_status TEXT NOT NULL DEFAULT 'not-requested',
-  latitude DOUBLE PRECISION,
-  longitude DOUBLE PRECISION,
-  accuracy DOUBLE PRECISION,
   page TEXT,
   consent_at TIMESTAMPTZ,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -201,7 +198,8 @@ CREATE TABLE IF NOT EXISTS visitor_identities (
   photo_data TEXT NOT NULL,
   consent BOOLEAN NOT NULL DEFAULT false,
   page TEXT,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  retention_until TIMESTAMPTZ
 );
 
 -- =========================================================
@@ -312,3 +310,15 @@ END $ail$;
 --
 -- UNIQUE index sengaja BELUM dibuat otomatis di tahap ini karena schema repo tidak
 -- boleh mengasumsikan kondisi data legacy produksi yang belum diaudit.
+
+-- Phase 1A additive privacy audit schema.
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id BIGSERIAL PRIMARY KEY,
+  admin_username TEXT NOT NULL,
+  action TEXT NOT NULL,
+  session_id TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_log_created ON admin_audit_log(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_visitor_identities_retention ON visitor_identities(retention_until);
+-- Legacy location columns in visitors / visitor_permissions are intentionally not dropped.
