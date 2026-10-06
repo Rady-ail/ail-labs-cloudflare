@@ -55,7 +55,7 @@ const esc=v=>String(v??"").replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&g
 const norm=v=>String(v??"").toLowerCase().replace(/&/g,"and").replace(/[^a-z0-9]+/g," ").trim();
 function selectProductForQuote(n){location.href="/contact.html?product="+encodeURIComponent(n)}
 function filterGroup(c){activeCategory=c;document.querySelectorAll("#categoryPills button").forEach(b=>b.className="snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold "+(b.dataset.cat===c?"border-ail-teal bg-ail-teal text-white":"border-slate-200 bg-white text-slate-600"));apply()}
-function pills(){document.getElementById("categoryPills").innerHTML=[...new Set(["Semua",...catalogData.map(x=>x.cat).filter(Boolean)])].map(c=>'<button type="button" data-cat="'+esc(c)+'" onclick="filterGroup('+JSON.stringify(c)+')" class="snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold '+(c===activeCategory?"border-ail-teal bg-ail-teal text-white":"border-slate-200 bg-white text-slate-600")+'">'+esc(c)+"</button>").join("")}
+function pills(){document.getElementById("categoryPills").innerHTML=[...new Set(["Semua",...catalogData.map(x=>x.cat).filter(Boolean)])].map(c=>'<button type="button" data-cat="'+esc(c)+'" aria-pressed="'+(c===activeCategory?'true':'false')+'" class="category-pill snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold '+(c===activeCategory?"border-ail-teal bg-ail-teal text-white":"border-slate-200 bg-white text-slate-600")+'">'+esc(c)+"</button>").join("")}
 function productSlug(v){return String(v||"").toLowerCase().normalize("NFKD").replace(/[\\u0300-\\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,90)}
 function setProductVisual(root,name){const label=root.querySelector(".product-label"),img=root.querySelector(".product-real"),fallback=root.querySelector(".product-fallback");if(label)label.textContent=name;if(!img)return;const slug=productSlug(name),candidates=["/images/products/"+slug+".webp","/images/products/"+slug+".png","/images/products/"+slug+".jpg","/images/"+slug+".webp","/images/"+slug+".png","/images/"+slug+".jpg"];let n=0;const next=()=>{if(n>=candidates.length){img.removeAttribute("src");img.hidden=true;if(fallback)fallback.hidden=false;return}img.src=candidates[n++];img.onload=()=>{img.hidden=false;if(fallback)fallback.hidden=true};img.onerror=next};next()}
 function hydrateProductVisuals(){document.querySelectorAll("[data-product]").forEach(el=>{const v=el.querySelector("[data-product-visual]");if(v)setProductVisual(v,el.dataset.product)})}
@@ -72,7 +72,7 @@ function card(i,c){
     '<h3 class="mt-1 font-bold">'+esc(n)+'</h3>'+
     '<p class="mt-1 text-xs text-slate-500">'+esc(k)+'</p>'+
     '<p class="mt-2 text-xs text-slate-500">'+esc(p)+'</p>'+
-    '<button type="button" onclick="selectProductForQuote('+JSON.stringify(n)+')" class="mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white">Request Bulk Quote</button>'+
+    '<button type="button" data-quote-product="'+esc(n)+'" class="quote-product-btn mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white">Request Bulk Quote</button>'+
   '</article>'
 }
 function apply(){
@@ -108,6 +108,7 @@ async function load(){
   }
 }
 document.getElementById("categoryPills")?.addEventListener("click",e=>{const b=e.target.closest("button[data-cat]");if(!b)return;filterGroup(b.dataset.cat);});
+document.getElementById("productGroups")?.addEventListener("click",e=>{const b=e.target.closest("button[data-quote-product]");if(!b)return;selectProductForQuote(b.dataset.quoteProduct);});
 document.getElementById("catalogSearch")?.addEventListener("input",apply);
 document.getElementById("catalogSort")?.addEventListener("change",apply);
 load();
