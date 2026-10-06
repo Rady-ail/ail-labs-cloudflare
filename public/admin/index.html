@@ -605,6 +605,15 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
     *,*::before,*::after{animation:none!important;transition:none!important;}
   }
 
+
+  .wa-command-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:16px}
+  .wa-info-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+  .wa-info-grid>div{padding:12px 14px;border:1px solid rgba(111,201,207,.18);border-radius:14px;background:rgba(111,201,207,.05)}
+  .wa-info-grid strong,.wa-info-grid span{display:block}.wa-info-grid strong{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--gold-500);margin-bottom:4px}.wa-info-grid span{font-size:12px;color:var(--ink-600);line-height:1.45}
+  .wa-compliance{padding:12px 14px;border-radius:14px;background:rgba(226,138,128,.07);border:1px solid rgba(226,138,128,.18);font-size:11.5px;color:var(--ink-600);line-height:1.55}
+  .wa-optin-gate{margin:12px 0;padding:11px 13px;border-radius:13px;background:rgba(127,227,198,.055);border:1px solid rgba(127,227,198,.16)}
+  .wa-optin-gate label{font-size:11.5px;line-height:1.5}
+  @media(max-width:700px){.wa-command-head{flex-direction:column}.wa-info-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -928,6 +937,25 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
 
     <!-- BROADCAST MASSAL (kontak_customer + pelanggan_klinik + customers, via Fonnte) -->
     <section class="panel" id="panel-broadcastmassal">
+      <div class="table-wrap glass wa-command-center" style="padding:24px;">
+        <div class="wa-command-head">
+          <div>
+            <div class="eyebrow">WHATSAPP COMMAND CENTER</div>
+            <h3 style="margin:4px 0 5px;">International WhatsApp Outreach</h3>
+            <p class="muted" style="margin:0;">Satu panel untuk kontak Indonesia + luar negeri, antrian, jadwal, dan monitoring pengiriman.</p>
+          </div>
+          <span id="waProviderStatus" class="ai-badge">Memeriksa koneksi…</span>
+        </div>
+        <div class="wa-info-grid">
+          <div><strong>Provider</strong><span>Meta WhatsApp Cloud API</span></div>
+          <div><strong>Format nomor</strong><span>E.164 internasional (+country code)</span></div>
+          <div><strong>Mode gratis</strong><span>Service/inbound dapat gratis dalam ketentuan Meta; marketing mengikuti tarif Meta</span></div>
+        </div>
+        <div class="wa-compliance">
+          <strong>Compliance gate:</strong> hanya kirim promo ke penerima yang sudah memberikan nomor + izin menerima pesan WhatsApp AIL LABS. WhatsApp mewajibkan opt-in dan penghormatan opt-out.
+        </div>
+      </div>
+
       <div class="table-wrap glass" style="padding:24px;">
         <h4 style="margin-top:0;">Broadcast Massal WhatsApp</h4>
         <p class="muted" style="margin-top:-8px;">Kirim pesan ke database kontak lengkap (Apotek, Klinik, RS, Puskesmas, Distributor, dll — 709 kontak) via Fonnte. Terpisah dari Popup Promo di atas yang hanya menyasar customer login website.</p>
@@ -970,6 +998,10 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
           </div>
         </div>
 
+        <div class="checkbox-field wa-optin-gate">
+          <input type="checkbox" id="broadcastJadwalOptInConfirm">
+          <label for="broadcastJadwalOptInConfirm">Saya memastikan semua penerima yang dipilih sudah opt-in menerima pesan WhatsApp AIL LABS.</label>
+        </div>
         <div class="modal-actions" style="justify-content:flex-start;">
           <button class="btn btn-secondary" onclick="loadBroadcastJadwalKategori()">🔄 Muat Ulang Kategori</button>
           <button class="btn btn-primary" onclick="buatBroadcastJadwal()">Buat Jadwal Broadcast</button>
@@ -1045,7 +1077,7 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
     <h3 id="kontakModalTitle">Tambah Kontak</h3>
     <input type="hidden" id="kId">
     <div class="field"><label>Nama</label><input type="text" id="kNama" placeholder="Nama kontak / klinik / dokter"></div>
-    <div class="field"><label>No HP (WhatsApp)</label><input type="text" id="kNoHp" placeholder="08xxxxxxxxxx"></div>
+    <div class="field"><label>No HP (WhatsApp)</label><input type="text" id="kNoHp" placeholder="08xxxxxxxxxx atau +60xxxxxxxxx"><small class="muted">Indonesia boleh 08xx. Nomor luar negeri gunakan kode negara, mis. +60 Malaysia, +65 Singapura, +971 UAE.</small></div>
     <div class="field"><label>Alamat</label><textarea id="kAlamat"></textarea></div>
     <div class="field">
       <label>Kategori</label>
@@ -1148,7 +1180,8 @@ function switchTab(tab){
     visitorsPollTimer = setInterval(loadVisitors, 15000);
   }
   if(tab==='promo') loadPromoSettings();
-  if(tab==='broadcastmassal'){ loadBroadcastMassalKategori(); loadBroadcastJadwalKategori(); loadBroadcastJadwalList(); loadKontakKategoriOptions(); loadKontakList(); }
+  if(tab==='broadcastmassal'){ loadBroadcastMassalKategori();
+loadWhatsAppCommandStatus(); loadBroadcastJadwalKategori(); loadBroadcastJadwalList(); loadKontakKategoriOptions(); loadKontakList(); }
 }
 
 /* ---------------- POPUP PROMO ---------------- */
@@ -1240,7 +1273,21 @@ async function sendBroadcastPromo(){
 }
 
 /* ---------------- BROADCAST MASSAL (pelanggan_broadcast) ---------------- */
-async function loadBroadcastMassalKategori(){
+async async function loadWhatsAppCommandStatus(){
+  const el=document.getElementById('waProviderStatus');
+  if(!el) return;
+  try{
+    const s=await api('/whatsapp/status');
+    el.textContent=s.configured ? '● CONNECTED' : '○ NOT CONFIGURED';
+    el.style.color=s.configured ? 'var(--ok)' : 'var(--danger)';
+    el.title=s.note || '';
+  }catch(err){
+    el.textContent='○ CHECK FAILED';
+    el.style.color='var(--danger)';
+  }
+}
+
+function loadBroadcastMassalKategori(){
   const listEl = document.getElementById('broadcastMassalKategoriList');
   listEl.textContent = 'Memuat kategori...';
   try{
@@ -1275,13 +1322,18 @@ async function sendBroadcastMassal(){
     showToast('Pilih minimal satu kategori tujuan');
     return;
   }
+  const confirmOptIn = document.getElementById('broadcastOptInConfirm')?.checked === true;
+  if(!confirmOptIn){
+    showToast('Centang konfirmasi opt-in sebelum mengirim.');
+    return;
+  }
   if(!confirm(`Kirim broadcast ke kategori: ${kategori.join(', ')}?`)) return;
 
   resultEl.textContent = 'Mengirim...';
   try{
     const res = await api('/broadcast/send', {
       method:'POST',
-      body: JSON.stringify({ kategori, message, delay })
+      body: JSON.stringify({ kategori, message, delay, confirm_opt_in: true })
     });
     const jumlahDilewati = (res.dilewati_no_hp_tidak_valid || []).length;
     resultEl.textContent = jumlahDilewati > 0
@@ -1332,13 +1384,18 @@ async function buatBroadcastJadwal(){
     showToast('Pilih minimal satu kategori tujuan');
     return;
   }
+  const confirmOptIn = document.getElementById('broadcastJadwalOptInConfirm')?.checked === true;
+  if(!confirmOptIn){
+    showToast('Centang konfirmasi opt-in sebelum membuat jadwal.');
+    return;
+  }
   if(!confirm(`Buat jadwal broadcast harian untuk kategori: ${kategori.join(', ')}?\n\nPesan akan dicicil ${perHari} kontak/hari otomatis mulai besok jam 08:00 WITA sampai antrian habis.`)) return;
 
   resultEl.textContent = 'Membuat jadwal...';
   try{
     const res = await api('/broadcast/jadwal', {
       method:'POST',
-      body: JSON.stringify({ kategori, message, per_hari: perHari, jeda_detik: jeda })
+      body: JSON.stringify({ kategori, message, per_hari: perHari, jeda_detik: jeda, confirm_opt_in: true })
     });
     const jumlahDilewati = (res.dilewati_no_hp_tidak_valid || []).length;
     resultEl.textContent = jumlahDilewati > 0
