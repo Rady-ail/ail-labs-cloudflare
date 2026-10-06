@@ -73,25 +73,43 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
     </div>
   </div>
 </section>
-<section id="catalog" class="pt-12">
-  <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-    <div>
-      <p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">Professional Catalog</p>
-      <h2 class="mt-2 text-3xl font-black tracking-tight">Smart Category</h2>
-      <p class="mt-2 max-w-xl text-sm leading-6 text-slate-500">Filter produk berdasarkan kategori atau cari nama produk secara langsung.</p>
-    </div>
-    <span id="catalogStatus" class="text-xs text-slate-500">Memuat katalog…</span>
-  </div>
-  <div class="mt-6 rounded-2xl border border-slate-200/80 bg-white p-3 card">
-    <div class="flex flex-col gap-3 lg:flex-row lg:items-center">
-      <div class="relative flex-1">
-        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span>
-        <input id="catalogSearch" type="search" placeholder="Cari produk, kandungan, atau kemasan…" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-4 text-sm outline-none transition focus:border-ail-teal focus:bg-white">
+<section id="catalog" aria-labelledby="catalog-title" class="pt-12">
+  <div class="rounded-[28px] border border-slate-200/80 bg-white p-6 card sm:p-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">04 • Professional Catalog</p>
+        <h2 id="catalog-title" class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Smart Catalog</h2>
+        <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-500">Cari produk, gunakan kategori, lalu pilih item yang ingin dimasukkan ke Request Quotation.</p>
       </div>
-      <div id="categoryPills" class="hide-scrollbar snap-x flex gap-2 overflow-x-auto pb-1 lg:max-w-[62%]"></div>
+      <div class="rounded-xl bg-ail-clinical px-4 py-3 text-right">
+        <div id="catalogStatus" class="text-sm font-bold text-ail-teal">Memuat katalog…</div>
+        <div class="mt-0.5 text-[10px] text-slate-400">Live product feed</div>
+      </div>
+    </div>
+    <div class="mt-6 grid gap-3 lg:grid-cols-[1fr_auto]">
+      <div class="relative">
+        <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">⌕</span>
+        <input id="catalogSearch" type="search" placeholder="Cari nama produk, kandungan, atau kemasan…" class="w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-10 pr-10 text-sm outline-none transition focus:border-ail-teal focus:bg-white">
+        <button type="button" onclick="clearCatalogSearch()" aria-label="Clear search" class="absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-lg px-2 py-1 text-slate-400 hover:bg-white" id="clearCatalogBtn">×</button>
+      </div>
+      <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2">
+        <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Sort</span>
+        <select id="catalogSort" class="bg-transparent text-sm font-semibold text-ail-teal outline-none">
+          <option value="default">Recommended</option>
+          <option value="az">A–Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="mt-4">
+      <div class="mb-2 text-[10px] font-bold uppercase tracking-widest text-slate-400">Categories</div>
+      <div id="categoryPills" class="hide-scrollbar snap-x flex gap-2 overflow-x-auto pb-1"></div>
     </div>
   </div>
-  <div id="productGroups" class="mt-5 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+  <div id="catalogEmpty" class="mt-5 hidden rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center">
+    <div class="text-2xl text-ail-teal">⌕</div><h3 class="mt-2 font-bold">Produk tidak ditemukan</h3>
+    <p class="mt-1 text-sm text-slate-500">Coba kata kunci lain atau pilih kategori Semua.</p>
+  </div>
+  <div id="productGroups" class="mt-5 grid gap-5 md:grid-cols-2"></div>
 </section>
 <section id="procurement" class="pt-8"><div class="grid gap-4 md:grid-cols-3"><article class="rounded-2xl border border-slate-200/80 bg-white p-6 card"><div class="text-2xl">◈</div><h3 class="mt-4 font-bold">Professional Procurement</h3><p class="mt-2 text-sm leading-6 text-slate-500">Untuk klinik, rumah sakit, distributor, PBF dan jaringan farmasi.</p></article><article id="private-label" class="rounded-2xl border border-slate-200 bg-white p-5"><div class="text-2xl">◇</div><h3 class="mt-4 font-bold">Private Label Manufacturing</h3><p class="mt-2 text-sm leading-6 text-slate-500">Diskusikan kebutuhan OEM/private label berdasarkan spesifikasi dan volume bisnis.</p></article><article class="rounded-2xl border border-slate-200 bg-white p-5"><div class="text-2xl">▣</div><h3 class="mt-4 font-bold">Bulk Supply &amp; Logistics</h3><p class="mt-2 text-sm leading-6 text-slate-500">Pengadaan berbasis quotation dengan kebutuhan handling dan dokumen produk.</p></article></div></section>
 <section id="compliance" class="pt-8"><div class="rounded-3xl bg-ail-ink p-6 text-white sm:p-8"><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-gold">Compliance First</p><h2 class="mt-2 text-2xl font-black">Dokumen &amp; kepatuhan untuk procurement</h2><p class="mt-2 max-w-2xl text-sm leading-6 text-white/65">Dokumen pendukung tersedia sesuai produk dan kebutuhan verifikasi partner profesional.</p><div class="mt-5 flex flex-wrap gap-2"><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">NIB 0308260088951</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">PBF upgrade in process</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">BPOM</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Halal mandatory 17 Oct 2026</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Porcine-Free</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Supplier certifications available</span></div></div></section>
@@ -141,16 +159,24 @@ function filterGroup(cat){
 }
 function applyCatalogFilter(){
   const q=norm(document.getElementById('catalogSearch')?.value||'');
+  const sort=document.getElementById('catalogSort')?.value||'default';
+  const groups=[...document.querySelectorAll('[data-group]')];
   let visible=0;
-  document.querySelectorAll('[data-group]').forEach(g=>{
+  groups.forEach(g=>{
     const catOk=categoryMatch(g.dataset.group,activeCategory);
     const textOk=!q||norm(g.dataset.group+' '+g.textContent).includes(q);
     const show=catOk&&textOk;
     g.classList.toggle('hidden',!show);
     if(show) visible++;
+    const cards=g.querySelectorAll('[data-product]');
+    if(sort==='az') [...cards].sort((a,b)=>a.dataset.product.localeCompare(b.dataset.product,'id')).forEach(x=>g.querySelector('[data-product-grid]').appendChild(x));
   });
   const status=document.getElementById('catalogStatus');
+  const empty=document.getElementById('catalogEmpty');
   if(status&&catalogData.length) status.textContent=visible+' kategori tersedia';
+  if(empty) empty.classList.toggle('hidden',visible!==0);
+  const clear=document.getElementById('clearCatalogBtn');
+  if(clear) clear.classList.toggle('hidden',!q);
 }
 function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]||m))}
 function productCard(name,kandungan,kemasan){return '<article class="rounded-2xl border border-slate-200/80 bg-white p-4 card"><div class="flex aspect-[4/3] items-center justify-center rounded-xl bg-ail-clinical text-ail-teal">▣</div><p class="mt-4 text-[10px] font-bold uppercase tracking-widest text-ail-teal">Professional Use</p><h3 class="mt-1 font-bold leading-5">'+esc(name)+'</h3><p class="mt-1 text-xs leading-5 text-slate-500">'+esc(kandungan||'')+'</p><p class="mt-2 text-xs text-slate-500">'+esc(kemasan||'')+'</p><div class="mt-3 flex flex-wrap gap-1.5"><span class="rounded-full border border-slate-200 bg-ail-clinical px-3 py-1.5 text-[10px] font-semibold text-ail-teal">MOQ by quotation</span><span class="rounded-full border border-[#B9D8CE] bg-[#EFF8F4] px-3 py-1.5 text-[10px] font-semibold text-[#145A4E]">BPOM status by SKU</span><span class="rounded-full border border-[#D9C39F] bg-[#FBF7EF] px-3 py-1.5 text-[10px] font-semibold text-[#725B37]">Porcine-Free</span></div><button onclick="openQuote()" class="mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white transition hover:opacity-90">Request Bulk Quote</button></article>'}
@@ -159,10 +185,12 @@ async function loadCatalog(){
   try{
     const r=await fetch('/api/products',{credentials:'include',cache:'no-store'}); const data=await r.json();
     if(!r.ok||!Array.isArray(data))throw new Error();
-    catalogData=data; groups.innerHTML=data.map(g=>'<section data-group="'+esc(g.cat)+'" class="rounded-2xl border border-slate-200/80 bg-white p-4 card"><div class="mb-4 flex items-center justify-between"><h3 class="font-black">'+esc(g.cat)+'</h3><span class="text-xs text-slate-400">'+g.items.length+' items</span></div><div class="grid gap-3">'+g.items.map(x=>productCard(x[0],x[1],x[2])).join('')+'</div></section>').join('');
+    catalogData=data; groups.innerHTML=data.map(g=>'<section data-group="'+esc(g.cat)+'" class="rounded-2xl border border-slate-200/80 bg-white p-4 card"><div class="mb-4 flex items-center justify-between gap-3"><div><h3 class="font-black">'+esc(g.cat)+'</h3><p class="mt-1 text-[10px] uppercase tracking-widest text-slate-400">Professional procurement</p></div><span class="shrink-0 rounded-full bg-ail-clinical px-3 py-1 text-xs font-bold text-ail-teal">'+g.items.length+' items</span></div><div data-product-grid class="grid gap-3 sm:grid-cols-2">'+g.items.map(x=>productCard(x[0],x[1],x[2],g.cat)).join('')+'</div></section>').join('');
     status.textContent=data.length+' kategori tersedia'; applyCatalogFilter();
   }catch(e){status.textContent='Katalog belum tersedia';groups.innerHTML='<div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500 sm:col-span-2 lg:col-span-3">Katalog sedang tidak tersedia. Gunakan Request Quotation untuk meminta daftar produk dan dokumen terbaru.</div>'}
 }
-pillRender();renderSteps();document.getElementById('catalogSearch').addEventListener('input',applyCatalogFilter);loadCatalog();
+function clearCatalogSearch(){const el=document.getElementById('catalogSearch');if(el){el.value='';applyCatalogFilter();el.focus()}}
+function selectProductForQuote(name){window.selectedQuoteProduct=name;openQuote()}
+pillRender();renderSteps();document.getElementById('catalogSearch').addEventListener('input',applyCatalogFilter);document.getElementById('catalogSort').addEventListener('change',applyCatalogFilter);loadCatalog();
 </script>
 </body></html>
