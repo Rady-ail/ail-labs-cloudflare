@@ -27,7 +27,12 @@ jobs:
       - name: Install dependencies
         run: npm ci || npm install
 
-      - name: Static integrity audit\n        run: npm run build\n\n      - name: Wrangler dry-run\n        run: npx wrangler@4.86.0 deploy --dry-run\n\n      - name: Check custom domain zone
+      - name: Static integrity audit
+        run: npm run build
+
+      - name: Wrangler dry-run
+        run: npx wrangler@4.86.0 deploy --dry-run
+
         id: zone
         shell: bash
         env:
