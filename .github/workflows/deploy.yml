@@ -162,6 +162,25 @@ jobs:
           wranglerVersion: '4.86.0'
           command: deploy
 
+      - name: Verify public custom domain
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in 1 2 3 4 5; do
+            echo "Public-domain verification attempt ${attempt}/5"
+            set +e
+            output=$(scripts/verify-deploy.sh "https://ail-aesthetic-labs.my.id" 2>&1)
+            verify_status=$?
+            set -e
+            printf '%s\n' "$output"
+            if [[ $verify_status -eq 0 ]]; then exit 0; fi
+            if [[ $attempt -lt 5 ]] && grep -Eq ' (000|404)([[:space:]]|$)' <<< "$output"; then
+              sleep 5
+              continue
+            fi
+            exit "$verify_status"
+          done
+
       - name: Verify deployment
         env:
           DEPLOYMENT_URL: ${{ steps.deploy_final.outputs.deployment-url }}
