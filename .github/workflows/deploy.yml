@@ -124,7 +124,7 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
@@ -132,13 +132,17 @@ jobs:
           node -e '
             const secrets = {
               DATABASE_URL: process.env.DATABASE_URL,
-              SESSION_SECRET: process.env.SESSION_SECRET,
+              ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
             };
             const googleId = process.env.GOOGLE_CLIENT_ID;
             const googleSecret = process.env.GOOGLE_CLIENT_SECRET;
-            if (!secrets.DATABASE_URL || !secrets.SESSION_SECRET) {
-              console.error("A required runtime secret is missing.");
+            if (!secrets.DATABASE_URL) {
+              console.error("DATABASE_URL is required.");
               process.exit(1);
+            }
+            if (!secrets.ADMIN_SESSION_SECRET) {
+              console.log("ADMIN_SESSION_SECRET GitHub secret is not configured; preserving the existing Cloudflare runtime secret.");
+              delete secrets.ADMIN_SESSION_SECRET;
             }
             if (Boolean(googleId) !== Boolean(googleSecret)) {
               console.error("GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together.");
