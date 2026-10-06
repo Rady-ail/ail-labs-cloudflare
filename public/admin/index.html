@@ -949,7 +949,7 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
         <div class="wa-info-grid">
           <div><strong>Provider</strong><span>Meta WhatsApp Cloud API</span></div>
           <div><strong>Format nomor</strong><span>E.164 internasional (+country code)</span></div>
-          <div><strong>Mode gratis</strong><span>Service/inbound dapat gratis dalam ketentuan Meta; marketing mengikuti tarif Meta</span></div>
+          <div><strong>Mode biaya</strong><span>Direct Cloud API tanpa markup BSP; marketing tetap mengikuti tarif Meta</span></div>
         </div>
         <div class="wa-compliance">
           <strong>Compliance gate:</strong> hanya kirim promo ke penerima yang sudah memberikan nomor + izin menerima pesan WhatsApp AIL LABS. WhatsApp mewajibkan opt-in dan penghormatan opt-out.
@@ -966,7 +966,7 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
         </div>
 
         <div class="field"><label>Pesan WhatsApp</label><textarea id="broadcastMassalMessage" placeholder="Halo {nama}, ada promo spesial dari Ail Labs..." rows="5"></textarea></div>
-        <div class="field"><label>Jeda antar pesan (detik, default 3 — jangan terlalu kecil supaya nomor tidak dianggap spam)</label><input type="number" id="broadcastMassalDelay" min="1" value="3"></div>
+        <div class="field"><label>Jeda antar pesan (detik, minimum 10 — gunakan jeda wajar dan hanya untuk penerima opt-in)</label><input type="number" id="broadcastMassalDelay" min="1" value="3"></div>
 
         <div class="modal-actions" style="justify-content:flex-start;">
           <button class="btn btn-secondary" onclick="loadBroadcastMassalKategori()">🔄 Muat Ulang Kategori</button>
@@ -1273,7 +1273,7 @@ async function sendBroadcastPromo(){
 }
 
 /* ---------------- BROADCAST MASSAL (pelanggan_broadcast) ---------------- */
-async async function loadWhatsAppCommandStatus(){
+async function loadWhatsAppCommandStatus(){
   const el=document.getElementById('waProviderStatus');
   if(!el) return;
   try{
