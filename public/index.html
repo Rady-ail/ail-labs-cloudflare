@@ -163,7 +163,7 @@ src="https://www.facebook.com/tr?id=27916556354683462&ev=PageView&noscript=1"
 :root{
   --mm-bg:#FAFAF8;--mm-surface:#FFFFFF;--mm-text:#111827;--mm-muted:#6B7280;
   --mm-teal:#0F766E;--mm-teal-dark:#115E59;--mm-rose:#B76E79;--mm-border:#E5E7EB;
-  --mm-radius:16px;--mm-shadow:0 2px 10px rgba(17,24,39,.045);
+  --mm-radius:16px;--mm-shadow:0 2px 10px rgba(17,24,39,.045);--mm-space-1:4px;--mm-space-2:8px;--mm-space-3:12px;--mm-space-4:16px;--mm-space-5:20px;--mm-space-6:24px;
   --spring:cubic-bezier(.22,1,.36,1);--font-main:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   --font-display:'Inter',system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
@@ -228,11 +228,11 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 .hero-kicker-muted{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--mm-muted)}
 .hero-rule{width:28px;height:1px;background:var(--mm-rose);display:block}
 .hero-card h1{
-  margin:0!important;max-width:800px;font-family:var(--font-display)!important;font-size:clamp(34px,6vw,64px)!important;
-  line-height:1.04!important;letter-spacing:-.045em!important;font-weight:600!important;color:var(--mm-text)!important;
+  margin:0!important;max-width:800px;font-family:var(--font-display)!important;font-size:clamp(32px,5.4vw,56px)!important;
+  line-height:1.08!important;letter-spacing:-.04em!important;font-weight:600!important;color:var(--mm-text)!important;
 }
 .hero-sub{
-  max-width:680px!important;margin:20px 0 28px!important;font-size:16px!important;line-height:1.65!important;
+  max-width:680px!important;margin:18px 0 26px!important;font-size:16px!important;line-height:1.55!important;
   color:var(--mm-muted)!important;
 }
 .hero-actions{display:flex!important;flex-wrap:wrap!important;gap:10px!important}
@@ -262,7 +262,7 @@ main.view.active{display:block!important;scroll-margin-top:150px}
 }
 .row{
   min-width:0!important;display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:10px!important;
-  padding:0 0 14px!important;margin:0!important;overflow:hidden!important;cursor:pointer!important;
+  padding:0 0 16px!important;margin:0!important;overflow:hidden!important;cursor:pointer!important;
   background:var(--mm-surface)!important;border:1px solid var(--mm-border)!important;border-radius:var(--mm-radius)!important;
   box-shadow:var(--mm-shadow)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;
   transition:transform .22s var(--spring),box-shadow .22s var(--spring)!important;
@@ -354,7 +354,102 @@ a{color:var(--mm-teal)}
   .hero-actions button:hover,.row:hover{transform:none!important}
 }
 </style>
-<style>.section-block{opacity:1!important;visibility:visible!important;transform:none!important}</style></head>
+<style>.section-block{opacity:1!important;visibility:visible!important;transform:none!important}</style><style id="ail-design-v2">
+/* AIL LABS DESIGN V2 — premium medical-lab hierarchy, CSS-only, DOM/JS hooks preserved */
+:root{
+  --v2-bg:#F7F8F6;
+  --v2-surface:#FFFFFF;
+  --v2-ink:#111817;
+  --v2-muted:#68736F;
+  --v2-line:#E4E9E6;
+  --v2-teal:#0F6B63;
+  --v2-teal-deep:#0A514B;
+  --v2-soft:#EDF5F2;
+  --v2-accent:#B78368;
+}
+body{background:var(--v2-bg)!important;color:var(--v2-ink)!important}
+.topbar{background:rgba(247,248,246,.94)!important;border-bottom-color:rgba(17,24,23,.07)!important}
+.topbar-inner{border-color:var(--v2-line)!important;box-shadow:0 4px 18px rgba(17,24,23,.035)!important}
+.brand-mark{border-radius:9px!important}
+.hero-card{
+  position:relative!important;overflow:hidden!important;
+  min-height:clamp(360px,48vw,520px)!important;
+  margin-top:20px!important;
+  border-color:var(--v2-line)!important;
+  background:
+    radial-gradient(500px 260px at 100% 0%,rgba(15,107,99,.075),transparent 70%),
+    linear-gradient(135deg,#fff 0%,#fbfcfa 62%,#f4f8f6 100%)!important;
+}
+.hero-card:after{
+  content:"";position:absolute;right:-90px;bottom:-130px;width:360px;height:360px;border:1px solid rgba(15,107,99,.10);
+  border-radius:50%;pointer-events:none;
+}
+.hero-body{position:relative;z-index:1}
+.hero-kicker{letter-spacing:.18em!important;color:var(--v2-teal)!important}
+.hero-kicker-muted{letter-spacing:.13em!important;color:#87918D!important}
+.hero-rule{background:var(--v2-accent)!important;width:34px!important}
+.hero-card h1{max-width:760px!important;font-size:clamp(34px,5.2vw,62px)!important;letter-spacing:-.052em!important}
+.hero-sub{max-width:610px!important;font-size:16px!important;line-height:1.65!important;color:var(--v2-muted)!important}
+.hero-actions .primary,.checkout-btn,.btn-reorder{background:var(--v2-teal)!important;border-color:var(--v2-teal)!important}
+.hero-actions .primary:hover,.checkout-btn:hover,.btn-reorder:hover{background:var(--v2-teal-deep)!important}
+.hero-actions .secondary{color:var(--v2-teal)!important;border-color:rgba(15,107,99,.34)!important}
+.section-head{border-bottom-color:var(--v2-line)!important}
+.section-head h2,.view-title{letter-spacing:-.035em!important}
+.section-count{letter-spacing:.01em!important}
+.section-block{content-visibility:auto;contain-intrinsic-size:1px 420px}
+.group{gap:14px!important}
+.row{
+  border-color:var(--v2-line)!important;
+  box-shadow:0 2px 12px rgba(17,24,23,.035)!important;
+}
+.row:hover{
+  transform:translateY(-3px)!important;
+  box-shadow:0 12px 30px rgba(17,24,23,.085)!important;
+  border-color:#D5DFDB!important;
+}
+.row-thumb{
+  aspect-ratio:1/1!important;
+  width:100%!important;height:auto!important;
+  border-radius:0!important;
+  background:linear-gradient(145deg,#F2F6F4,#EAF0ED)!important;
+}
+.row-thumb-placeholder{min-height:150px!important}
+.row-body{padding:0 14px!important}
+.row-name{font-size:15px!important;line-height:1.35!important;letter-spacing:-.012em!important}
+.row-sub{line-height:1.45!important;color:#707B77!important}
+.row-kemasan{line-height:1.35!important}
+.row-price{font-size:13.5px!important;color:var(--v2-teal)!important}
+.row-price-locked{background:var(--v2-soft)!important;color:var(--v2-teal)!important}
+.wish-btn{margin:0 12px 12px!important;align-self:flex-end!important}
+.info-card,.cart-summary,.order-card{
+  border-color:var(--v2-line)!important;
+  box-shadow:0 2px 12px rgba(17,24,23,.035)!important;
+}
+.bank-card{border-color:var(--v2-line)!important}
+.form-field input,.form-field textarea{border-color:#DCE3DF!important;background:#FCFDFC!important}
+.form-field input:focus,.form-field textarea:focus{border-color:var(--v2-teal)!important;box-shadow:0 0 0 3px rgba(15,107,99,.10)!important}
+.tabbar{border-color:var(--v2-line)!important;box-shadow:0 8px 28px rgba(17,24,23,.10)!important}
+.tab.active{background:var(--v2-teal)!important}
+@media(min-width:760px){
+  main.view{padding-left:24px!important;padding-right:24px!important}
+  .group{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:16px!important}
+  .hero-card{padding:clamp(42px,6vw,76px)!important}
+}
+@media(max-width:759px){
+  .hero-card{min-height:390px!important}
+}
+@media(max-width:420px){
+  main.view{padding-left:12px!important;padding-right:12px!important}
+  .hero-card{border-radius:20px!important;padding:28px 22px!important}
+  .hero-card h1{font-size:32px!important}
+  .hero-sub{font-size:15px!important}
+  .row-body{padding:0 12px!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .row:hover{transform:none!important}
+}
+</style>
+</head>
 <body>
 <div id="root"></div>
 <div id="bootFallback" style="display:none;padding:60px 20px;text-align:center;font-family:-apple-system,system-ui,sans-serif;color:#153237">
@@ -905,29 +1000,11 @@ function App(){
     const done = ()=>{ setCopyLabel('Tersalin'); setTimeout(()=> setCopyLabel('Salin'), 1600); };
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(BANK_ACC_NO).then(done).catch(done); } else { done(); }
   }
-  async function confirmPaymentEmail(){
-    const btn = document.querySelector('[data-payment-confirm]');
-    if(btn){ btn.disabled = true; btn.textContent = 'Mengirim konfirmasi…'; }
-    try{
-      const response = await fetch('/api/payment-confirmation/confirm',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          customer_name: currentUser?.name || currentUser?.displayName || 'Pelanggan AIL LABS',
-          customer_email: currentUser?.email || '',
-          note: 'Konfirmasi pembayaran dikirim dari halaman Prosedur Pembayaran.'
-        })
-      });
-      const data = await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(data.error || 'Konfirmasi pembayaran gagal dikirim.');
-      if(btn) btn.textContent = 'Konfirmasi Pembayaran Terkirim';
-      alert('Konfirmasi pembayaran telah dikirim ke info@ail-aesthetic-labs.my.id.');
-    }catch(err){
-      console.error(err);
-      if(btn){ btn.disabled = false; btn.textContent = 'Konfirmasi Pembayaran'; }
-      alert(err.message || 'Konfirmasi pembayaran gagal dikirim.');
-    }
+  function confirmPaymentWhatsApp(){
+    const msg = `==========================================\n    KONFIRMASI PEMBAYARAN — AIL LABS     \n==========================================\n\nHalo, saya sudah melakukan transfer ke rekening\nBCA a.n. Fudhail Aesthetic Labs, PT.\n\nBerikut saya lampirkan bukti pembayarannya.\nMohon dicek dan diproses pesanannya. Terima kasih! 🙏`;
+    openWA(msg);
   }
+
   /* --- riwayat --- */
   function reorderHistory(id){
     const order = history.find(o=>o.id===id); if(!order) return;
@@ -1172,12 +1249,12 @@ function App(){
             </div>
             <button className="copy-btn" type="button" style={{border:'none', borderRadius:'999px', padding:'8px 14px', fontSize:'12px', fontWeight:700, background:'#fff', cursor:'pointer'}} onClick={copyBankAccount}>{copyLabel}</button>
           </div>
-          <button className="checkout-btn" type="button" style={{marginTop:'12px'}} onClick={confirmPaymentEmail}>Konfirmasi Pembayaran</button>
+          <button className="checkout-btn" type="button" style={{marginTop:'12px'}} onClick={confirmPaymentWhatsApp}>Konfirmasi Pembayaran via WhatsApp</button>
         </div>
         <div className="contact-card glass" style={{padding:'18px', color:'#fff', background:'var(--green-900)', borderRadius:'var(--radius-lg)'}}>
           <h2>PT Fudhail Aesthetic Laboratories</h2>
           <div className="contact-links" style={{display:'flex', flexDirection:'column', gap:'8px'}}>
-            <a className="contact-link" href="mailto:info@ail-aesthetic-labs.my.id" style={{color:'#fff', textDecoration:'none'}}>Email: info@ail-aesthetic-labs.my.id</a>
+            <a className="contact-link" href="mailto:FALABS@icloud.com" style={{color:'#fff', textDecoration:'none'}}>Email: FALABS@icloud.com</a>
           </div>
         </div>
       </main>
@@ -1323,3 +1400,13 @@ createRoot(document.getElementById('root')).render(<App />);
 
 </body>
 </html>
+\n<style id="design-polish-cards">\n.row .row-thumb{width:100%!important;height:auto!important;aspect-ratio:1/1!important;object-fit:cover!important;border-radius:0!important;background:#F3F4F6!important;}\n.row .row-thumb-placeholder{display:flex!important;align-items:center!important;justify-content:center!important;}\n.row .row-body{padding:0 14px!important;}\n.row .row-name{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;min-height:2.7em!important;line-height:1.35!important;font-size:14px!important;}\n.row .row-sub{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;line-height:1.45!important;min-height:2.9em!important;}\n.row .row-bottom{align-items:center!important;gap:8px!important;}\n.row .wish-btn{min-width:44px!important;min-height:44px!important;margin:0 10px 0 auto!important;}\n@media(min-width:700px){.group{gap:16px!important}.row .row-name{font-size:15px!important}}\n</style>\n\n<style id="design-polish-hero">\n.hero-card{min-height:360px!important;margin:18px 0 36px!important;padding:clamp(30px,6vw,64px)!important;}\n.hero-body{width:100%!important;}\n.hero-actions{gap:10px!important;}\n.hero-actions button{min-width:148px!important;min-height:48px!important;}\n@media(max-width:520px){.hero-card{min-height:340px!important;padding:28px 22px!important}.hero-actions{display:grid!important;grid-template-columns:1fr!important}.hero-actions button{width:100%!important}}\n</style>\n\n<style id="design-polish-nav">\n.topbar{padding:10px 16px 6px!important;}\n.chip-scroller{gap:8px!important;overflow-x:auto!important;overscroll-behavior-x:contain!important;}\n.chip{flex:0 0 auto!important;}\n.tabbar{bottom:max(12px,env(safe-area-inset-bottom))!important;}\n.tab{min-height:48px!important;}\n</style>\n\n<style id="design-polish-modal-motion">\n.modal-overlay{transition:opacity .2s ease!important;}\n.modal-card{transition:transform .22s cubic-bezier(.22,1,.36,1)!important;}\n@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}.row,.hero-actions button,.tab,.chip,.modal-overlay,.modal-card{transition:none!important}.row:hover,.hero-actions button:hover{transform:none!important}}\n</style>\n
+<style id="ail-design-v3">.section-block{margin-bottom:34px!important}.section-block>.section-head{position:relative!important;margin-top:0!important;padding:0 2px 11px!important}.section-block>.section-head h2{font-size:18px!important;line-height:1.25!important}.section-block>.section-head .section-count{white-space:nowrap!important}.group{align-items:stretch!important}.row{min-height:100%!important;border-radius:16px!important}.row .row-thumb{background:linear-gradient(145deg,#F5F7F6,#EAEFED)!important}.row:hover .row-thumb{filter:saturate(1.02)!important}.row-body{display:flex!important;flex-direction:column!important;min-height:122px!important}.row-name{font-weight:650!important;color:#17201E!important}.row-sub{color:#6B7773!important}.row-bottom{margin-top:auto!important;padding-top:8px!important}.row-kemasan{color:#89938F!important}.row-price{font-weight:750!important;letter-spacing:-.01em!important}.row-price-locked{display:inline-flex!important;align-items:center!important;min-height:28px!important;padding:5px 9px!important;background:#F0F5F3!important;border:1px solid #DCE8E3!important}.wish-btn{color:#68736F!important;border-radius:10px!important}.wish-btn:hover{background:#F3F6F5!important;color:#0F6B63!important}@media(min-width:760px){.section-block>.section-head h2{font-size:19px!important}.row{border-radius:18px!important}}</style>
+
+<style id="ail-design-v4">.hero-card{isolation:isolate!important;border-radius:24px!important;overflow:hidden!important;background:radial-gradient(420px 260px at 92% 12%,rgba(15,118,110,.10),transparent 72%),radial-gradient(300px 240px at 4% 100%,rgba(183,110,121,.055),transparent 70%),#fff!important}.hero-card:before{content:"AIL LABS";position:absolute;right:clamp(18px,5vw,58px);top:24px;font-size:clamp(42px,9vw,118px);font-weight:800;letter-spacing:-.075em;color:rgba(15,118,110,.035);pointer-events:none;white-space:nowrap}.hero-card:after{content:"";position:absolute;right:-110px;bottom:-150px;width:330px;height:330px;border:1px solid rgba(15,118,110,.10);border-radius:50%;pointer-events:none}.hero-body{position:relative!important;z-index:1!important}.hero-brandline{margin-bottom:24px!important}.hero-kicker{font-weight:750!important;letter-spacing:.16em!important}.hero-kicker-muted{letter-spacing:.12em!important}.hero-card h1{font-weight:650!important;max-width:760px!important}.hero-sub{max-width:600px!important}.hero-actions .primary{box-shadow:0 8px 18px rgba(15,118,110,.14)!important}@media(max-width:520px){.hero-card:before{right:-10px;top:18px;font-size:48px}.hero-card:after{width:220px;height:220px;right:-95px;bottom:-105px}}</style>
+
+<style id="ail-design-v5">.row,.chip,.icon-btn,.tab,.hero-actions button,.wish-btn,.checkout-btn,.bank-card,.info-card,.order-card{will-change:auto!important}.row{transition:transform .24s cubic-bezier(.22,1,.36,1),box-shadow .24s ease,border-color .2s ease!important}.row:hover{transform:translateY(-3px)!important;box-shadow:0 12px 28px rgba(17,24,39,.075)!important}.row:active{transform:translateY(-1px) scale(.995)!important}.chip:hover{border-color:#BFD4CE!important;color:#0F6B63!important}.icon-btn:hover{transform:translateY(-1px)!important}.tab:hover{color:#0F6B63!important}.hero-actions button:hover{transform:translateY(-2px)!important}.hero-actions button:active{transform:translateY(0) scale(.985)!important}.wish-btn{transition:background .18s ease,color .18s ease,transform .18s ease!important}.wish-btn:hover{transform:scale(1.04)!important}.modal-overlay{transition:opacity .22s ease,backdrop-filter .22s ease!important}@media(prefers-reduced-motion:reduce){.row,.chip,.icon-btn,.tab,.hero-actions button,.wish-btn,.modal-overlay{transition:none!important}.row:hover,.row:active,.icon-btn:hover,.hero-actions button:hover,.hero-actions button:active,.wish-btn:hover{transform:none!important}}</style>
+
+<style id="ail-design-v6">@media(max-width:759px){.topbar{padding-left:12px!important;padding-right:12px!important}main.view{padding-left:12px!important;padding-right:12px!important;padding-top:14px!important}.hero-card{margin-top:12px!important;margin-bottom:30px!important;border-radius:20px!important}.section-head{margin-top:22px!important}.section-block{margin-bottom:28px!important}.group{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}.row{border-radius:15px!important;padding-bottom:13px!important}.row .row-body{padding-left:11px!important;padding-right:11px!important;min-height:118px!important}.row .row-name{font-size:13.5px!important;min-height:2.65em!important}.row .row-sub{font-size:11px!important;min-height:2.8em!important}.row .row-kemasan{font-size:10.5px!important}.row .row-price{font-size:12.5px!important}.row .wish-btn{min-width:40px!important;min-height:40px!important;margin-right:7px!important}.tabbar{width:calc(100% - 20px)!important;bottom:max(8px,env(safe-area-inset-bottom))!important}}@media(max-width:360px){.group{gap:8px!important}.row .row-body{padding-left:9px!important;padding-right:9px!important}.row .row-name{font-size:13px!important}.row .row-sub{font-size:10.5px!important}.tab{font-size:9.5px!important}}</style>
+
+<style id="ail-design-v7">:focus-visible{outline:3px solid rgba(15,118,110,.24)!important;outline-offset:2px!important}button:disabled{cursor:not-allowed!important}.row,.cart-row,.info-card,.order-card,.bank-card{overflow:hidden}.empty-state{border:1px dashed #D9E2DE!important;border-radius:16px!important;background:#FCFDFC!important}.pending-banner{border:1px solid #E9DFC9!important;background:#FFF9EC!important;color:#6D5A35!important}.modal-overlay{z-index:100!important}.modal-card{border:1px solid #E5E7EB!important;box-shadow:0 -16px 42px rgba(17,24,39,.12)!important}.cart-summary,.info-card,.order-card{background:#fff!important}.bank-card{background:#FAFCFB!important}.checkout-btn{box-shadow:0 8px 20px rgba(15,118,110,.12)!important}@media(max-width:759px){.hero-actions button,.checkout-btn,.google-btn{min-height:48px!important}.form-field input,.form-field textarea{min-height:46px!important}}@media(min-width:760px){.group{grid-template-columns:repeat(3,minmax(0,1fr))!important}}@media(min-width:1180px){main.view{padding-left:0!important;padding-right:0!important}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important}}</style>
