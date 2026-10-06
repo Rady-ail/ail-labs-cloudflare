@@ -1,229 +1,50 @@
-================================================================================
-                    AIL LABS KATALOG - SETUP DOCUMENTATION
-                          August 25, 2026
-================================================================================
+# AIL LABS — Production Setup & Security Notes
 
-🌐 LIVE WEBSITE & ADMIN PANEL
-================================================================================
-Public Site:    https://ail-labs-katalog-production.up.railway.app/
-Admin Panel:    https://ail-labs-katalog-production.up.railway.app/admin
+## Production architecture
+- Public site: Cloudflare Worker/static assets.
+- Admin panel: /admin/
+- API: /api/*
+- Admin authentication: runtime environment secrets.
+- Session: signed HttpOnly ail_session cookie.
+- Database: PostgreSQL/Neon.
+- Procurement AI: protected by admin authentication and a server-side OpenAI API secret.
 
+## Admin authentication
+Production admin login uses:
+- ADMIN_USERNAME
+- ADMIN_PASSWORD
+- SESSION_SECRET
 
-👤 ADMIN CREDENTIALS
-================================================================================
-Username:       admin
-Password:       Ail@Labs2026SecurePass
+Never commit the values of these variables to GitHub, documentation, screenshots, chat, or client-side JavaScript.
 
+Login flow:
+1. Open /admin/.
+2. Submit the runtime admin username/password.
+3. POST /api/auth/login validates the credentials.
+4. A signed, HttpOnly session cookie is created.
+5. Protected admin endpoints require req.session.isAdmin.
 
-📱 CONTACT INFORMATION (UPDATED)
-================================================================================
-WhatsApp Number:    +62 878-1739-1521
-WhatsApp Link:      https://wa.me/628781739521?text=Halo%20saya%20mau%20order
-Telepon:            628781739521
-Email:              FALABS@icloud.com
+There is no database password-reset flow. To rotate the admin password, update the Cloudflare runtime secret ADMIN_PASSWORD and redeploy/restart the Worker.
 
+## Security rules
+- Do not store database URLs, API keys, admin passwords, or session secrets in source control.
+- Rotate any credential that has previously been committed or exposed.
+- Keep OPENAI_API_KEY server-side only.
+- Keep Procurement AI behind admin authentication.
+- Do not expose secrets through health checks, logs, or API responses.
+- Use Cloudflare or CI/CD secret storage for production runtime secrets.
 
-🔐 GITHUB REPOSITORY
-================================================================================
-Repository URL:     https://github.com/Rady-ail/ail-labs-katalog.git
-Repository Link:    https://github.com/Rady-ail/ail-labs-katalog
-Username:           Rady-ail
-Branch:             main
-Privacy:            Private
+## Production validation checklist
+- [ ] ADMIN_USERNAME configured in Cloudflare.
+- [ ] ADMIN_PASSWORD configured in Cloudflare.
+- [ ] SESSION_SECRET configured in Cloudflare.
+- [ ] OPENAI_API_KEY configured in Cloudflare.
+- [ ] No real secret values exist in tracked files.
+- [ ] Admin login succeeds.
+- [ ] Admin logout succeeds.
+- [ ] Unauthenticated admin API requests return 401.
+- [ ] Procurement AI remains inaccessible without admin session.
+- [ ] Public catalog and checkout remain functional.
 
-
-🗄️ NEON DATABASE
-================================================================================
-Provider:           Neon
-Project ID:         blue-cherry-17692261
-Database Name:      neondb
-Role:               neondb_owner
-Connection URL:     postgresql://neondb_owner:npg_qJXn4CI6vbsG@ep-quiet-leaf-azrytx01-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-Region:             ap-southeast-1 (Southeast Asia)
-Console:            https://console.neon.tech
-
-
-🚀 RAILWAY DEPLOYMENT
-================================================================================
-Provider:           Railway
-Site Name:          ail-labs-katalog-prod
-Site ID:            5fd40995-9fec-4797-be89-58a00d1f005a
-Live URL:           https://ail-labs-katalog-production.up.railway.app
-Node Region:        Southeast Asia
-Node Version:       18.20.8
-Replicas:           1
-Status:             Active
-Dashboard:          https://railway.app
-
-
-🔑 ENVIRONMENT VARIABLES (Railway)
-================================================================================
-DATABASE_URL=postgresql://neondb_owner:npg_qJXn4CI6vbsG@ep-quiet-leaf-azrytx01-pooler.c-3.ap-southeast-1.aws.neon.tech/neondb?channel_binding=require&sslmode=require
-ADMIN_USERNAME=admin
-ADMIN_PASSWORD=Ail@Labs2026SecurePass
-SESSION_SECRET=ail-labs-session-secret-2026-sk9f4kx0
-NODE_ENV=production
-PORT=8080
-
-
-📝 NEON DATABASE MIGRATION (SQL)
-================================================================================
-Table: settings
-Purpose: Store promo popup configuration
-
-SQL MIGRATION:
----
-CREATE TABLE IF NOT EXISTS settings (
-  key         TEXT PRIMARY KEY,
-  value       JSONB NOT NULL,
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
-);
-
-INSERT INTO settings (key, value) VALUES (
-  'promo_popup',
-  '{
-    "active": false,
-    "badge": "Promo Spesial",
-    "title": "Judul Promo Ail Labs",
-    "subtitle": "Deskripsi singkat promo",
-    "discount": "30%-50%",
-    "note": "S&K berlaku. Chat admin untuk info lebih lanjut.",
-    "whatsapp_number": "628781739521",
-    "whatsapp_message": "Halo Ail Labs, saya mau tanya soal promo",
-    "reappear_hours": 24
-  }'::jsonb
-) ON CONFLICT (key) DO NOTHING;
----
-
-
-📦 PROJECT STRUCTURE
-================================================================================
-Framework:          Express.js + Vite (React)
-Frontend:           React.js (Vite)
-Backend:            Node.js + Express
-Database:           PostgreSQL (Neon)
-Deployment:         Railway
-Hosting:            Netlify (fallback: Render.com)
-Database Adapter:   Drizzle ORM
-
-Build Command:      npm install
-Start Command:      node server.js
-Public Folder:      public/
-Functions:          netlify/functions/ (serverless)
-
-
-📂 PROJECT CONTENTS
-================================================================================
-- routes/           API endpoints & routes
-- public/           Frontend assets & static files
-- public/admin/     Admin panel (index.html)
-- db/               Database schema & migrations
-- netlify/          Serverless functions
-- app.js            Express app configuration
-- server.js         Main server entry point
-- package.json      Dependencies & scripts
-- netlify.toml      Netlify configuration
-
-
-✅ SETUP CHECKLIST - COMPLETED
-================================================================================
-✅ GitHub repository created & connected
-✅ Project uploaded to GitHub via Termux
-✅ Neon database provisioned & connected
-✅ Railway deployment created & active
-✅ Environment variables configured
-✅ Admin panel deployed & accessible
-✅ Database migration applied
-✅ Admin credentials set
-✅ WhatsApp number updated (628781739521)
-✅ All contact info synchronized
-
-
-🔧 HELPFUL TERMUX COMMANDS
-================================================================================
-# Navigate to project
-cd ~/storage/downloads/ail-labs-katalog
-
-# Update phone number across all files
-find . -type f -exec sed -i 's/OLD_NUMBER/NEW_NUMBER/g' {} \;
-
-# Git push changes
-git add .
-git commit -m "update: your message"
-git push origin main
-
-# Check git log
-git log --oneline -5
-
-# List all files with specific number
-grep -r "628781739521" .
-
-
-🌍 DEPLOYMENT WORKFLOW
-================================================================================
-1. Make changes locally → git push to GitHub
-2. Railway auto-detects push → builds & deploys (~2-3 min)
-3. Changes go live at https://ail-labs-katalog-production.up.railway.app
-
-To manually trigger deploy:
-- Railway Dashboard → Projects → ail-labs-katalog-prod → Deployments → Redeploy
-
-
-📊 KEY FEATURES
-================================================================================
-- 122 products in catalog
-- Public catalog page
-- Admin panel with settings
-- Promo popup configuration
-- WhatsApp integration
-- Database-driven content
-- Automatic deployments
-- SSL/TLS encryption
-
-
-🔒 SECURITY NOTES
-================================================================================
-- Repository is PRIVATE
-- Never share GitHub Personal Access Token
-- Admin credentials are secure
-- Database credentials are in environment variables (not in code)
-- All data transmitted over HTTPS
-- Session secrets protect user sessions
-
-
-📌 IMPORTANT LINKS TO BOOKMARK
-================================================================================
-Railway Dashboard:      https://railway.app
-Neon Console:          https://console.neon.tech
-GitHub Repository:     https://github.com/Rady-ail/ail-labs-katalog
-Live Admin Panel:      https://ail-labs-katalog-production.up.railway.app/admin
-Live Public Site:      https://ail-labs-katalog-production.up.railway.app
-
-
-💡 NEXT STEPS (If Needed)
-================================================================================
-1. Test admin panel functionality
-2. Customize promo settings via admin UI
-3. Monitor Railway logs for errors
-4. Regular backups of database
-5. Update content as needed
-
-
-📞 SUPPORT & TROUBLESHOOTING
-================================================================================
-Database Issues:    Check Neon console for connection
-Deploy Issues:      Check Railway deployment logs
-Admin Panel Down:   Hard refresh (Ctrl+Shift+R) or check Railway status
-Git Push Errors:    Verify Personal Access Token & remote URL
-
-GitHub Remote Check:
-  git remote -v
-
-Fix Remote if needed:
-  git remote set-url origin https://github.com/Rady-ail/ail-labs-katalog.git
-
-
-================================================================================
-                    LAST UPDATED: August 25, 2026, 18:19
-                All services: ✅ ACTIVE & DEPLOYED
-================================================================================
+## Credential exposure warning
+If a credential was ever committed to the repository, treat it as compromised even after the file is edited. Rotate the credential in the real provider first, then remove the exposed value from the repository.
