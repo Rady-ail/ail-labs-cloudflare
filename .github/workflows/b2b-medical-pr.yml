@@ -1,0 +1,32 @@
+name: B2B Medical PR Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+
+concurrency:
+  group: b2b-medical-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: npm run build
+        run: npm run build
+
+      - name: Wrangler dry-run
+        run: npx wrangler@4.86.0 deploy --dry-run
