@@ -111,7 +111,54 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
   </div>
   <div id="productGroups" class="mt-5 grid gap-5 md:grid-cols-2"></div>
 </section>
-<section id="procurement" class="pt-8"><div class="grid gap-4 md:grid-cols-3"><article class="rounded-2xl border border-slate-200/80 bg-white p-6 card"><div class="text-2xl">◈</div><h3 class="mt-4 font-bold">Professional Procurement</h3><p class="mt-2 text-sm leading-6 text-slate-500">Untuk klinik, rumah sakit, distributor, PBF dan jaringan farmasi.</p></article><article id="private-label" class="rounded-2xl border border-slate-200 bg-white p-5"><div class="text-2xl">◇</div><h3 class="mt-4 font-bold">Private Label Manufacturing</h3><p class="mt-2 text-sm leading-6 text-slate-500">Diskusikan kebutuhan OEM/private label berdasarkan spesifikasi dan volume bisnis.</p></article><article class="rounded-2xl border border-slate-200 bg-white p-5"><div class="text-2xl">▣</div><h3 class="mt-4 font-bold">Bulk Supply &amp; Logistics</h3><p class="mt-2 text-sm leading-6 text-slate-500">Pengadaan berbasis quotation dengan kebutuhan handling dan dokumen produk.</p></article></div></section>
+<section id="procurement" aria-labelledby="procurement-title" class="pt-10">
+  <div class="rounded-[28px] border border-slate-200/80 bg-white p-6 card sm:p-8">
+    <div class="grid gap-8 lg:grid-cols-[.85fr_1.15fr] lg:items-start">
+      <div>
+        <p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">05 • Professional Procurement</p>
+        <h2 id="procurement-title" class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Procurement yang siap diverifikasi</h2>
+        <p class="mt-3 max-w-xl text-sm leading-7 text-slate-600">AIL LABS melayani kebutuhan B2B dengan alur quotation, verifikasi, dokumen transaksi, dan pengiriman yang disesuaikan dengan kebutuhan partner profesional.</p>
+        <button onclick="openQuote()" class="mt-5 rounded-xl bg-ail-teal px-5 py-3.5 text-sm font-bold text-white">Mulai Request Quotation →</button>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <article class="rounded-2xl bg-ail-clinical p-5">
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Customer Profile</div>
+          <h3 class="mt-2 font-bold">Siapa yang kami layani?</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Klinik • Distributor • PBF • Esthetic Center • Dokter</p>
+        </article>
+        <article class="rounded-2xl bg-ail-clinical p-5">
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Minimum Order</div>
+          <h3 class="mt-2 font-bold">Sample → Bulk</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">Sample 2 pcs/item. Bulk MOQ mulai 500 pcs/item untuk program yang memenuhi ketentuan principal.</p>
+        </article>
+        <article class="rounded-2xl bg-ail-clinical p-5">
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Verification</div>
+          <h3 class="mt-2 font-bold">Business Screening</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">NIB dan dokumen fasilitas profesional dapat diminta sebelum quotation final.</p>
+        </article>
+        <article class="rounded-2xl bg-ail-clinical p-5">
+          <div class="text-[10px] font-bold uppercase tracking-widest text-slate-400">Commercial Terms</div>
+          <h3 class="mt-2 font-bold">PI → Payment → Delivery</h3>
+          <p class="mt-2 text-sm leading-6 text-slate-500">PI diterbitkan setelah quotation dan verifikasi disetujui. DDP Banjarmasin / DAP sesuai layanan.</p>
+        </article>
+      </div>
+    </div>
+    <div class="mt-7 border-t border-slate-100 pt-6">
+      <div class="text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Procurement Flow</div>
+      <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-2xl border border-slate-200 p-4"><span class="text-xs font-black text-ail-teal">01</span><h3 class="mt-2 text-sm font-bold">Request Quotation</h3><p class="mt-1 text-xs leading-5 text-slate-500">Produk, quantity, dan kebutuhan handling.</p></div>
+        <div class="rounded-2xl border border-slate-200 p-4"><span class="text-xs font-black text-ail-teal">02</span><h3 class="mt-2 text-sm font-bold">Verify NIB / SIP</h3><p class="mt-1 text-xs leading-5 text-slate-500">Screening partner sesuai kategori customer.</p></div>
+        <div class="rounded-2xl border border-slate-200 p-4"><span class="text-xs font-black text-ail-teal">03</span><h3 class="mt-2 text-sm font-bold">PI &amp; Confirmation</h3><p class="mt-1 text-xs leading-5 text-slate-500">Commercial terms dan dokumen transaksi.</p></div>
+        <div class="rounded-2xl border border-slate-200 p-4"><span class="text-xs font-black text-ail-teal">04</span><h3 class="mt-2 text-sm font-bold">Payment &amp; Delivery</h3><p class="mt-1 text-xs leading-5 text-slate-500">Pengiriman sesuai term dan handling produk.</p></div>
+      </div>
+    </div>
+    <div class="mt-6 flex flex-col gap-2 rounded-2xl border border-[#D9C39F] bg-[#FBF7EF] p-4 text-xs leading-5 text-[#725B37] sm:flex-row sm:items-center sm:justify-between">
+      <span><b>Sample benefit:</b> sample fee dapat dikreditkan 100% ke first order, sesuai ketentuan program/principal.</span>
+      <span class="font-semibold">Terms subject to verification.</span>
+    </div>
+  </div>
+</section>
+<section id="private-label" class="sr-only" aria-hidden="true"></section>
 <section id="compliance" class="pt-8"><div class="rounded-3xl bg-ail-ink p-6 text-white sm:p-8"><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-gold">Compliance First</p><h2 class="mt-2 text-2xl font-black">Dokumen &amp; kepatuhan untuk procurement</h2><p class="mt-2 max-w-2xl text-sm leading-6 text-white/65">Dokumen pendukung tersedia sesuai produk dan kebutuhan verifikasi partner profesional.</p><div class="mt-5 flex flex-wrap gap-2"><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">NIB 0308260088951</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">PBF upgrade in process</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">BPOM</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Halal mandatory 17 Oct 2026</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Porcine-Free</span><span class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-[10px] font-semibold text-white/80">Supplier certifications available</span></div></div></section>
 <section id="logistics" class="pt-8"><div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8"><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">Bulk Supply &amp; Logistics</p><h2 class="mt-2 text-2xl font-black">Cold chain &amp; professional delivery</h2><p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">Pengadaan nasional melalui partner logistik, dengan handling 2–8°C dan 2–25°C sesuai kebutuhan produk. Ketentuan DDP 70582 atau DAP diterapkan sesuai ketersediaan layanan.</p><div class="mt-5 grid gap-3 sm:grid-cols-3"><div class="rounded-2xl bg-ail-clinical p-4"><b class="text-sm">Sample</b><p class="mt-1 text-xs text-slate-500">7–10 hari setelah payment</p></div><div class="rounded-2xl bg-ail-clinical p-4"><b class="text-sm">Bulk</b><p class="mt-1 text-xs text-slate-500">30–45 hari</p></div><div class="rounded-2xl bg-ail-clinical p-4"><b class="text-sm">Coverage</b><p class="mt-1 text-xs text-slate-500">Kalimantan Selatan &amp; nasional</p></div></div></div></section>
 <section id="about" class="pt-8"><div class="rounded-3xl border border-slate-200 bg-white p-6 sm:p-8"><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">About AIL LABS</p><h2 class="mt-2 text-2xl font-black">Borneo-based aesthetic supply partner untuk Indonesia</h2><p class="mt-3 max-w-3xl text-sm leading-7 text-slate-600">PT Fudhail Aesthetic Laboratories hadir sebagai partner B2B untuk kebutuhan estetika profesional, distributor dan private label.</p><div class="mt-5 rounded-2xl bg-ail-clinical p-4"><p class="text-[10px] font-bold uppercase tracking-widest text-[#725B37]">Trust Story</p><p class="mt-2 text-sm font-semibold">Putra Daerah Kotabaru Dapil Kalsel II</p><p class="mt-1 text-xs text-slate-500">Surat DPR RI 001/AIL-DPR/X/2026</p></div></div></section>
