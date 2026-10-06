@@ -11,7 +11,8 @@
   "vars": {
     "ALLOWED_ORIGIN": "https://ail-aesthetic-labs.my.id",
     "GOOGLE_CALLBACK_URL": "https://ail-aesthetic-labs.my.id/api/customer/auth/google/callback",
-    "PAYPAL_MODE": "live"
+    "PAYPAL_MODE": "live",
+    "VISITOR_PHOTO_PURGE_ENABLED": "false"
   },
   "assets": {
     "directory": "./public",

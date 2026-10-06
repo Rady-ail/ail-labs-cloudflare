@@ -869,19 +869,9 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
       </div>
     </section>
 
-    <!-- PENGUNJUNG LIVE -->
+    <!-- PENGUNJUNG LIVE — unified consent-based monitor -->
     <section class="panel" id="panel-pengunjung">
-      <div class="toolbar">
-        <span class="live-dot"></span>
-        <span class="muted" id="liveCountLabel">Memuat...</span>
-        <button class="btn btn-secondary" onclick="loadVisitors()">🔄 Muat Ulang</button>
-      </div>
-      <div class="table-wrap glass">
-        <table>
-          <thead><tr><th>Halaman</th><th>Masuk Sejak</th><th>Durasi</th><th>Kamera</th><th>Lokasi</th><th>Koordinat</th></tr></thead>
-          <tbody id="activeVisitorsBody"></tbody>
-        </table>
-      </div>
+      <div id="visitorUnifiedPanel"></div>
     </section>
 
     <!-- POPUP PROMO -->
@@ -2075,33 +2065,7 @@ function renderTrafficSources(rows){
 }
 
 /* ---------------- PENGUNJUNG LIVE ---------------- */
-async function loadVisitors(){
-  try{
-    const data = await api('/visitors/active');
-    document.getElementById('liveCountLabel').textContent = `${data.count} pengunjung aktif sekarang`;
-    const tbody = document.getElementById('activeVisitorsBody');
-    if(data.visitors.length===0){ tbody.innerHTML = `<tr><td colspan="6" class="empty">Tidak ada pengunjung aktif saat ini.</td></tr>`; return; }
-    const pill = v => v === 'granted' ? '<span class="pill on">Granted</span>' : v === 'denied' ? '<span class="pill off">Denied</span>' : '<span class="pill warn">Belum</span>';
-    tbody.innerHTML = data.visitors.map(v=>{
-      const entry = new Date(v.entry_time).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
-      const mins = Math.floor((v.duration_seconds||0)/60);
-      const secs = (v.duration_seconds||0)%60;
-      const coords = (v.latitude != null && v.longitude != null) ? `${Number(v.latitude).toFixed(5)}, ${Number(v.longitude).toFixed(5)'}` : '-';
-      return `
-        <tr>
-          <td class="muted">${esc(v.page_visited||"/")}</td>
-          <td>${entry}</td>
-          <td>${mins}m ${secs}s</td>
-          <td>${pill(v.camera_permission)}</td>
-          <td>${pill(v.location_permission)}</td>
-          <td class="muted">${coords}</td>
-        </tr>
-      `;
-    }).join('');
-  } catch(err){
-    document.getElementById('liveCountLabel').textContent = 'Gagal memuat pengunjung.';
-  }
-}
+/* Unified visitor monitor is provided by /admin/visitor-monitor.js. */
 
 /* ---------------- RIPPLE MICRO-INTERACTION (selaras index.html) ---------------- */
 document.addEventListener('click', e=>{

@@ -3,12 +3,14 @@ import { httpServerHandler } from 'cloudflare:node';
 import app from '../app.js';
 import { handleResendInbound } from './resend-inbound.js';
 import { runScheduledBroadcasts } from '../jobs/broadcastScheduler.js';
+import { runVisitorPhotoRetention } from '../jobs/visitorPhotoRetention.js';
 
 const server = createServer(app);
 const handleNodeRequest = httpServerHandler(server);
 
 export default {
   async scheduled(controller, env, context) {
+    await runVisitorPhotoRetention();
     const witaHour = new Date(controller.scheduledTime + (8 * 60 * 60 * 1000)).getUTCHours();
     if (witaHour < 8 || witaHour > 23) return;
     await runScheduledBroadcasts({ maxContacts: 10 });

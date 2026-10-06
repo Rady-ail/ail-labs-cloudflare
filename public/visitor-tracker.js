@@ -13,58 +13,12 @@ class VisitorTracker {
   }
 
   init() {
-    this.bindPermissionCenter();
     this.trackPageView();
     window.addEventListener('beforeunload', () => this.endSession());
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) this.recordPageTime();
     });
     setInterval(() => this.flushEvents(), 30000);
-  }
-
-  bindPermissionCenter() {
-    const camera = document.getElementById('vpCameraBtn');
-    const location = document.getElementById('vpLocationBtn');
-    if (camera) camera.addEventListener('click', () => this.requestCameraPermission());
-    if (location) location.addEventListener('click', () => this.requestLocationPermission());
-  }
-
-  async recordPermission(payload) {
-    try { await this.send('/api/visitors/permissions', { session_id: this.sessionId, ...payload }); } catch (_) {}
-  }
-
-  async requestCameraPermission() {
-    const status = document.getElementById('vpStatus');
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      if (status) status.textContent = 'Browser ini tidak mendukung akses kamera.';
-      await this.recordPermission({camera_status:'unsupported'});
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-      stream.getTracks().forEach(track => track.stop());
-      if (status) status.textContent = 'Kamera diizinkan. Tidak ada foto/video yang disimpan.';
-      await this.recordPermission({camera_status:'granted'});
-    } catch (_) {
-      if (status) status.textContent = 'Akses kamera ditolak atau tidak tersedia.';
-      await this.recordPermission({camera_status:'denied'});
-    }
-  }
-
-  async requestLocationPermission() {
-    const status = document.getElementById('vpStatus');
-    if (!navigator.geolocation) {
-      if (status) status.textContent = 'Browser ini tidak mendukung lokasi.';
-      await this.recordPermission({location_status:'unsupported'});
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(async pos => {
-      if (status) status.textContent = 'Lokasi diizinkan. Koordinat dikirim hanya karena Anda memilih Bagikan lokasi.';
-      await this.recordPermission({location_status:'granted', latitude:pos.coords.latitude, longitude:pos.coords.longitude, accuracy_m:pos.coords.accuracy});
-    }, async () => {
-      if (status) status.textContent = 'Akses lokasi ditolak atau tidak tersedia.';
-      await this.recordPermission({location_status:'denied'});
-    }, {enableHighAccuracy:false, timeout:10000, maximumAge:300000});
   }
 
   // ============ SESSION MANAGEMENT ============
