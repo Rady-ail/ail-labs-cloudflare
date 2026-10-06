@@ -30,3 +30,4 @@ jobs:
 
       - name: Wrangler dry-run
         run: npx wrangler@4.86.0 deploy --dry-run
+# PR-only validation; never deploys to Cloudflare.
