@@ -67,6 +67,7 @@ app.use(cors({
 }));
 if (!isCloudflareWorker) app.use(compression());
 app.use(express.json({
+  limit: '400kb',
   verify: (req, res, buf) => { req.rawBody = Buffer.from(buf); }
 }));
 const passport = require('passport');
