@@ -8,8 +8,24 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 const { sendWhatsApp } = require('../lib/whatsapp');
+const { requireAdmin } = require('./authMiddleware');
 
 const MAX_HASIL = 5;
+
+// Admin-only connection health. Never exposes token values.
+router.get('/status', requireAdmin, async (req, res) => {
+  const configured = Boolean(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID);
+  res.set('Cache-Control', 'no-store');
+  res.json({
+    configured,
+    provider: 'Meta WhatsApp Cloud API',
+    graph_version: process.env.WHATSAPP_GRAPH_VERSION || 'v25.0',
+    international_numbers: true,
+    note: configured
+      ? 'WhatsApp Cloud API siap digunakan. Pesan marketing tetap mengikuti template/opt-in dan tarif Meta.'
+      : 'WHATSAPP_TOKEN atau WHATSAPP_PHONE_NUMBER_ID belum dikonfigurasi.'
+  });
+});
 
 // Normalisasi nomor: WA kirim format internasional (mis. 62812xxxxxxx),
 // sedangkan di tabel customers kemungkinan tersimpan format lokal (0812xxxxxxx).
