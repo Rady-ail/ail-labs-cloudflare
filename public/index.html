@@ -165,78 +165,150 @@ body{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,
 <section id="contact" aria-labelledby="contact-title" class="pt-10"><div class="rounded-[28px] border border-slate-200/80 bg-white p-6 card sm:p-8"><div class="grid gap-8 lg:grid-cols-[1fr_.85fr] lg:items-start"><div><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">10 • Contact</p><h2 id="contact-title" class="mt-2 text-3xl font-black tracking-tight sm:text-4xl">Start a verified B2B conversation</h2><p class="mt-3 max-w-2xl text-sm leading-7 text-slate-600">Request quotation untuk mendapatkan quotation, dokumen transaksi, dan official channel setelah verifikasi bisnis.</p><div class="mt-6 grid gap-3 sm:grid-cols-2"><div class="rounded-2xl bg-ail-clinical p-4"><div class="text-xs font-bold uppercase tracking-widest text-slate-400">Official Email</div><div class="mt-1 font-semibold text-ail-teal">info@ail-aesthetic-labs.my.id</div></div><div class="rounded-2xl bg-ail-clinical p-4"><div class="text-xs font-bold uppercase tracking-widest text-slate-400">Distribution Hub</div><div class="mt-1 font-semibold text-ail-teal">South Kalimantan, ID 70582</div><div class="mt-1 text-xs text-slate-500">Detailed address available for verified B2B partners.</div></div></div></div><div class="rounded-3xl bg-ail-clinical p-6"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-ail-teal">Business Hours</div><div class="mt-2 text-xl font-black">Mon–Fri • 09:00–17:00 WITA</div><p class="mt-2 text-xs leading-5 text-slate-500">Official channel provided after business verification.</p><button onclick="openQuote()" class="mt-5 w-full rounded-xl bg-ail-teal px-5 py-3.5 text-sm font-bold text-white">Request Quotation →</button></div></div></div></section>
 <footer class="mt-10 rounded-[28px] bg-ail-ink p-6 text-white sm:p-8"><div class="grid gap-8 lg:grid-cols-3"><div><div class="font-black tracking-[.15em] text-ail-gold">AIL LABS</div><h2 class="mt-2 text-xl font-bold">PT Fudhail Aesthetic Laboratories</h2><p class="mt-3 text-sm leading-6 text-white/60">B2B Aesthetic Distributor &amp; Private Label Manufacturing Partner.</p></div><div><div class="text-xs font-bold uppercase tracking-widest text-white/40">Business</div><p class="mt-3 text-sm text-white/75">NIB 0308260088951</p><p class="mt-1 text-sm leading-6 text-white/60">Distribution Hub: South Kalimantan, ID 70582</p><p class="mt-1 text-xs leading-5 text-white/45">Detailed address available for verified B2B partners upon quotation.</p></div><div><div class="text-xs font-bold uppercase tracking-widest text-white/40">Official Contact</div><p class="mt-3 text-sm text-white/75">info@ail-aesthetic-labs.my.id</p><p class="mt-2 text-sm font-bold text-ail-gold">WhatsApp: via Request Quotation</p><p class="mt-1 text-xs leading-5 text-white/45">Official channel provided after business verification.</p></div></div><div class="mt-7 border-t border-white/10 pt-5 text-xs leading-5 text-white/45">Products intended for professional use and procurement. Product status, regulatory documentation, availability and commercial terms are subject to verification.</div></footer>
 </main>
-<nav class="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 px-3 pt-2 backdrop-blur"><div class="mx-auto grid max-w-md grid-cols-3"><a href="#catalog" class="flex flex-col items-center gap-1 py-2 text-ail-teal"><span>▦</span><span class="text-[10px] font-bold">Katalog</span></a><button onclick="openQuote()" class="relative flex flex-col items-center gap-1 py-2 text-ail-teal"><span>▤<b id="quoteBadge" class="absolute -mt-2 ml-4 hidden h-4 min-w-4 rounded-full bg-ail-gold px-1 text-[8px] text-ail-ink">0</b></span><span class="text-[10px] font-bold">Quotation</span></button><button onclick="openQuote()" class="flex flex-col items-center gap-1 py-2 text-ail-teal"><span>◯</span><span class="text-[10px] font-bold">Akun</span></button></div></nav>
+<nav class="safe-bottom fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/95 px-3 pt-2 backdrop-blur"><div class="mx-auto grid max-w-md grid-cols-3"><a href="#catalog" class="flex flex-col items-center gap-1 py-2 text-ail-teal"><span>▦</span><span class="text-[10px] font-bold">Katalog</span></a><button onclick="openQuote()" class="relative flex flex-col items-center gap-1 py-2 text-ail-teal"><span>▤<b id="quoteBadge" class="absolute -mt-2 ml-4 hidden h-4 min-w-4 rounded-full bg-ail-gold px-1 text-[8px] text-ail-ink">0</b></span><span class="text-[10px] font-bold">Quotation</span></button><button onclick="openQuote()" class="flex flex-col items-center gap-1 py-2 text-ail-teal"><span>◯</span><span class="text-[10px] font-bold">Contact</span></button></div></nav>
 <div id="quoteModal" class="fixed inset-0 z-[100] hidden items-end justify-center bg-[#071817]/70 p-0 backdrop-blur-sm sm:items-center sm:p-5"><div class="max-h-[94vh] w-full overflow-y-auto rounded-t-3xl bg-white p-5 shadow-2xl sm:max-w-2xl sm:rounded-3xl"><div class="flex items-center justify-between"><div><p class="text-[10px] font-bold uppercase tracking-[.2em] text-ail-teal">B2B QUOTATION</p><h2 class="mt-1 text-xl font-black">Request Quotation</h2></div><button onclick="closeQuote()" class="rounded-xl border border-slate-200 px-3 py-2">×</button></div><form id="quoteForm" class="mt-5 space-y-4" onsubmit="submitQuote(event)"><div id="selectedProductBox" class="hidden rounded-2xl border border-[#B9D8CE] bg-[#EFF8F4] p-4 text-sm"></div><div class="grid gap-3 sm:grid-cols-2"><input required name="name" placeholder="Nama PIC *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input required name="company" placeholder="Nama perusahaan / klinik *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input required name="position" placeholder="Jabatan *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input required name="whatsapp" placeholder="WhatsApp *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input type="email" required name="email" placeholder="Email *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input name="nib" placeholder="NIB perusahaan / fasilitas" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"></div><select required name="customer" class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><option value="">Kategori customer *</option><option>Klinik</option><option>Distributor</option><option>PBF</option><option>Esthetic Center</option><option>Dokter</option></select><div class="grid gap-3 sm:grid-cols-2"><input required name="product" id="quoteProduct" placeholder="Produk / kebutuhan *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"><input required name="qty" placeholder="Quantity *" class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"></div><textarea name="notes" rows="3" placeholder="Catatan: packaging, cold chain, OEM, delivery, dll." class="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-ail-teal"></textarea><div class="rounded-2xl border border-slate-200 p-4"><div class="text-xs font-bold">Dokumen verifikasi (opsional)</div><p class="mt-1 text-[11px] leading-5 text-slate-500">NIB, SIP/izin praktik, izin klinik, NPWP. File dipilih di perangkat dan nama file dicantumkan pada email quotation; lampiran dapat dikirim pada follow-up resmi.</p><div class="mt-3 grid gap-3 sm:grid-cols-2"><input type="file" name="nibFile" accept=".pdf,.jpg,.jpeg,.png" class="text-xs"><input type="file" name="permitFile" accept=".pdf,.jpg,.jpeg,.png" class="text-xs"></div></div><div class="rounded-2xl bg-ail-clinical p-4 text-xs leading-5 text-slate-600">Thank you, our team will contact you via official WhatsApp within 1x24h after NIB verification. Detail pembayaran hanya melalui dokumen transaksi resmi.</div><button type="submit" class="w-full rounded-xl bg-ail-teal px-5 py-3.5 font-bold text-white">Generate Request → Email AIL LABS</button></form></div></div>
 <script>
-const categories=['Body Care & Slimming','Filler & Skinbooster','Skincare Professional','PDRN / PN / Exosome','Mesotherapy','Private Label OEM'];
-let quoteStep=1;
-const steps=[['1. Add to Quotation','Pilih kebutuhan produk dan estimasi quantity.'],['2. NIB / Business Verification','Verifikasi badan usaha atau fasilitas profesional.'],['3. Upload SIP / Clinic License','Dokumen digunakan untuk proses verifikasi profesional.'],['4. Receive Proforma Invoice','PI diterbitkan setelah quotation dan verifikasi disetujui.'],['5. Payment Confirmation','Konfirmasi melalui WhatsApp setelah PI disetujui.']];
-function renderSteps(){document.getElementById('quoteSteps').innerHTML=steps.map((s,i)=>'<div class="rounded-2xl border '+(i+1===quoteStep?'border-ail-teal bg-[#F3F8F7]':'border-slate-200')+' p-4"><div class="font-bold">'+s[0]+'</div><div class="mt-1 text-xs leading-5 text-slate-500">'+s[1]+'</div></div>').join('')}
-function openQuote(){document.body.classList.add('modal-open');document.getElementById('quoteModal').classList.remove('hidden');document.getElementById('quoteModal').classList.add('flex');renderSteps()}
-function closeQuote(){document.body.classList.remove('modal-open');document.getElementById('quoteModal').classList.add('hidden');document.getElementById('quoteModal').classList.remove('flex')}
-let activeCategory='Semua', catalogData=[];
-const categoryAliases={
-  'Body Care & Slimming':['Body Care & Slimming','Body Lotion','Slimming'],
-  'Filler & Skinbooster':['Filler & Skinbooster','Filler','Skinbooster'],
-  'Skincare Professional':['Skincare Professional','Skincare & Perawatan Wajah'],
-  'PDRN / PN / Exosome':['PDRN / PN / Exosome','PDRN','PN','Exosome'],
-  'Mesotherapy':['Mesotherapy','Meso'],
-  'Private Label OEM':['Private Label OEM','Private Label','OEM']
-};
-function norm(v){return String(v||'').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim()}
-function categoryMatch(group,selected){
-  if(selected==='Semua') return true;
-  const aliases=categoryAliases[selected]||[selected];
-  const g=norm(group);
-  return aliases.some(a=>g===norm(a)||g.includes(norm(a))||norm(a).includes(g));
+let activeCategory='Semua';
+let catalogData=[];
+let selectedQuoteProduct='';
+
+function esc(value){
+  return String(value ?? '').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]||m));
 }
-function pillRender(){
+function norm(value){
+  return String(value ?? '').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+function openQuote(product=''){
+  selectedQuoteProduct=String(product||'');
+  document.body.classList.add('modal-open');
+  const modal=document.getElementById('quoteModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  const input=document.getElementById('quoteProduct');
+  if(input && selectedQuoteProduct) input.value=selectedQuoteProduct;
+  const box=document.getElementById('selectedProductBox');
+  if(box){
+    box.textContent=selectedQuoteProduct ? 'Produk dipilih: '+selectedQuoteProduct : '';
+    box.classList.toggle('hidden',!selectedQuoteProduct);
+  }
+}
+function closeQuote(){
+  document.body.classList.remove('modal-open');
+  const modal=document.getElementById('quoteModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+function selectProductForQuote(name){ openQuote(name); }
+
+function renderCategoryPills(){
   const el=document.getElementById('categoryPills');
-  const cats=['Semua',...categories];
-  el.innerHTML=cats.map((c,i)=>'<button type="button" onclick="filterGroup('+JSON.stringify(c)+')" data-cat="'+esc(c)+'" class="snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold transition '+(i===0?'border-ail-teal bg-ail-teal text-white':'border-slate-200 bg-white text-slate-600 hover:border-ail-teal hover:text-ail-teal')+'">'+esc(c)+'</button>').join('');
+  const cats=['Semua',...catalogData.map(g=>g.cat).filter(Boolean)];
+  const unique=[...new Set(cats)];
+  el.innerHTML=unique.map((c,i)=>'<button type="button" onclick="filterGroup('+JSON.stringify(c)+')" data-cat="'+esc(c)+'" class="snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold transition '+(c===activeCategory?'border-ail-teal bg-ail-teal text-white':'border-slate-200 bg-white text-slate-600 hover:border-ail-teal hover:text-ail-teal')+'">'+esc(c)+'</button>').join('');
 }
-function filterGroup(cat){
-  activeCategory=cat;
-  document.querySelectorAll('#categoryPills button').forEach(b=>{
-    const on=b.dataset.cat===cat;
-    b.className='snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold transition '+(on?'border-ail-teal bg-ail-teal text-white':'border-slate-200 bg-white text-slate-600 hover:border-ail-teal hover:text-ail-teal');
+
+function filterGroup(category){
+  activeCategory=category;
+  document.querySelectorAll('#categoryPills button').forEach(btn=>{
+    const active=btn.dataset.cat===activeCategory;
+    btn.className='snap-start shrink-0 rounded-xl border px-4 py-2.5 text-xs font-bold transition '+(active?'border-ail-teal bg-ail-teal text-white':'border-slate-200 bg-white text-slate-600 hover:border-ail-teal hover:text-ail-teal');
   });
   applyCatalogFilter();
 }
+
+function productCard(item,category){
+  const name=item?.[0] ?? '';
+  const kandungan=item?.[1] ?? '';
+  const kemasan=item?.[2] ?? '';
+  return '<article data-product="'+esc(name)+'" class="rounded-2xl border border-slate-200/80 bg-white p-4 card">'+
+    '<div class="flex aspect-[4/3] items-center justify-center rounded-xl bg-ail-clinical text-ail-teal">▣</div>'+
+    '<p class="mt-4 text-[10px] font-bold uppercase tracking-widest text-ail-teal">'+esc(category||'Professional Use')+'</p>'+
+    '<h3 class="mt-1 font-bold leading-5">'+esc(name)+'</h3>'+
+    '<p class="mt-1 text-xs leading-5 text-slate-500">'+esc(kandungan)+'</p>'+
+    '<p class="mt-2 text-xs text-slate-500">'+esc(kemasan)+'</p>'+
+    '<div class="mt-3 flex flex-wrap gap-1.5">'+
+      '<span class="rounded-full border border-slate-200 bg-ail-clinical px-3 py-1.5 text-[10px] font-semibold text-ail-teal">MOQ by quotation</span>'+
+      '<span class="rounded-full border border-[#B9D8CE] bg-[#EFF8F4] px-3 py-1.5 text-[10px] font-semibold text-[#145A4E]">BPOM status by SKU</span>'+
+      '<span class="rounded-full border border-[#D9C39F] bg-[#FBF7EF] px-3 py-1.5 text-[10px] font-semibold text-[#725B37]">Porcine-Free</span>'+
+    '</div>'+
+    '<button type="button" onclick="selectProductForQuote('+JSON.stringify(name)+')" class="mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white transition hover:opacity-90">Request Bulk Quote</button>'+
+  '</article>';
+}
+
 function applyCatalogFilter(){
-  const q=norm(document.getElementById('catalogSearch')?.value||'');
+  const query=norm(document.getElementById('catalogSearch')?.value||'');
   const sort=document.getElementById('catalogSort')?.value||'default';
   const groups=[...document.querySelectorAll('[data-group]')];
-  let visible=0;
-  groups.forEach(g=>{
-    const catOk=categoryMatch(g.dataset.group,activeCategory);
-    const textOk=!q||norm(g.dataset.group+' '+g.textContent).includes(q);
-    const show=catOk&&textOk;
-    g.classList.toggle('hidden',!show);
-    if(show) visible++;
-    const cards=g.querySelectorAll('[data-product]');
-    if(sort==='az') [...cards].sort((a,b)=>a.dataset.product.localeCompare(b.dataset.product,'id')).forEach(x=>g.querySelector('[data-product-grid]').appendChild(x));
+  let visibleGroups=0;
+  let visibleProducts=0;
+  groups.forEach(group=>{
+    const categoryOk=activeCategory==='Semua' || norm(group.dataset.group)===norm(activeCategory);
+    const cards=[...group.querySelectorAll('[data-product]')];
+    cards.forEach(card=>{
+      const textOk=!query || norm(card.dataset.product+' '+card.textContent).includes(query);
+      card.classList.toggle('hidden',!(categoryOk && textOk));
+      if(categoryOk && textOk) visibleProducts++;
+    });
+    if(sort==='az'){
+      cards.sort((a,b)=>a.dataset.product.localeCompare(b.dataset.product,'id')).forEach(card=>group.querySelector('[data-product-grid]').appendChild(card));
+    }
+    const hasVisible=categoryOk && cards.some(card=>!card.classList.contains('hidden'));
+    group.classList.toggle('hidden',!hasVisible);
+    if(hasVisible) visibleGroups++;
   });
   const status=document.getElementById('catalogStatus');
   const empty=document.getElementById('catalogEmpty');
-  if(status&&catalogData.length) status.textContent=visible+' kategori tersedia';
-  if(empty) empty.classList.toggle('hidden',visible!==0);
+  if(status) status.textContent=visibleProducts+' produk • '+visibleGroups+' kategori';
+  if(empty) empty.classList.toggle('hidden',visibleProducts!==0);
   const clear=document.getElementById('clearCatalogBtn');
-  if(clear) clear.classList.toggle('hidden',!q);
+  if(clear) clear.classList.toggle('hidden',!query);
 }
-function esc(s){return String(s??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]||m))}
-function productCard(name,kandungan,kemasan){return '<article class="rounded-2xl border border-slate-200/80 bg-white p-4 card"><div class="flex aspect-[4/3] items-center justify-center rounded-xl bg-ail-clinical text-ail-teal">▣</div><p class="mt-4 text-[10px] font-bold uppercase tracking-widest text-ail-teal">Professional Use</p><h3 class="mt-1 font-bold leading-5">'+esc(name)+'</h3><p class="mt-1 text-xs leading-5 text-slate-500">'+esc(kandungan||'')+'</p><p class="mt-2 text-xs text-slate-500">'+esc(kemasan||'')+'</p><div class="mt-3 flex flex-wrap gap-1.5"><span class="rounded-full border border-slate-200 bg-ail-clinical px-3 py-1.5 text-[10px] font-semibold text-ail-teal">MOQ by quotation</span><span class="rounded-full border border-[#B9D8CE] bg-[#EFF8F4] px-3 py-1.5 text-[10px] font-semibold text-[#145A4E]">BPOM status by SKU</span><span class="rounded-full border border-[#D9C39F] bg-[#FBF7EF] px-3 py-1.5 text-[10px] font-semibold text-[#725B37]">Porcine-Free</span></div><button onclick="openQuote()" class="mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white transition hover:opacity-90">Request Bulk Quote</button></article>'}
+
 async function loadCatalog(){
-  const status=document.getElementById('catalogStatus'),groups=document.getElementById('productGroups');
+  const status=document.getElementById('catalogStatus');
+  const groups=document.getElementById('productGroups');
+  if(status) status.textContent='Memuat katalog…';
   try{
-    const r=await fetch('/api/products',{credentials:'include',cache:'no-store'}); const data=await r.json();
-    if(!r.ok||!Array.isArray(data))throw new Error();
-    catalogData=data; groups.innerHTML=data.map(g=>'<section data-group="'+esc(g.cat)+'" class="rounded-2xl border border-slate-200/80 bg-white p-4 card"><div class="mb-4 flex items-center justify-between gap-3"><div><h3 class="font-black">'+esc(g.cat)+'</h3><p class="mt-1 text-[10px] uppercase tracking-widest text-slate-400">Professional procurement</p></div><span class="shrink-0 rounded-full bg-ail-clinical px-3 py-1 text-xs font-bold text-ail-teal">'+g.items.length+' items</span></div><div data-product-grid class="grid gap-3 sm:grid-cols-2">'+g.items.map(x=>productCard(x[0],x[1],x[2],g.cat)).join('')+'</div></section>').join('');
-    status.textContent=data.length+' kategori tersedia'; applyCatalogFilter();
-  }catch(e){status.textContent='Katalog belum tersedia';groups.innerHTML='<div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500 sm:col-span-2 lg:col-span-3">Katalog sedang tidak tersedia. Gunakan Request Quotation untuk meminta daftar produk dan dokumen terbaru.</div>'}
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),10000);
+    const response=await fetch('/api/products',{method:'GET',headers:{'Accept':'application/json'},cache:'no-store',signal:controller.signal});
+    clearTimeout(timer);
+    const raw=await response.text();
+    let data;
+    try{ data=JSON.parse(raw); }catch{ throw new Error('API tidak mengembalikan JSON'); }
+    if(!response.ok) throw new Error(data?.error || ('HTTP '+response.status));
+    if(!Array.isArray(data)) throw new Error('Format katalog tidak valid');
+    const valid=data.filter(g=>g && typeof g.cat==='string' && Array.isArray(g.items));
+    if(!valid.length) throw new Error('Katalog kosong');
+    catalogData=valid;
+    groups.innerHTML=catalogData.map(g=>
+      '<section data-group="'+esc(g.cat)+'" class="rounded-2xl border border-slate-200/80 bg-white p-4 card">'+
+        '<div class="mb-4 flex items-center justify-between gap-3">'+
+          '<div><h3 class="font-black">'+esc(g.cat)+'</h3><p class="mt-1 text-[10px] uppercase tracking-widest text-slate-400">Professional procurement</p></div>'+
+          '<span class="shrink-0 rounded-full bg-ail-clinical px-3 py-1 text-xs font-bold text-ail-teal">'+g.items.length+' items</span>'+
+        '</div>'+
+        '<div data-product-grid class="grid gap-3 sm:grid-cols-2">'+g.items.map(item=>productCard(item,g.cat)).join('')+'</div>'+
+      '</section>'
+    ).join('');
+    renderCategoryPills();
+    applyCatalogFilter();
+  }catch(error){
+    console.error('AIL LABS catalog error:',error);
+    catalogData=[];
+    renderCategoryPills();
+    groups.innerHTML='<div class="rounded-2xl border border-dashed border-slate-300 bg-white p-6 text-sm text-slate-500 sm:col-span-2 lg:col-span-3"><b class="text-ail-ink">Katalog belum dapat dimuat.</b><p class="mt-1">Data produk tidak dibuat-buat. Silakan coba refresh. Jika API sedang bermasalah, gunakan Request Quotation untuk meminta daftar produk terbaru.</p></div>';
+    if(status) status.textContent='Katalog offline';
+  }
 }
-function clearCatalogSearch(){const el=document.getElementById('catalogSearch');if(el){el.value='';applyCatalogFilter();el.focus()}}
-function selectProductForQuote(name){window.selectedQuoteProduct=name;openQuote()}
-pillRender();renderSteps();document.getElementById('catalogSearch').addEventListener('input',applyCatalogFilter);document.getElementById('catalogSort').addEventListener('change',applyCatalogFilter);loadCatalog();
+
+function clearCatalogSearch(){
+  const input=document.getElementById('catalogSearch');
+  if(input){ input.value=''; applyCatalogFilter(); input.focus(); }
+}
+
+document.getElementById('catalogSearch')?.addEventListener('input',applyCatalogFilter);
+document.getElementById('catalogSort')?.addEventListener('change',applyCatalogFilter);
+loadCatalog();
 </script>
 </body></html>
