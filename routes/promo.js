@@ -4,16 +4,23 @@ const pool = require('../db/pool');
 const { normalizePhoneNumber, broadcastInChunks } = require('../services/fonnteService');
 const { requireAdmin } = require('./authMiddleware');
 
-router.post('/api/admin/promo', requireAdmin, async (req, res) => {
+router.post('/', requireAdmin, async (req, res) => {
   try {
-    const { title, description, discount, imageUrl } = req.body;
+    const { title, description, discount, imageUrl, statusTarget = 'approved', customerTypes = [] } = req.body;
 
     if (!title || !description) {
       return res.status(400).json({ error: 'title dan description wajib diisi' });
     }
 
+    const statusClause = statusTarget === 'all' ? '' : ' AND status = \'approved\'';
+    const typeFilter = Array.isArray(customerTypes) && customerTypes.length > 0
+      ? ` AND COALESCE(customer_type, '') = ANY($1::text[])`
+      : '';
+    const params = (Array.isArray(customerTypes) && customerTypes.length > 0) ? [customerTypes] : [];
     const { rows: customers } = await pool.query(
-   `SELECT phone FROM customers WHERE status = 'approved' AND phone IS NOT NULL AND phone != ''`
+      `SELECT phone FROM customers
+       WHERE phone IS NOT NULL AND phone != ''${statusClause}${typeFilter}`,
+      params
     );
 
     const targets = customers
