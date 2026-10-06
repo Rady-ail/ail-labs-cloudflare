@@ -8,7 +8,7 @@ const pool = require('./db/pool');
 
 const app = express();
 const isCloudflareWorker = typeof WebSocketPair !== 'undefined';
-const sessionSecret = process.env.SESSION_SECRET;
+const sessionSecret = process.env.ADMIN_SESSION_SECRET;
 
 app.set('trust proxy', 1);
 
@@ -84,7 +84,7 @@ if (sessionSecret) {
 } else {
   // Keep the public site available, but do not pretend admin sessions are healthy.
   if (process.env.NODE_ENV === 'production' || isCloudflareWorker) {
-    console.error('[auth] SESSION_SECRET is missing in production; admin sessions are disabled.');
+    console.error('[auth] ADMIN_SESSION_SECRET is missing in production; admin sessions are disabled.');
   }
   app.use((req, res, next) => {
     req.session = {};
@@ -114,9 +114,6 @@ app.use('/api/procurement-ai', require('./routes/procurement-ai'));
 app.use('/api/admin', require('./routes/promoKategori'));
 
 // ---------- File statis (katalog publik + panel admin) ----------
-// Catatan: di Netlify, folder public/ sudah otomatis disajikan sebagai
-// situs statis (lewat pengaturan "publish" di netlify.toml), jadi baris
-// ini terutama dipakai saat jalan lokal / di Render.
 if (typeof __dirname !== 'undefined') {
   app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d', etag: true }));
 
@@ -128,6 +125,5 @@ if (typeof __dirname !== 'undefined') {
     res.sendFile(path.join(__dirname, 'public/index.html'));
   });
 }
-
 
 module.exports = app;
