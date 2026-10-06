@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { transporter } = require('../db/mailer');
+const pool = require('../db/pool');
+
+const RFQ_PERSISTENCE_ENABLED = process.env.RFQ_PERSISTENCE_ENABLED === 'true';
 
 const LIMITS = {
   name: 120,
@@ -63,6 +66,25 @@ router.post('/', async (req, res) => {
     return res.status(503).json({ ok: false, error: 'Kanal quotation sedang dikonfigurasi. Silakan coba lagi nanti.' });
   }
 
+  let rfqId = null;
+  if (RFQ_PERSISTENCE_ENABLED) {
+    try {
+      const result = await pool.query(
+        `INSERT INTO rfq_requests
+          (name, company, position, whatsapp, email, nib, customer_category, product, quantity, notes, status)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'new')
+         RETURNING id`,
+        [data.name, data.company, data.position || null, data.whatsapp, data.email,
+         data.nib || null, data.customer || null, data.product || null,
+         data.qty || null, data.notes || null]
+      );
+      rfqId = result.rows[0]?.id || null;
+    } catch (error) {
+      console.error('[quotation] RFQ persistence failed:', error?.message || error);
+      return res.status(503).json({ ok: false, error: 'Request quotation belum dapat disimpan. Silakan coba lagi.' });
+    }
+  }
+
   const subjectCompany = data.company.replace(/[\r\n]/g, ' ').slice(0, 120);
   const subject = `Request Quotation — ${subjectCompany}`;
   const text = [
@@ -97,8 +119,21 @@ router.post('/', async (req, res) => {
       ok: true,
       message: 'Request quotation berhasil dikirim.',
       id: result?.id || null,
+      rfq_id: rfqId,
     });
   } catch (error) {
+    if (RFQ_PERSISTENCE_ENABLED && rfqId) {
+      try {
+        await pool.query(
+          `UPDATE rfq_requests
+              SET status = 'email_failed', updated_at = now()
+            WHERE id = $1`,
+          [rfqId]
+        );
+      } catch (updateError) {
+        console.error('[quotation] RFQ status update failed:', updateError?.message || updateError);
+      }
+    }
     console.error('[quotation] send failed:', error?.message || error);
     return res.status(502).json({ ok: false, error: 'Quotation belum dapat dikirim. Silakan coba lagi.' });
   }
