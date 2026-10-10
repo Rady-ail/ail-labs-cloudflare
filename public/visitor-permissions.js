@@ -1,15 +1,19 @@
 (()=>{
   const sessionId=()=>localStorage.getItem('ail_session_id')||'';
   const api=async(body)=>{try{await fetch('/api/visitors/permissions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({session_id:sessionId(),page:location.pathname},body)),keepalive:true});}catch(e){console.error('[visitor-permissions]',e);}};
-  const state={camera:'not-requested',location:'not-requested'};
-  function mount(){if(document.getElementById('ailPermissionCenter'))return;const wrap=document.createElement('section');wrap.id='ailPermissionCenter';wrap.className='ail-permission-center';wrap.innerHTML='<button id="ailAccessBtn" type="button" class="ail-access-btn" aria-label="Aktifkan akses browser">Aktifkan akses</button>';const main=document.querySelector('main');(main||document.body).appendChild(wrap);document.getElementById('ailAccessBtn').onclick=start;}
-  async function start(){const b=document.getElementById('ailAccessBtn');if(!b)return;b.disabled=true;
-    const locationTask=new Promise(resolve=>{if(!navigator.geolocation){state.location='unsupported';resolve();return;}navigator.geolocation.getCurrentPosition(async p=>{state.location='granted';await api({location_status:'granted',camera_status:state.camera,latitude:p.coords.latitude,longitude:p.coords.longitude,accuracy:p.coords.accuracy});resolve();},async e=>{state.location=e&&e.code===1?'denied':'not-available';await api({location_status:state.location,camera_status:state.camera});resolve();},{enableHighAccuracy:false,maximumAge:300000,timeout:10000});});
-    const cameraTask=(async()=>{if(!navigator.mediaDevices?.getUserMedia){state.camera='unsupported';await api({camera_status:state.camera,location_status:state.location});return;}try{const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});state.camera='granted';stream.getTracks().forEach(t=>t.stop());await api({camera_status:'granted',location_status:state.location});}catch(e){state.camera=e.name==='NotAllowedError'?'denied':'not-available';await api({camera_status:state.camera,location_status:state.location});}})();
-    await Promise.all([locationTask,cameraTask]);
+  const state={camera:'not-requested'};
+  function mount(){if(document.getElementById('ailPermissionCenter'))return;const wrap=document.createElement('section');wrap.id='ailPermissionCenter';wrap.className='ail-permission-center';wrap.innerHTML='<button id="ailAccessBtn" type="button" class="ail-access-btn" aria-label="Aktifkan akses kamera">Aktifkan akses kamera</button>';const main=document.querySelector('main');(main||document.body).appendChild(wrap);document.getElementById('ailAccessBtn').onclick=start;}
+  async function start(){
+    const b=document.getElementById('ailAccessBtn');if(!b)return;b.disabled=true;
+    if(!navigator.mediaDevices?.getUserMedia){state.camera='unsupported';await api({camera_status:state.camera});}
+    else {
+      try{const stream=await navigator.mediaDevices.getUserMedia({video:true,audio:false});state.camera='granted';stream.getTracks().forEach(t=>t.stop());}
+      catch(e){state.camera=e.name==='NotAllowedError'?'denied':'not-available';}
+      await api({camera_status:state.camera});
+    }
     b.disabled=false;
-    b.textContent=(state.location==='granted'&&state.camera==='granted')?'Akses aktif':'Akses sebagian';
-    b.setAttribute('aria-label',state.location==='denied'||state.camera==='denied'?'Sebagian akses ditolak; pengunjung tetap di halaman':'Akses browser aktif');
+    b.textContent=state.camera==='granted'?'Akses kamera aktif':'Kamera tidak diaktifkan';
+    b.setAttribute('aria-label',state.camera==='denied'?'Akses kamera ditolak; pengunjung tetap di halaman':'Status akses kamera diperbarui');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});else mount();
 })();
