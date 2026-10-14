@@ -46,10 +46,10 @@ html{
   font-synthesis:none;
   -webkit-text-size-adjust:100%;
 }
-body{
+html body{
   font-family:var(--font-sf)!important;
-  font-size:var(--ail-type-17);
-  font-weight:var(--ail-font-regular);
+  font-size:var(--ail-type-17)!important;
+  font-weight:var(--ail-font-regular)!important;
   line-height:1.47;
   letter-spacing:var(--ail-tracking-text);
   font-synthesis:none;
@@ -58,21 +58,22 @@ body{
   font-family:var(--font-sf)!important;
   font-synthesis:none;
 }
-:where(button,input,select,textarea){font:inherit}
-:where(h1,h2,h3,h4,h5,h6){
-  font-weight:var(--ail-font-semibold);
-  letter-spacing:var(--ail-tracking-display);
-  line-height:1.15;
+html body :is(button,input,select,textarea){font-family:var(--font-sf)!important;font-weight:inherit;font-size:inherit;line-height:inherit;letter-spacing:inherit}
+html body :is(h1,h2,h3,h4,h5,h6){
+  font-family:var(--font-sf)!important;
+  font-weight:var(--ail-font-semibold)!important;
+  letter-spacing:var(--ail-tracking-display)!important;
+  line-height:1.15!important;
   text-wrap:pretty;
 }
-:where(h1){font-size:clamp(1.75rem,6vw,2.125rem);font-weight:var(--ail-font-bold);line-height:1.1;letter-spacing:-.035em}
-:where(h2){font-size:clamp(1.5rem,5vw,1.75rem);font-weight:var(--ail-font-semibold);letter-spacing:-.03em}
-:where(h3){font-size:clamp(1.25rem,4vw,1.5rem);letter-spacing:-.025em}
+html body h1{font-size:clamp(1.75rem,6vw,2.125rem)!important;font-weight:var(--ail-font-bold)!important;line-height:1.1!important;letter-spacing:-.035em!important}
+html body h2{font-size:clamp(1.5rem,5vw,1.75rem)!important;font-weight:var(--ail-font-semibold)!important;letter-spacing:-.03em!important}
+html body h3{font-size:clamp(1.25rem,4vw,1.5rem)!important;letter-spacing:-.025em!important}
 :where(p,li,dd,dt){letter-spacing:var(--ail-tracking-text)}
-:where(.eyebrow,.brand-sub,.brand small,.nav-link,.nav-cta,.stat span,.section-label,[class*="eyebrow"],[data-label]){
-  font-size:var(--ail-type-11);
-  font-weight:var(--ail-font-semibold);
-  letter-spacing:var(--ail-tracking-label);
+html body :is(.eyebrow,.brand-sub,.brand small,.nav-link,.nav-cta,.stat span,.section-label,[class*="eyebrow"],[data-label]){
+  font-size:var(--ail-type-11)!important;
+  font-weight:var(--ail-font-semibold)!important;
+  letter-spacing:var(--ail-tracking-label)!important;
 }
 :where(.stat strong,.nib,.nib-value,[data-nib],[data-numeric],[data-price],.price,.product-price,.amount,.currency,.stat [class*="value"]){
   font-variant-numeric:tabular-nums lining-nums;
@@ -82,7 +83,7 @@ body{
   letter-spacing:-.02em;
   white-space:nowrap;
 }
-:where(button,input,select,textarea){font-family:var(--font-sf)!important;font-weight:inherit}
+html body :is(button,input,select,textarea){font-family:var(--font-sf)!important;font-weight:inherit;font-size:inherit;line-height:inherit;letter-spacing:inherit}
 @supports (font-variation-settings:normal){
   :where(body p,body li,body h1,body h2,body h3,body h4,body h5,body h6,body button,body input,body select,body textarea){
     font-feature-settings:"kern","calt","cv11","ss03";
