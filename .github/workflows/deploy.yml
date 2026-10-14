@@ -149,7 +149,7 @@ jobs:
               secrets.GOOGLE_CLIENT_ID = googleId;
               secrets.GOOGLE_CLIENT_SECRET = googleSecret;
             } else {
-              console.log("Google customer login secrets are not configured yet; deployment will keep the existing runtime state.");
+              console.error("Google customer login secrets are not configured yet; deployment will keep the existing runtime state.");
             }
             process.stdout.write(JSON.stringify(secrets));
           ' | npx wrangler secret bulk
