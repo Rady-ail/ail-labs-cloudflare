@@ -252,6 +252,47 @@ html,body{max-width:100%;overflow-x:clip}
 
 <link id="ail-typography-preload" rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous">
 <link rel="stylesheet" href="/styles/ail-typography.css">
+<style id="ail-hero-following-stats-cleanup">
+/* Keep the metrics below the hero as one quiet information row, not nested glass cards. */
+.hero + .stats{
+  gap:0;
+  margin-top:22px;
+  border:0;
+  border-radius:0;
+  overflow:visible;
+  background:transparent;
+}
+.hero + .stats .stat{
+  position:relative;
+  min-width:0;
+  padding:17px 18px;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  overflow:visible;
+  transform:none!important;
+}
+.hero + .stats .stat::before,
+.hero + .stats .stat::after{
+  content:none!important;
+  display:none!important;
+  animation:none!important;
+}
+.hero + .stats .stat strong{font-size:clamp(15px,2vw,19px);letter-spacing:-.035em}
+.hero + .stats .stat span{font-size:10px;line-height:1.45}
+@media(max-width:639px){
+  .hero + .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .hero + .stats .stat:nth-child(2n){border-left:1px solid var(--line)!important}
+  .hero + .stats .stat:nth-child(n+3){border-top:1px solid var(--line)!important}
+}
+@media(min-width:640px){
+  .hero + .stats{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .hero + .stats .stat + .stat{border-left:1px solid var(--line)!important}
+}
+</style>
 </head>
 <body>
 <header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="AIL LABS home"><img src="/images/logo.png" alt="AIL LABS"><span><span class="brand-name">AIL LABS</span><span class="brand-sub">B2B AESTHETIC SUPPLY</span></span></a><nav class="nav" aria-label="Navigasi utama"><a href="/" aria-current="page">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation <span aria-hidden="true">↗</span></a></nav><button id="mobileMenuBtn" class="menu-btn" type="button" aria-label="Buka menu" aria-expanded="false" >☰</button></div><div id="mobileMenu" class="mobile-menu"><div class="container"><a href="/">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation</a></div></div></header>
