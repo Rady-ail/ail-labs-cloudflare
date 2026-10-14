@@ -1,0 +1,2996 @@
+{
+  "schema_version": "1.0",
+  "generated_from": "Neon production products table",
+  "generated_at": "2026-10-07",
+  "active_sku_count": 298,
+  "purpose": "Mockup-ready catalog validation. Derived visual form only; does not alter clinical/product data.",
+  "rules": [
+    "name, kandungan, kemasan are copied exactly from catalog",
+    "never invent missing ingredient/content",
+    "never invent manufacturer, BPOM/registration, barcode, certification or medical claims",
+    "source_photo means preserve supplied packaging identity; no source photo means generic form-matched concept",
+    "mockup_type is derived deterministically from name+kandungan+kemasan and is a visual production instruction, not a clinical category"
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "ClearSkin Concentrate",
+      "kandungan": "Acne Concentrate (Sulfur 6, Res 0,5, Salicyl 1,5, Mentol 1,5, Clinda 3)",
+      "kemasan": "Botol 30ml",
+      "source_photo": "/images/products/clearskin_concentrate.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 2,
+      "name": "ClearSkin Back Lotion",
+      "kandungan": "Acne Lotion – Jerawat Punggung (Res 1,5, Sulfur 6, Clinda 3, Ery 3)",
+      "kemasan": "Botol 30ml",
+      "source_photo": "/images/products/clearskin_back_lotion.png",
+      "mockup_type": "lotion",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 3,
+      "name": "ClearSkin Spot Cream",
+      "kandungan": "Acne Cream Totol (Resorsinol 2, Sulfur 2, Clindamycin 2)",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_spot_cream.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 4,
+      "name": "ClearSkin Clinda Gel",
+      "kandungan": "Clinda 2% Gel (Clindamycin 2%)",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_clinda_gel.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 5,
+      "name": "ClearSkin Niacin Duo",
+      "kandungan": "Niacin 4, Clinda 1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_niacin_duo.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 6,
+      "name": "ClearSkin Scar Fix Niacin",
+      "kandungan": "Azelaic Acid 20, Niacin 4 Cream (Bekas Jerawat)",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_scar_fix_niacin.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 7,
+      "name": "ClearSkin Scar Fix Clinda",
+      "kandungan": "Azelaic Acid 20, Clinda 1 Cream (Bekas Jerawat)",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_scar_fix_clinda.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 8,
+      "name": "ClearSkin Tretinoin Max",
+      "kandungan": "Tretinoin 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_tretinoin_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 9,
+      "name": "ClearSkin Tretinoin Plus",
+      "kandungan": "Tretinoin 0,05% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_tretinoin_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 10,
+      "name": "ClearSkin Tretinoin Mild",
+      "kandungan": "Tretinoin 0,025% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_tretinoin_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 11,
+      "name": "ClearSkin Combo Plus",
+      "kandungan": "Tret 0,05 Clinda 1 Dexa 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_combo_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 12,
+      "name": "ClearSkin Combo Max",
+      "kandungan": "Tret 0,1 Clinda 1 Dexa 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_combo_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 13,
+      "name": "ClearSkin BPO5",
+      "kandungan": "BPO 5, Clinda 1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_bpo5.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 14,
+      "name": "ClearSkin BPO2.5",
+      "kandungan": "BPO 2,5, Clinda 1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_bpo2_5.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 15,
+      "name": "ClearSkin Adapalene",
+      "kandungan": "Adapalene 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_adapalene.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 16,
+      "name": "ClearSkin Centella Soothe",
+      "kandungan": "Centella Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_centella_soothe.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 17,
+      "name": "ClearSkin Night Repair",
+      "kandungan": "Acne Night Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/clearskin_night_repair.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 18,
+      "name": "ClearSkin Strongest",
+      "kandungan": "Acnestrongest",
+      "kemasan": "Tube 10gr",
+      "source_photo": "/images/products/clearskin_strongest.png",
+      "mockup_type": "tube",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 19,
+      "name": "SilkyGlow Renew",
+      "kandungan": "AHA 10% Lotion",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/silkyglow_renew.png",
+      "mockup_type": "lotion",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 20,
+      "name": "SilkyGlow Bright",
+      "kandungan": "HQ 5 AHA 10 Lotion",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/silkyglow_bright.png",
+      "mockup_type": "lotion",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 21,
+      "name": "SilkyGlow Bright Plus",
+      "kandungan": "HQ 5 Tret 0,05 AHA 10 Lotion",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/silkyglow_bright_plus.png",
+      "mockup_type": "lotion",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 22,
+      "name": "SilkyGlow Bright Max",
+      "kandungan": "HQ 5 Tret 0,05 Klobet 0,05 Lotion",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/silkyglow_bright_max.png",
+      "mockup_type": "lotion",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 23,
+      "name": "SpecialCare Underarm Bright",
+      "kandungan": "Cream Lipatan (Under Arm) Ceramide, Purac Acid, Vit E, Vit C",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/specialcare_underarm_bright.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 24,
+      "name": "SpecialCare Underarm Intense",
+      "kandungan": "Cream Lipatan (Sal 3, Coalt 4, LCD 5, Beta 0,1)",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/specialcare_underarm_intense.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 25,
+      "name": "SpecialCare Lip Tint",
+      "kandungan": "Cream Bibir HQ 1 Gluco 4 Res 0,05",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/specialcare_lip_tint.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 26,
+      "name": "SpecialCare Anti Aging",
+      "kandungan": "Anti Aging Cream Purac Acid 3%, Vit C 5%",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/specialcare_anti_aging.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 27,
+      "name": "SpecialCare Neutralizer",
+      "kandungan": "Neutralizer Asam Bikarbonat 5%",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/specialcare_neutralizer.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 28,
+      "name": "HydraGlow Barrier",
+      "kandungan": "Ceramide, Aloevera Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_barrier.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 29,
+      "name": "HydraGlow Bright",
+      "kandungan": "Arbutin, Ceramide, Aloevera Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_bright.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 30,
+      "name": "HydraGlow Renew 8",
+      "kandungan": "AHA 8% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_renew_8.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 31,
+      "name": "HydraGlow Renew 10",
+      "kandungan": "AHA 10% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_renew_10.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 32,
+      "name": "HydraGlow Renew 12",
+      "kandungan": "AHA 12% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_renew_12.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 33,
+      "name": "HydraGlow Duo Peel",
+      "kandungan": "AHA 8%, Salicyl Acid 2% Cream Gel",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_duo_peel.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 34,
+      "name": "HydraGlow Collagen",
+      "kandungan": "Collagen, Aloevera, Vit C, Vit E Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_collagen.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 35,
+      "name": "HydraGlow Lactic",
+      "kandungan": "Lactic Acid 5% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_lactic.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 36,
+      "name": "HydraGlow VitC",
+      "kandungan": "Vit C 3% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_vitc.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 37,
+      "name": "HydraGlow Calm",
+      "kandungan": "Niacinamide 4%, Aloevera 1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/hydraglow_calm.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 38,
+      "name": "PeelPro TCA 10",
+      "kandungan": "TCA 10% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_10.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 39,
+      "name": "PeelPro TCA 15",
+      "kandungan": "TCA 15% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_15.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 40,
+      "name": "PeelPro TCA 20",
+      "kandungan": "TCA 20% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_20.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 41,
+      "name": "PeelPro TCA 30",
+      "kandungan": "TCA 30% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_30.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 42,
+      "name": "PeelPro TCA 35",
+      "kandungan": "TCA 35% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_35.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 43,
+      "name": "PeelPro TCA 50",
+      "kandungan": "TCA 50% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_tca_50.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 44,
+      "name": "PeelPro GA 10",
+      "kandungan": "GA 10% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_10.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 45,
+      "name": "PeelPro GA 15",
+      "kandungan": "GA 15% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_15.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 46,
+      "name": "PeelPro GA 20",
+      "kandungan": "GA 20% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_20.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 47,
+      "name": "PeelPro GA 30",
+      "kandungan": "GA 30% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_30.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 48,
+      "name": "PeelPro GA 35",
+      "kandungan": "GA 35% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_35.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 49,
+      "name": "PeelPro GA 50",
+      "kandungan": "GA 50% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_50.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 50,
+      "name": "PeelPro GA 70",
+      "kandungan": "GA 70% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_ga_70.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 51,
+      "name": "PeelPro SA 10",
+      "kandungan": "SA 10% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_sa_10.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 52,
+      "name": "PeelPro SA 20",
+      "kandungan": "SA 20% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_sa_20.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 53,
+      "name": "PeelPro SA 30",
+      "kandungan": "SA 30% Peeling Solution",
+      "kemasan": "Botol 100ml",
+      "source_photo": "/images/products/peelpro_sa_30.png",
+      "mockup_type": "peeling_solution",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 54,
+      "name": "PureEssence VitC",
+      "kandungan": "Serum Vit C 15%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_vitc.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 55,
+      "name": "PureEssence Niacinamide",
+      "kandungan": "Serum Niacin 6%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_niacinamide.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 56,
+      "name": "PureEssence Acne Clear",
+      "kandungan": "Serum Clinda 4%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_acne_clear.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 57,
+      "name": "PureEssence AHA Renew",
+      "kandungan": "Serum AHA 12%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_aha_renew.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 58,
+      "name": "PureEssence Flek Fix",
+      "kandungan": "Serum Flek HQ 5 Tret 0,05 Sal 1 Fluci 0,025",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_flek_fix.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 59,
+      "name": "PureEssence Collagen",
+      "kandungan": "Serum Collagen 1%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_collagen.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 60,
+      "name": "PureEssence Centella",
+      "kandungan": "Serum Centella 5%",
+      "kemasan": "Botol 15ml",
+      "source_photo": "/images/products/pureessence_centella.png",
+      "mockup_type": "serum",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 61,
+      "name": "ClearFix Triam Solution",
+      "kandungan": "HQ 5 Tret 0,05 Sal 1,5 Triam 0,1 Solution",
+      "kemasan": "Botol 30ml",
+      "source_photo": "/images/products/clearfix_triam_solution.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 62,
+      "name": "ClearFix Fluci Solution",
+      "kandungan": "HQ 5 Tret 0,05 Sal 1 Fluci 0,025 Solution",
+      "kemasan": "Botol 30ml",
+      "source_photo": "/images/products/clearfix_fluci_solution.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 63,
+      "name": "MediCare Desonide",
+      "kandungan": "Desonide 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_desonide.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 64,
+      "name": "MediCare Dexamethasone",
+      "kandungan": "Dexamethasone 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_dexamethasone.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 65,
+      "name": "MediCare Betamethasone",
+      "kandungan": "Betamethasone 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_betamethasone.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 66,
+      "name": "MediCare Momethasone",
+      "kandungan": "Momethasone 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_momethasone.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 67,
+      "name": "MediCare Flucinolone",
+      "kandungan": "Flucinolone 0,025% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_flucinolone.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 68,
+      "name": "MediCare Triamcinolone",
+      "kandungan": "Triamcinolone 0,1% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_triamcinolone.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 69,
+      "name": "MediCare Klobetasol",
+      "kandungan": "Klobetasol 0,05% Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/medicare_klobetasol.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 70,
+      "name": "SunGuard Basic",
+      "kandungan": "Sunscreen SPF 15 Titanium Dioxide",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_basic.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 71,
+      "name": "SunGuard Renew",
+      "kandungan": "Sunscreen + AHA 4% Titanium Dioxide SPF 30",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_renew.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 72,
+      "name": "SunGuard Bright",
+      "kandungan": "Sunscreen + Arbutin Titanium Dioxide SPF 30",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_bright.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 73,
+      "name": "SunGuard Acne Care",
+      "kandungan": "Sunscreen (Acne) Titanium Dioxide, Clinda 1%",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_acne_care.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 74,
+      "name": "SunGuard White+",
+      "kandungan": "Sunscreen SPF 5 White+",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_white.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 75,
+      "name": "SunGuard Thiamidol Pro",
+      "kandungan": "SPF + Thiamidol",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/sunguard_thiamidol_pro.png",
+      "mockup_type": "bottle_box",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 76,
+      "name": "Radiance Dexa Max",
+      "kandungan": "HQ 5 Tret 0,1 Dexa 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_dexa_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 77,
+      "name": "Radiance Dexa Plus",
+      "kandungan": "HQ 5 Tret 0,05 Dexa 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_dexa_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 78,
+      "name": "Radiance Dexa Mild",
+      "kandungan": "HQ 5 Tret 0,025 Dexa 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_dexa_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 79,
+      "name": "Radiance Deso Max",
+      "kandungan": "HQ 5 Tret 0,1 Deso 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_deso_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 80,
+      "name": "Radiance Deso Plus",
+      "kandungan": "HQ 5 Tret 0,05 Deso 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_deso_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 81,
+      "name": "Radiance Deso Mild",
+      "kandungan": "HQ 5 Tret 0,025 Deso 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_deso_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 82,
+      "name": "Radiance Beta Max",
+      "kandungan": "HQ 5 Tret 0,1 Beta 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_beta_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 83,
+      "name": "Radiance Beta Plus",
+      "kandungan": "HQ 5 Tret 0,05 Beta 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_beta_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 84,
+      "name": "Radiance Beta Mild",
+      "kandungan": "HQ 5 Tret 0,025 Beta 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_beta_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 85,
+      "name": "Radiance Fluci Max",
+      "kandungan": "HQ 5 Tret 0,1 Fluci 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 86,
+      "name": "Radiance Fluci Plus",
+      "kandungan": "HQ 5 Tret 0,05 Fluci 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 87,
+      "name": "Radiance Fluci Mild",
+      "kandungan": "HQ 5 Tret 0,025 Fluci 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 88,
+      "name": "Radiance Fluci-05 Max",
+      "kandungan": "HQ 5 Tret 0,1 Fluci 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_05_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 89,
+      "name": "Radiance Fluci-05 Plus",
+      "kandungan": "HQ 5 Tret 0,05 Fluci 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_05_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 90,
+      "name": "Radiance Fluci-05 Mild",
+      "kandungan": "HQ 5 Tret 0,025 Fluci 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_05_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 91,
+      "name": "Radiance Fluci-025 Max",
+      "kandungan": "HQ 5 Tret 0,1 Fluci 0,025 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_025_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 92,
+      "name": "Radiance Fluci-025 Plus",
+      "kandungan": "HQ 5 Tret 0,05 Fluci 0,025 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_025_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 93,
+      "name": "Radiance Fluci-025 Mild",
+      "kandungan": "HQ 5 Tret 0,025 Fluci 0,025 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_fluci_025_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 94,
+      "name": "Radiance Mome Max",
+      "kandungan": "HQ 5 Tret 0,1 Mome 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 95,
+      "name": "Radiance Mome Plus",
+      "kandungan": "HQ 5 Tret 0,05 Mome 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 96,
+      "name": "Radiance Mome Mild",
+      "kandungan": "HQ 5 Tret 0,025 Mome 0,1 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 97,
+      "name": "Radiance Mome-05 Max",
+      "kandungan": "HQ 5 Tret 0,1 Mome 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_05_max.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 98,
+      "name": "Radiance Mome-05 Plus",
+      "kandungan": "HQ 5 Tret 0,05 Mome 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_05_plus.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 99,
+      "name": "Radiance Mome-05 Mild",
+      "kandungan": "HQ 5 Tret 0,025 Mome 0,05 Cream",
+      "kemasan": "Pot 10gr",
+      "source_photo": "/images/products/radiance_mome_05_mild.png",
+      "mockup_type": "cream_gel",
+      "render_mode": "REFERENCE_PRESERVE",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 100,
+      "name": "Ascorbic Acid 500 mg / 5 ml inj",
+      "kandungan": "Ascorbic Acid 100 mg / ml inj",
+      "kemasan": "box, 10 ampul @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 101,
+      "name": "Ascorbic Acid 1000 mg / 5 ml inj",
+      "kandungan": "Ascorbic Acid 200 mg / ml inj",
+      "kemasan": "box, 10 ampul @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 102,
+      "name": "Asam Traneksamat 50 mg / ml inj",
+      "kandungan": "Asam Traneksamat 50 mg / ml inj",
+      "kemasan": "box, 5 ampul @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 103,
+      "name": "Asam Tranexamic 100 mg / ml inj",
+      "kandungan": "Asam Tranexamic 100 mg / ml inj",
+      "kemasan": "box, 10 ampul @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 104,
+      "name": "Bupivacaine Hcl Heavy Injeksi 5 mg/ml",
+      "kandungan": "Bupivacaine Hcl Heavy Injeksi 5 mg/ml, dextrose mono drate 80 mg / ml",
+      "kemasan": "box 5 ampul @ 4 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 105,
+      "name": "Cefoperazone Sulbactam 1 g Dry Inj",
+      "kandungan": "Cefoperazone 500 mg, Sulbactam 500 mg",
+      "kemasan": "box, 1 vial @ 1 g",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 106,
+      "name": "Ceftazidime 1 g Dry inj",
+      "kandungan": "Ceftazidime 1 g",
+      "kemasan": "box, 1 vial @ 1 g",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 107,
+      "name": "Ciprofloxacin 200 mg/ 100 ml infus",
+      "kandungan": "Ciprofloxacin 200 mg/ 100 ml infus",
+      "kemasan": "box, botol 100 ml",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 108,
+      "name": "Dexketoprofen Trometamol",
+      "kandungan": "Dexketoprofen 25 mg / ml",
+      "kemasan": "box , 5 ampul @ 2 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 109,
+      "name": "Fluconazole 200 mg / 100 ml infus",
+      "kandungan": "Fluconazole 2mg / ml infus",
+      "kemasan": "Botol 100 ml",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 110,
+      "name": "Granisetron injeksi 1 mg",
+      "kandungan": "Granisetron injeksi 1 mg / 1 ml",
+      "kemasan": "Dus, 5 ampul @ 1 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 111,
+      "name": "Granisetron injeksi 3 mg",
+      "kandungan": "Granisetron injeksi 1 mg / 1 ml",
+      "kemasan": "Dus, 5 ampul @ 3 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 112,
+      "name": "iron sucrose injeksi 20 mg / ml",
+      "kandungan": "iron sucrose injeksi 20 mg / ml",
+      "kemasan": "Box, 5 ampul @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 113,
+      "name": "Ketoprofen 100 mg / 2 ml inj",
+      "kandungan": "Ketoprofen 50 mg / ml inj",
+      "kemasan": "Box, 5 ampul @ 2 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 114,
+      "name": "ketorolac 10 mg inj",
+      "kandungan": "ketorolac tromethamine 10 mg / ml",
+      "kemasan": "Box, 6 ampul @ 1 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 115,
+      "name": "ketorolac 30 mg inj",
+      "kandungan": "ketorolac tromethamine 30 mg / ml",
+      "kemasan": "Box, 6 ampul @ 1 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 116,
+      "name": "Levofloxacin 500 mg / 100 ml infus",
+      "kandungan": "Levofloxacin 5 mg /  ml infus",
+      "kemasan": "Botol 100 ml",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 117,
+      "name": "Levofloxacin 750 mg / 150 ml infus",
+      "kandungan": "Levofloxacin 5 mg /  ml infus",
+      "kemasan": "Box, 1 softbag @ 150 ml",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 118,
+      "name": "Mecobalamine 500 mcg inj",
+      "kandungan": "Mecobalamine 500 mcg inj",
+      "kemasan": "Box, 10 Ampul @ 1 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 119,
+      "name": "meropenem Trihydrate 1 g dry inj",
+      "kandungan": "meropenem Trihydrate 1 g dry inj",
+      "kemasan": "Box, 1 vial @ 1 g",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 120,
+      "name": "metronidazole 500 mg / ml 100 ml infus",
+      "kandungan": "metronidazole 5 mg / ml",
+      "kemasan": "Box, Botol 100 ml",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 121,
+      "name": "omeprazole 40 mg inj",
+      "kandungan": "omeprazole 40 mg inj",
+      "kemasan": "Box, 1 vial @ 40 mg & 10 ml pelarut",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 122,
+      "name": "ondansetron 4 mg inj",
+      "kandungan": "ondansetron 2 mg / ml inj",
+      "kemasan": "Box, 5 ampul @ 2ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 123,
+      "name": "ondansetron 8 mg inj",
+      "kandungan": "ondansetron 2 mg / ml inj",
+      "kemasan": "Box, 5 ampul @ 4 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 124,
+      "name": "pantoprazole 40 mg inj",
+      "kandungan": "pantoprazole 40 mg inj",
+      "kemasan": "Dus, 1 vial @ 40 mg",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 125,
+      "name": "paracetamol 1 g infus",
+      "kandungan": "paracetamol 10 mg / ml infus",
+      "kemasan": "Box, vial @ 40 mg",
+      "source_photo": null,
+      "mockup_type": "infusion",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 126,
+      "name": "ranitidin 50 mg / 2 ml inj",
+      "kandungan": "ranitidin 25 mg / ml inj",
+      "kemasan": "Box, 10 ampul @ 2ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 127,
+      "name": "tramadol 100 mg / 2 ml inj",
+      "kandungan": "tramadol 50 mg /  ml inj",
+      "kemasan": "Box, 5 ampul @ 2 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 128,
+      "name": "triamcinolone acetonide IA/ID 10 mg / ml",
+      "kandungan": "triamcinolone acetonide IA/ID 10 mg / ml",
+      "kemasan": "Dus, 1 vial @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 129,
+      "name": "triamcinolone acetonide IA/ID 40 mg / ml",
+      "kandungan": "triamcinolone acetonide IA/ID 40 mg / ml",
+      "kemasan": "Dus, 1 vial @ 5 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 130,
+      "name": "Lumière Infinie",
+      "kandungan": "FDF • Infinite Radiance Essence",
+      "kemasan": "1 Box / 10 Vial @3ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 131,
+      "name": "Équilibre Pur",
+      "kandungan": "FDF • Infinite Purity Essence",
+      "kemasan": "1 Box / 10 Vial @3ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 132,
+      "name": "Abysse Céleste",
+      "kandungan": "Deep Ocean Magic Essence 6°C",
+      "kemasan": "1 Box / 3 Vial @10ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 133,
+      "name": "Regard Éternel",
+      "kandungan": "FDF • Eternal Eye Renewal Masque",
+      "kemasan": "1 Box / 10pcs",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 134,
+      "name": "Sculpture Vivante",
+      "kandungan": "FDF • 3D Hydra-Firming Masque",
+      "kemasan": "1 Box / 8pcs",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 135,
+      "name": "Clarté Médicale",
+      "kandungan": "Med Brightening Mask",
+      "kemasan": "1 Box / 5pcs",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 136,
+      "name": "Hydratation Profonde",
+      "kandungan": "Med Deep Hydration Mask",
+      "kemasan": "1 Box / 5pcs",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 137,
+      "name": "Fermeté Sculptée",
+      "kandungan": "Med Firming Sculpt Mask",
+      "kemasan": "1 Box / 5pcs",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 138,
+      "name": "Matité Parfaite",
+      "kandungan": "Med Oil Control Mask",
+      "kemasan": "1 Box / 5pcs",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 139,
+      "name": "Éclat Vitaminé",
+      "kandungan": "Vitamin C Glow Ampoule",
+      "kemasan": "1 Box / 10 Ampoule @2ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 140,
+      "name": "Ascension",
+      "kandungan": "Contour Lift Ampoule",
+      "kemasan": "1 Box / 10 Ampoule @2ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 141,
+      "name": "Azur Apaisant",
+      "kandungan": "Azulane Soothing Ampoule",
+      "kemasan": "1 Box / 10 Ampoule @2ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 142,
+      "name": "Pureté Nette",
+      "kandungan": "Clear Skin Ampoule",
+      "kemasan": "1 Box / 10 Ampoule @2ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 143,
+      "name": "Renaissance A",
+      "kandungan": "Vitamin A Renewal Ampoule",
+      "kemasan": "1 Box / 10 Ampoule @2ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 144,
+      "name": "Perle de Lait",
+      "kandungan": "FDF • Anti-Wrinkle Pearl Milk Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 145,
+      "name": "Papaye Dorée",
+      "kandungan": "FDF • Golden Papaya Exfoliating Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 146,
+      "name": "Voile d'Aloé",
+      "kandungan": "FDF • Calming Aloe Veil Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 147,
+      "name": "Pureté Sauvage",
+      "kandungan": "FDF • Wild Tea Tree Purifying Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 148,
+      "name": "Rosée Éternelle",
+      "kandungan": "FDF • Eternal Rose Dew Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 149,
+      "name": "Songe de Lavande",
+      "kandungan": "FDF • Lavender Dream Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 150,
+      "name": "Fraîcheur Menthée",
+      "kandungan": "FDF • Mint Clarity Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 151,
+      "name": "Brume de Concombre",
+      "kandungan": "FDF • Cucumber Mist Hydra Peel",
+      "kemasan": "5kg",
+      "source_photo": null,
+      "mockup_type": "peeling_solution",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 152,
+      "name": "Rituel du Vin",
+      "kandungan": "Wine Polyphenol Ritual Mask",
+      "kemasan": "1 Sachet 5000gr",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 153,
+      "name": "Poudre du Temps",
+      "kandungan": "Age-Defying Modeling Powder",
+      "kemasan": "1 Sachet 5000gr",
+      "source_photo": null,
+      "mockup_type": "powder",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 154,
+      "name": "Poudre Pureté",
+      "kandungan": "Acne-Clear Modeling Powder",
+      "kemasan": "1 Sachet 5000gr",
+      "source_photo": null,
+      "mockup_type": "powder",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 155,
+      "name": "Sérénité Hyaluronique",
+      "kandungan": "Hyal Soothing Modeling Mask",
+      "kemasan": "1 Sachet 5000gr",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 156,
+      "name": "Baume de Perle",
+      "kandungan": "Pearl Whitening Balm",
+      "kemasan": "1 Tube 60ml",
+      "source_photo": null,
+      "mockup_type": "cream_gel",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 157,
+      "name": "Élixir Enzymatique",
+      "kandungan": "Enzyme Brightening Cleanser",
+      "kemasan": "1 Botol 1000ml",
+      "source_photo": null,
+      "mockup_type": "bottle_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 158,
+      "name": "Gel Régénérant Suprême",
+      "kandungan": "Supreme Regenerating Gel",
+      "kemasan": "1 Botol 5000ml",
+      "source_photo": null,
+      "mockup_type": "cream_gel",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 159,
+      "name": "Velours Anti-Oxydant",
+      "kandungan": "Anti-Oxi Intensive Moisturizer",
+      "kemasan": "Tube @120ml",
+      "source_photo": null,
+      "mockup_type": "cream_gel",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 160,
+      "name": "Asam Traneksamat 500 mg",
+      "kandungan": "Asam Traneksamat 500 mg",
+      "kemasan": "10 Strip / Box",
+      "source_photo": null,
+      "mockup_type": "pharma_strip_box",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 161,
+      "name": "Curenex DNA Salmon Skinbooster",
+      "kandungan": "DNA Salmon",
+      "kemasan": "5ml/vial, isi 5 vial per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 162,
+      "name": "Curenex Dailycare Skinbooster",
+      "kandungan": "DNA Salmon",
+      "kemasan": "30ml",
+      "source_photo": null,
+      "mockup_type": "filler_skinbooster",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 163,
+      "name": "Curenex Snow Peel (Peeling DNA Salmon)",
+      "kandungan": "DNA Salmon",
+      "kemasan": "1g/vial, isi 4 vial + 30ml activator per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 164,
+      "name": "Curenex Rejuvenating Cream",
+      "kandungan": "DNA Salmon",
+      "kemasan": "120ml",
+      "source_photo": null,
+      "mockup_type": "cream_gel",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 165,
+      "name": "Curenex Daily Sheer Sunscreen",
+      "kandungan": "",
+      "kemasan": "50ml",
+      "source_photo": null,
+      "mockup_type": "generic_b2b_pack",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KEMASAN_IF_NEEDED; NO_INGREDIENT_INVENTION"
+    },
+    {
+      "id": 166,
+      "name": "Curenex Salmon DNA Rejuvenating Mask",
+      "kandungan": "DNA Salmon",
+      "kemasan": "25g/mask, isi 5 sheet per box",
+      "source_photo": null,
+      "mockup_type": "mask",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 167,
+      "name": "Lipo Lab V Line",
+      "kandungan": "",
+      "kemasan": "10ml/vial, isi 5 vial per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KEMASAN_IF_NEEDED; NO_INGREDIENT_INVENTION"
+    },
+    {
+      "id": 168,
+      "name": "DR.LIPO+ Prime",
+      "kandungan": "",
+      "kemasan": "2ml/vial, isi 10 vial per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KEMASAN_IF_NEEDED; NO_INGREDIENT_INVENTION"
+    },
+    {
+      "id": 169,
+      "name": "DR.LIPO+ V-LINE",
+      "kandungan": "",
+      "kemasan": "5ml/vial, isi 10 vial per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KEMASAN_IF_NEEDED; NO_INGREDIENT_INVENTION"
+    },
+    {
+      "id": 170,
+      "name": "DR.LIPO+",
+      "kandungan": "",
+      "kemasan": "10ml/vial, isi 10 vial per box",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KEMASAN_IF_NEEDED; NO_INGREDIENT_INVENTION"
+    },
+    {
+      "id": 199,
+      "name": "Mixo Volume Plus (with Lidocaine)",
+      "kandungan": "HA 20mg/ml, Lidocaine 0,30%",
+      "kemasan": "1,1ml x1, jarum 25G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 200,
+      "name": "Mixo Deep Plus (with Lidocaine)",
+      "kandungan": "HA 20mg/ml, Lidocaine 0,30%",
+      "kemasan": "1,1ml x1, jarum 27G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 201,
+      "name": "Mixo Light Plus (with Lidocaine)",
+      "kandungan": "HA 20mg/ml, Lidocaine 0,30%",
+      "kemasan": "1,1ml x1, jarum 30G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 202,
+      "name": "Mixo Volume",
+      "kandungan": "HA 20mg/ml",
+      "kemasan": "1,0ml x1, jarum 25G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 203,
+      "name": "Mixo Deep",
+      "kandungan": "HA 20mg/ml",
+      "kemasan": "1,0ml x1, jarum 27G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 204,
+      "name": "Mixo Light",
+      "kandungan": "HA 20mg/ml",
+      "kemasan": "1,0ml x1, jarum 30G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 205,
+      "name": "Medeyra Deep with Lidocaine",
+      "kandungan": "HA 24mg/ml, Lidocaine 3mg/ml",
+      "kemasan": "1,1ml x1, jarum 27G + kanula",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 206,
+      "name": "Medeyra Fine with Lidocaine",
+      "kandungan": "HA 24mg/ml, Lidocaine 3mg/ml",
+      "kemasan": "1,1ml x1, jarum 30G x 2pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 207,
+      "name": "Medeyra Shape with Lidocaine",
+      "kandungan": "HA 24mg/ml, Lidocaine 3mg/ml",
+      "kemasan": "1,1ml x1, jarum 25G + kanula",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 213,
+      "name": "Reina Mono (Sharp Needle) 26G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 100mm, isi 10pcs/pouch, harga satuan Rp22.500/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 214,
+      "name": "Reina Mono (Sharp Needle) 26G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 100mm, isi 10pcs/pouch, harga satuan Rp42.500/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 215,
+      "name": "Reina Mono (Sharp Needle) 29G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 60mm, isi 10pcs/pouch, harga satuan Rp22.500/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 216,
+      "name": "Reina Mono (Sharp Needle) 29G 38mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 6-0 60mm, isi 10pcs/pouch, harga satuan Rp42.500/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 217,
+      "name": "Reina Screw (Sharp Needle) 26G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 100mm, isi 10pcs/pouch, harga satuan Rp41.625/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 218,
+      "name": "Reina Screw (Sharp Needle) 26G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 100mm, isi 10pcs/pouch, harga satuan Rp104.063/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 219,
+      "name": "Reina Screw (Sharp Needle) 29G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 60mm, isi 10pcs/pouch, harga satuan Rp41.625/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 220,
+      "name": "Reina Screw (Sharp Needle) 29G 38mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 6-0 60mm, isi 10pcs/pouch, harga satuan Rp104.063/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 221,
+      "name": "Reina Multi Thread (1 needle isi 14 benang mono) 23G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 25mm, isi 4pcs/pouch, harga satuan Rp139.860/pcs. Diskon 25% (min. beli Rp8jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 222,
+      "name": "Reina Multi Thread (1 needle isi 14 benang mono) 23G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 45mm, isi 4pcs/pouch, harga satuan Rp139.860/pcs. Diskon 25% (min. beli Rp8jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 223,
+      "name": "Reina Multi Thread (1 needle isi 14 benang mono) 23G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 45mm, isi 4pcs/pouch, harga satuan Rp287.712/pcs. Diskon 25% (min. beli Rp8jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 224,
+      "name": "Reina Cavern Screw 23G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 80mm, isi 4pcs/pouch, harga satuan Rp371.573/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 225,
+      "name": "Reina Cavern Screw 27G 50mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 80mm, isi 4pcs/pouch, harga satuan Rp330.336/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 226,
+      "name": "Reina Nose I (Cannula L Type) 21G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 80mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 227,
+      "name": "Reina Nose I (Cannula L Type) 21G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 80mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 228,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 50mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 229,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 38mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2 50mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 230,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 50mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 50mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 231,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 50mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2 50mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 232,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 80mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 233,
+      "name": "Reina Nose 2 (Cannula L Type) 19G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2 80mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 234,
+      "name": "Reina Nose 3 (Cannula W Type) 18G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 64mm, isi 3pcs/pouch, harga satuan Rp508.750/pcs. Diskon 35% (min. beli Rp100jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 235,
+      "name": "Reina Eye Cannula (R Type) 30G 25mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 30mm, isi 8pcs/pouch, harga satuan Rp78.047/pcs. Diskon 35% (min. beli Rp100jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 236,
+      "name": "Reina Eye Cannula (R Type) 30G 25mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 6-0 30mm, isi 8pcs/pouch, harga satuan Rp147.422/pcs. Diskon 35% (min. beli Rp100jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 237,
+      "name": "Reina Cog R (Cannula R Type) 19G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 140mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 238,
+      "name": "Reina Cog R (Cannula R Type) 19G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 140mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 239,
+      "name": "Reina Cog R (Cannula R Type) 19G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 160mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 240,
+      "name": "Reina Cog R (Cannula R Type) 19G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 160mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 241,
+      "name": "Reina Cog R (Cannula R Type) 21G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 140mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 242,
+      "name": "Reina Cog R (Cannula R Type) 21G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2-0 140mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 243,
+      "name": "Reina Cog R (Cannula R Type) 21G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 160mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 244,
+      "name": "Reina Cog R (Cannula R Type) 21G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2-0 160mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 245,
+      "name": "Reina Cog R (Cannula R Type) 23G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4-0 140mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 246,
+      "name": "Reina Cog R (Cannula R Type) 23G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 4-0 140mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 247,
+      "name": "Reina Cog R (Cannula R Type) 23G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4-0 160mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 248,
+      "name": "Reina Cog R (Cannula R Type) 23G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 4-0 160mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 249,
+      "name": "Reina Cog L (Cannula L Type) 19G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 140mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 250,
+      "name": "Reina Cog L (Cannula L Type) 19G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 140mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 251,
+      "name": "Reina Cog L (Cannula L Type) 19G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 160mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 252,
+      "name": "Reina Cog L (Cannula L Type) 19G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 160mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 253,
+      "name": "Reina Cog L (Cannula L Type) 21G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 140mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 254,
+      "name": "Reina Cog L (Cannula L Type) 21G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2-0 140mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 255,
+      "name": "Reina Cog L (Cannula L Type) 21G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 160mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 256,
+      "name": "Reina Cog L (Cannula L Type) 21G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 2-0 160mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 257,
+      "name": "Reina Cog L (Cannula L Type) 23G 70mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4-0 140mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 258,
+      "name": "Reina Cog L (Cannula L Type) 23G 70mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 4-0 140mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 259,
+      "name": "Reina Cog L (Cannula L Type) 23G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4-0 160mm, isi 8pcs/pouch, harga satuan Rp182.109/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 260,
+      "name": "Reina Cog L (Cannula L Type) 23G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 4-0 160mm, isi 8pcs/pouch, harga satuan Rp346.875/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 261,
+      "name": "Reina Ultra Lift 1 (Cannula L Type) 18G 100mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 185mm, isi 4pcs/pouch, harga satuan Rp398.906/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 262,
+      "name": "Reina Ultra Lift 1 (Cannula L Type) 18G 100mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 185mm, isi 4pcs/pouch, harga satuan Rp624.375/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 263,
+      "name": "Reina Ultra Lift 3 (Cannula W Type) 19G 100mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 165mm, isi 4pcs/pouch, harga satuan Rp242.813/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 264,
+      "name": "Reina Cogging Screw 1 27G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 70mm, isi 8pcs/pouch, harga satuan Rp147.422/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 265,
+      "name": "Reina Cogging Screw 1 27G 38mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 70mm, isi 8pcs/pouch, harga satuan Rp286.172/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 266,
+      "name": "Reina Cogging Screw 1 27G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 100mm, isi 8pcs/pouch, harga satuan Rp147.422/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 267,
+      "name": "Reina Cogging Screw 1 27G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 100mm, isi 8pcs/pouch, harga satuan Rp286.172/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 268,
+      "name": "Reina Cogging Screw 1 27G 90mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 150mm, isi 8pcs/pouch, harga satuan Rp147.422/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 269,
+      "name": "Reina Cogging Screw 1 27G 90mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 150mm, isi 8pcs/pouch, harga satuan Rp286.172/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 270,
+      "name": "Reina Cogging Screw 2 (Sharp Needle) 25G 38mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 136mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 271,
+      "name": "Reina Cogging Screw 2 (Sharp Needle) 25G 38mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 136mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 272,
+      "name": "Reina Cogging Screw 2 (Sharp Needle) 25G 60mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 185mm, isi 8pcs/pouch, harga satuan Rp164.766/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 273,
+      "name": "Reina Cogging Screw 2 (Sharp Needle) 25G 60mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 5-0 185mm, isi 8pcs/pouch, harga satuan Rp320.859/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 274,
+      "name": "Reina Dual Lifting 1 (Blunt Needle) 21G 110mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 420mm, isi 1pcs/pouch, harga satuan Rp485.625/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 275,
+      "name": "Reina Dual Lifting 1 (Blunt Needle) 21G 110mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 420mm, isi 1pcs/pouch, harga satuan Rp971.250/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 276,
+      "name": "Reina Dual Lifting 2 (Blunt Needle) 21G 110mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 420mm, isi 1pcs/pouch, harga satuan Rp971.250/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 277,
+      "name": "Reina Dual Lifting 2 (Blunt Needle) 21G 110mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 420mm, isi 1pcs/pouch, harga satuan Rp1.942.500/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 278,
+      "name": "Reina Dual Lifting 3 (Blunt Needle) 21G 110mm - PDO",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1-0 300mm, isi 1pcs/pouch, harga satuan Rp936.563/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 279,
+      "name": "Reina Dual Lifting 3 (Blunt Needle) 21G 110mm - PLACL",
+      "kandungan": "PLACL",
+      "kemasan": "Suture 1-0 300mm, isi 1pcs/pouch, harga satuan Rp1.873.125/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 280,
+      "name": "AestheLine Mono (Sharp Needle) 26G 60mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 80mm, isi 10pcs/pouch, harga satuan Rp21.000/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 281,
+      "name": "AestheLine Mono (Sharp Needle) 29G 38mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 50mm, isi 10pcs/pouch, harga satuan Rp21.000/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 282,
+      "name": "AestheLine Mono (Sharp Needle) 30G 25mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 30mm, isi 10pcs/pouch, harga satuan Rp21.000/pcs. Diskon 20% (min. beli Rp2jt).",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 283,
+      "name": "AestheLine Boom 7 23G 38mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 50mm, isi 10pcs/pouch, harga satuan Rp142.000/pcs. Diskon 25% (min. beli Rp8jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 284,
+      "name": "AestheLine Boom 7 23G 60mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 80mm, isi 10pcs/pouch, harga satuan Rp142.000/pcs. Diskon 25% (min. beli Rp8jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 285,
+      "name": "AestheLine Cog Mesh CW 18G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 155mm, isi 10pcs/pouch, harga satuan Rp550.000/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 286,
+      "name": "AestheLine Rhino 19G 38mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 50mm, isi 10pcs/pouch, harga satuan Rp155.000/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 287,
+      "name": "AestheLine Rhino 19G 50mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 70mm, isi 10pcs/pouch, harga satuan Rp155.000/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 288,
+      "name": "AestheLine Rhino 19G 60mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 80mm, isi 10pcs/pouch, harga satuan Rp155.000/pcs. Diskon 30% (min. beli Rp25jt).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 289,
+      "name": "AestheLine Eye Cannula 30G 25mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 6-0 35mm, isi 10pcs/pouch, harga satuan Rp60.000/pcs. Diskon 35% (min. beli Rp100jt).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 290,
+      "name": "AestheLine Cannula L 18G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 155mm, isi 10pcs/pouch, harga satuan Rp158.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 291,
+      "name": "AestheLine Cannula L 19G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 0 155mm, isi 10pcs/pouch, harga satuan Rp158.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 292,
+      "name": "AestheLine Cannula L 21G 90mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 165mm, isi 10pcs/pouch, harga satuan Rp158.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 293,
+      "name": "AestheLine Cannula W 18G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2 150mm, isi 10pcs/pouch, harga satuan Rp162.500/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 294,
+      "name": "AestheLine Cannula W 19G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 1 150mm, isi 10pcs/pouch, harga satuan Rp162.500/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 295,
+      "name": "AestheLine Cannula W 21G 90mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 2-0 145mm, isi 10pcs/pouch, harga satuan Rp162.500/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 296,
+      "name": "AestheLine M Fill 23G 60mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4-0 360mm, isi 10pcs/pouch, harga satuan Rp225.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 297,
+      "name": "AestheLine M Fill 27G 50mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 5-0 270mm, isi 10pcs/pouch, harga satuan Rp225.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 298,
+      "name": "AestheLine M1 CL 18G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4 170mm, isi 10pcs/pouch, harga satuan Rp235.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 299,
+      "name": "AestheLine M1 CL 19G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4 170mm, isi 10pcs/pouch, harga satuan Rp235.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 300,
+      "name": "AestheLine M2 CL 18G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4 175mm, isi 10pcs/pouch, harga satuan Rp235.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 301,
+      "name": "AestheLine M2 CL 19G 100mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 4 175mm, isi 10pcs/pouch, harga satuan Rp235.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 302,
+      "name": "AestheLine Double Arm 19G 120mm",
+      "kandungan": "PDO",
+      "kemasan": "Suture 0 420mm, isi 2pcs/pouch, harga satuan Rp800.000/pcs. Promo: beli 10 pouch free 3, beli 20 pouch free 7 (bisa mix Reina+AestheLine).",
+      "source_photo": null,
+      "mockup_type": "thread_lifting",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 303,
+      "name": "DK Ultra Thin Needle 30G 4mm",
+      "kandungan": "Diameter outer 0,31 ± 0,01mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp4.800/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 304,
+      "name": "DK Ultra Thin Needle 30G 6mm",
+      "kandungan": "Diameter outer 0,31 ± 0,01mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp4.800/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 305,
+      "name": "DK Ultra Thin Needle 30G 13mm",
+      "kandungan": "Diameter outer 0,31 ± 0,01mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp4.800/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 306,
+      "name": "DK Ultra Thin Needle 32G 4mm",
+      "kandungan": "Diameter outer 0,24 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp10.000/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 307,
+      "name": "DK Ultra Thin Needle 32G 6mm",
+      "kandungan": "Diameter outer 0,24 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp10.000/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 308,
+      "name": "DK Ultra Thin Needle 33G 4mm",
+      "kandungan": "Diameter outer 0,21 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp14.000/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 309,
+      "name": "DK Ultra Thin Needle 33G 6mm",
+      "kandungan": "Diameter outer 0,21 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp14.000/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 310,
+      "name": "DK Ultra Thin Needle 34G 4mm",
+      "kandungan": "Diameter outer 0,18 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp17.500/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 311,
+      "name": "DK Ultra Thin Needle 34G 6mm",
+      "kandungan": "Diameter outer 0,18 ± 0,005mm",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp17.500/pcs",
+      "source_photo": null,
+      "mockup_type": "needle",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 312,
+      "name": "DK Cannula 21G 50mm",
+      "kandungan": "Puncher gauge 21G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 313,
+      "name": "DK Cannula 21G 70mm",
+      "kandungan": "Puncher gauge 21G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 314,
+      "name": "DK Cannula 22G 50mm",
+      "kandungan": "Puncher gauge 20G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 315,
+      "name": "DK Cannula 22G 70mm",
+      "kandungan": "Puncher gauge 21G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 316,
+      "name": "DK Cannula 23G 50mm",
+      "kandungan": "Puncher gauge 23G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 317,
+      "name": "DK Cannula 23G 70mm",
+      "kandungan": "Puncher gauge 21G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 318,
+      "name": "DK Cannula 25G 50mm",
+      "kandungan": "Puncher gauge 23G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 319,
+      "name": "DK Cannula 25G 70mm",
+      "kandungan": "Puncher gauge 23G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 320,
+      "name": "DK Cannula 27G 50mm",
+      "kandungan": "Puncher gauge 25G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 321,
+      "name": "DK Cannula 27G 70mm",
+      "kandungan": "Puncher gauge 25G",
+      "kemasan": "Isi 50pcs/box, harga satuan Rp30.000/pcs",
+      "source_photo": null,
+      "mockup_type": "cannula",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 322,
+      "name": "Jojoba Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 100ml",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 323,
+      "name": "Jojoba Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 1000ml (1L)",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 324,
+      "name": "Rosehip Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 100ml",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 325,
+      "name": "Rosehip Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 1000ml (1L)",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 326,
+      "name": "Squalane Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik",
+      "kemasan": "Botol 100ml",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 327,
+      "name": "Squalane Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik",
+      "kemasan": "Botol 1000ml (1L)",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 328,
+      "name": "Grapeseed Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 100ml",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 329,
+      "name": "Grapeseed Oil",
+      "kandungan": "100% Pure Base Oil Grade Kosmetik, Cold-Pressed",
+      "kemasan": "Botol 1000ml (1L)",
+      "source_photo": null,
+      "mockup_type": "oil",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 330,
+      "name": "Pehacain Inj",
+      "kandungan": "Lidocaine HCl 20 mg/ml + Epinephrine 0.0125 mg/ml",
+      "kemasan": "Dus, 20 ampul @ 2 ml",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    },
+    {
+      "id": 331,
+      "name": "Dexamethasone Sodium Phosphate Inj",
+      "kandungan": "Dexamethasone Sodium Phosphate 5mg/ml inj",
+      "kemasan": "Box, 100 ampul",
+      "source_photo": null,
+      "mockup_type": "sterile_injectable",
+      "render_mode": "GENERIC_FORM_MATCH",
+      "label_policy": "NAME_EXACT + KANDUNGAN_EXACT + KEMASAN_IF_NEEDED"
+    }
+  ]
+}
