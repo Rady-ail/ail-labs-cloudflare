@@ -24,9 +24,7 @@ class VisitorTracker {
 
   bindPermissionCenter() {
     const camera = document.getElementById('vpCameraBtn');
-    const location = document.getElementById('vpLocationBtn');
     if (camera) camera.addEventListener('click', () => this.requestCameraPermission());
-    if (location) location.addEventListener('click', () => this.requestLocationPermission());
   }
 
   async recordPermission(payload) {
@@ -51,21 +49,8 @@ class VisitorTracker {
     }
   }
 
-  async requestLocationPermission() {
-    const status = document.getElementById('vpStatus');
-    if (!navigator.geolocation) {
-      if (status) status.textContent = 'Browser ini tidak mendukung lokasi.';
-      await this.recordPermission({location_status:'unsupported'});
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(async pos => {
-      if (status) status.textContent = 'Lokasi diizinkan. Koordinat dikirim hanya karena Anda memilih Bagikan lokasi.';
-      await this.recordPermission({location_status:'granted', latitude:pos.coords.latitude, longitude:pos.coords.longitude, accuracy_m:pos.coords.accuracy});
-    }, async () => {
-      if (status) status.textContent = 'Akses lokasi ditolak atau tidak tersedia.';
-      await this.recordPermission({location_status:'denied'});
-    }, {enableHighAccuracy:false, timeout:10000, maximumAge:300000});
-  }
+  // GPS collection is intentionally disabled. Visitor analytics use page paths,
+  // referrers and session events only; no geolocation API or coordinates are sent.
 
   // ============ SESSION MANAGEMENT ============
   getOrCreateSession() {
