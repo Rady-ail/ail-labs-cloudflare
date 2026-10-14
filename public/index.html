@@ -55,7 +55,50 @@
 @keyframes ailGlassSheen{0%,18%{left:-70%;opacity:0}32%{opacity:.55}58%,100%{left:140%;opacity:0}}
 @media(hover:none){:is(.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]):hover{transform:none}}
 @media(prefers-reduced-motion:reduce){:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])::before,:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])::after{animation:none}.card{transition:none}}
-</style></head>
+</style><style id="ail-ios-inspired-system">
+/* iOS-inspired design language: native-feeling type, layered glass, consistent geometry */
+:root{
+ --ail-radius-card:26px;
+ --ail-glass-surface:rgba(255,255,255,.68);
+ --ail-glass-border:rgba(255,255,255,.88);
+ --ail-glass-shadow:0 14px 38px rgba(8,47,50,.075),0 3px 10px rgba(8,47,50,.035),inset 0 1px 0 rgba(255,255,255,.95);
+ --ail-glass-shadow-hover:0 22px 48px rgba(8,47,50,.12),0 6px 14px rgba(8,47,50,.045),inset 0 1px 0 rgba(255,255,255,.98);
+ --ail-font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,ui-sans-serif,system-ui,sans-serif;
+}
+html{font-family:var(--ail-font-ui);-webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none}
+body{font-family:var(--ail-font-ui)!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.018em}
+h1,h2,h3,h4,h5,h6{font-family:var(--ail-font-ui);letter-spacing:-.04em;line-height:1.08;text-wrap:balance;font-weight:720}
+h1{letter-spacing:-.052em;line-height:1.02}
+h2{letter-spacing:-.045em;line-height:1.08}
+p,li,label,input,select,textarea,button{font-family:var(--ail-font-ui)}
+p{line-height:1.62}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]){
+ border-radius:var(--ail-radius-card)!important;
+ background-color:var(--ail-glass-surface);
+ border:1px solid var(--ail-glass-border)!important;
+ box-shadow:var(--ail-glass-shadow);
+ backdrop-filter:blur(26px) saturate(175%);
+ -webkit-backdrop-filter:blur(26px) saturate(175%);
+}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])> :not(style):not(script){position:relative;z-index:1}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]){transition:transform .32s cubic-bezier(.2,.75,.2,1),box-shadow .32s ease,border-color .32s ease,background-color .32s ease}
+@media(hover:hover) and (pointer:fine){
+ :is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]):hover{transform:translateY(-3px);box-shadow:var(--ail-glass-shadow-hover);border-color:rgba(10,167,181,.28)!important}
+}
+:is(.button,.button-primary,.button-light,.button-orange,.mobile-cta,.mobile-menu-btn,.category-pill,button[type="submit"]){transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease;border-radius:999px}
+:is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid rgba(10,167,181,.42);outline-offset:3px}
+::selection{background:rgba(10,167,181,.2);color:#082f32}
+@media(max-width:640px){
+ :root{--ail-radius-card:23px}
+ h1{letter-spacing:-.045em}
+ body{letter-spacing:-.012em}
+}
+@media(prefers-reduced-motion:reduce){
+ :is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card){transition:none!important}
+}
+</style>
+</head>
 <body>
 <header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="AIL LABS home"><img src="/images/logo.png" alt="AIL LABS"><span><span class="brand-name">AIL LABS</span><span class="brand-sub">B2B AESTHETIC SUPPLY</span></span></a><nav class="nav" aria-label="Navigasi utama"><a href="/" aria-current="page">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation <span aria-hidden="true">↗</span></a></nav><button id="mobileMenuBtn" class="menu-btn" type="button" aria-label="Buka menu" aria-expanded="false" >☰</button></div><div id="mobileMenu" class="mobile-menu"><div class="container"><a href="/">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation</a></div></div></header>
 <main>
