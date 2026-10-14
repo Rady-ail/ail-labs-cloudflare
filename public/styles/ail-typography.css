@@ -84,6 +84,15 @@ html body :is(.eyebrow,.brand-sub,.brand small,.nav-link,.nav-cta,.stat span,.se
   white-space:nowrap;
 }
 html body :is(button,input,select,textarea){font-family:var(--font-sf)!important;font-weight:inherit;font-size:inherit;line-height:inherit;letter-spacing:inherit}
+/* Normalize existing utility weights to the supported 400/500/600/700 range. */
+html body :is(.font-extralight,.font-light,.font-normal){font-weight:400!important}
+html body :is(.font-medium){font-weight:500!important}
+html body :is(.font-semibold){font-weight:600!important}
+html body :is(.font-bold,.font-extrabold,.font-black){font-weight:700!important}
+html body [style*="font-weight:800"],
+html body [style*="font-weight: 800"],
+html body [style*="font-weight:900"],
+html body [style*="font-weight: 900"]{font-weight:700!important}
 @supports (font-variation-settings:normal){
   :where(body p,body li,body h1,body h2,body h3,body h4,body h5,body h6,body button,body input,body select,body textarea){
     font-feature-settings:"kern","calt","cv11","ss03";
