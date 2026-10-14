@@ -1,0 +1,95 @@
+/* AIL LABS — SF-style system typography with self-hosted Inter */
+@font-face{
+  font-family:"Inter Variable";
+  font-style:normal;
+  font-weight:400 700;
+  font-display:swap;
+  src:url("/fonts/inter-latin-wght-normal.woff2") format("woff2");
+  unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD;
+}
+@font-face{
+  font-family:"AIL Inter Fallback";
+  src:local("Arial");
+  size-adjust:100%;
+  ascent-override:90%;
+  descent-override:22%;
+  line-gap-override:0%;
+}
+:root{
+  --font-sf:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter Variable","Inter","AIL Inter Fallback","Helvetica Neue",Arial,sans-serif;
+  --ail-type-11:11px;
+  --ail-type-13:13px;
+  --ail-type-15:15px;
+  --ail-type-17:17px;
+  --ail-type-20:20px;
+  --ail-type-24:24px;
+  --ail-type-28:28px;
+  --ail-type-34:34px;
+  --ail-font-regular:400;
+  --ail-font-medium:500;
+  --ail-font-semibold:600;
+  --ail-font-bold:700;
+  --ail-tracking-text:-.022em;
+  --ail-tracking-display:-.03em;
+  --ail-tracking-label:.07em;
+  --font-ui:var(--font-sf);
+  --font-main:var(--font-sf);
+  --ail-font-ui:var(--font-sf);
+  --bs-body-font-family:var(--font-sf);
+  --bs-font-sans-serif:var(--font-sf);
+}
+html{
+  font-family:var(--font-sf)!important;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-rendering:optimizeLegibility;
+  font-synthesis:none;
+  -webkit-text-size-adjust:100%;
+}
+body{
+  font-family:var(--font-sf)!important;
+  font-size:var(--ail-type-17);
+  font-weight:var(--ail-font-regular);
+  line-height:1.47;
+  letter-spacing:var(--ail-tracking-text);
+  font-synthesis:none;
+}
+:where(h1,h2,h3,h4,h5,h6,p,a,li,dt,dd,label,small,strong,b,button,input,select,textarea,th,td,summary){
+  font-family:var(--font-sf)!important;
+  font-synthesis:none;
+}
+:where(button,input,select,textarea){font:inherit}
+:where(h1,h2,h3,h4,h5,h6){
+  font-weight:var(--ail-font-semibold);
+  letter-spacing:var(--ail-tracking-display);
+  line-height:1.15;
+  text-wrap:pretty;
+}
+:where(h1){font-size:clamp(1.75rem,6vw,2.125rem);font-weight:var(--ail-font-bold);line-height:1.1;letter-spacing:-.035em}
+:where(h2){font-size:clamp(1.5rem,5vw,1.75rem);font-weight:var(--ail-font-semibold);letter-spacing:-.03em}
+:where(h3){font-size:clamp(1.25rem,4vw,1.5rem);letter-spacing:-.025em}
+:where(p,li,dd,dt){letter-spacing:var(--ail-tracking-text)}
+:where(.eyebrow,.brand-sub,.brand small,.nav-link,.nav-cta,.stat span,.section-label,[class*="eyebrow"],[data-label]){
+  font-size:var(--ail-type-11);
+  font-weight:var(--ail-font-semibold);
+  letter-spacing:var(--ail-tracking-label);
+}
+:where(.stat strong,.nib,.nib-value,[data-nib],[data-numeric],[data-price],.price,.product-price,.amount,.currency,.stat [class*="value"]){
+  font-variant-numeric:tabular-nums lining-nums;
+}
+:where(.stat:first-child strong,.nib,.nib-value,[data-nib]){
+  font-size:clamp(.82rem,3.7vw,1.05rem);
+  letter-spacing:-.02em;
+  white-space:nowrap;
+}
+:where(button,input,select,textarea){font-family:var(--font-sf)!important;font-weight:inherit}
+@supports (font-variation-settings:normal){
+  :where(body p,body li,body h1,body h2,body h3,body h4,body h5,body h6,body button,body input,body select,body textarea){
+    font-feature-settings:"kern","calt","cv11","ss03";
+  }
+}
+@media(max-width:359px){
+  body{letter-spacing:-.018em}
+  :where(h1){font-size:clamp(1.65rem,7vw,1.85rem)}
+  :where(.stat:first-child strong,.nib,.nib-value,[data-nib]){font-size:clamp(.78rem,3.5vw,.92rem)}
+}
