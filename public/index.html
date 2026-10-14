@@ -293,11 +293,60 @@ html,body{max-width:100%;overflow-x:clip}
   .hero + .stats .stat + .stat{border-left:1px solid var(--line)!important}
 }
 </style>
+
+<style id="ail-hero-stats-final-layer-override">
+/* High-specificity final override: the global Liquid Glass rules are declared later in the head. */
+html body #hero-following-stats{
+  gap:0!important;
+  margin-top:22px!important;
+  border:0!important;
+  border-radius:0!important;
+  overflow:visible!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+}
+html body #hero-following-stats .stat{
+  position:relative!important;
+  min-width:0!important;
+  padding:17px 18px!important;
+  border:0!important;
+  border-radius:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  backdrop-filter:none!important;
+  -webkit-backdrop-filter:none!important;
+  overflow:visible!important;
+  transform:none!important;
+  transition:none!important;
+}
+html body #hero-following-stats .stat::before,
+html body #hero-following-stats .stat::after{
+  content:none!important;
+  display:none!important;
+  animation:none!important;
+  background:none!important;
+  box-shadow:none!important;
+}
+html body #hero-following-stats .stat strong{font-size:clamp(15px,2vw,19px);letter-spacing:-.035em}
+html body #hero-following-stats .stat span{font-size:10px;line-height:1.45}
+@media(max-width:639px){
+  html body #hero-following-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  html body #hero-following-stats .stat:nth-child(2n){border-left:1px solid var(--line)!important}
+  html body #hero-following-stats .stat:nth-child(n+3){border-top:1px solid var(--line)!important}
+}
+@media(min-width:640px){
+  html body #hero-following-stats{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+  html body #hero-following-stats .stat + .stat{border-left:1px solid var(--line)!important}
+}
+</style>
+
 </head>
 <body>
 <header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="AIL LABS home"><img src="/images/logo.png" alt="AIL LABS"><span><span class="brand-name">AIL LABS</span><span class="brand-sub">B2B AESTHETIC SUPPLY</span></span></a><nav class="nav" aria-label="Navigasi utama"><a href="/" aria-current="page">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation <span aria-hidden="true">↗</span></a></nav><button id="mobileMenuBtn" class="menu-btn" type="button" aria-label="Buka menu" aria-expanded="false" >☰</button></div><div id="mobileMenu" class="mobile-menu"><div class="container"><a href="/">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation</a></div></div></header>
 <main>
-<section class="hero"><div class="container hero-grid"><div><div class="eyebrow">PT Fudhail Aesthetic Laboratories</div><h1>Supply that helps your practice <span>move forward.</span></h1><p class="hero-lead">Mitra B2B untuk klinik, distributor, dan profesional aesthetic di Indonesia — dari sourcing produk hingga dokumentasi procurement yang lebih siap.</p><div class="hero-actions"><a class="button button-primary" href="/catalog.html">Explore catalog <span aria-hidden="true">→</span></a><a class="button button-light" href="/contact.html">Start an inquiry</a></div><div class="hero-note"><i aria-hidden="true"></i> Indonesia · Serving nationwide</div></div><div class="hero-panel liquid-glass hero-3d" aria-label="AIL LABS professional supply overview" data-hero-3d><div class="hero-ring" aria-hidden="true"></div><div class="hero-ring two" aria-hidden="true"></div><div class="panel-label">Professional supply partner</div><div class="orb hero-orb-3d" data-hero-orb><img src="/images/logo.png" alt="AIL LABS logo"></div><div class="panel-card"><strong>Built for better procurement.</strong><p>Focused sourcing, responsive communication, and product information aligned with professional use.</p></div></div></div><div class="container stats" aria-label="Business highlights"><div class="stat"><strong>0308260088951</strong><span>NIB registered</span></div><div class="stat"><strong>500m²</strong><span>Distribution hub</span></div><div class="stat"><strong>7+</strong><span>Brand principal</span></div><div class="stat"><strong>2–25°C</strong><span>Handling range</span></div></div></section>
+<section class="hero"><div class="container hero-grid"><div><div class="eyebrow">PT Fudhail Aesthetic Laboratories</div><h1>Supply that helps your practice <span>move forward.</span></h1><p class="hero-lead">Mitra B2B untuk klinik, distributor, dan profesional aesthetic di Indonesia — dari sourcing produk hingga dokumentasi procurement yang lebih siap.</p><div class="hero-actions"><a class="button button-primary" href="/catalog.html">Explore catalog <span aria-hidden="true">→</span></a><a class="button button-light" href="/contact.html">Start an inquiry</a></div><div class="hero-note"><i aria-hidden="true"></i> Indonesia · Serving nationwide</div></div><div class="hero-panel liquid-glass hero-3d" aria-label="AIL LABS professional supply overview" data-hero-3d><div class="hero-ring" aria-hidden="true"></div><div class="hero-ring two" aria-hidden="true"></div><div class="panel-label">Professional supply partner</div><div class="orb hero-orb-3d" data-hero-orb><img src="/images/logo.png" alt="AIL LABS logo"></div><div class="panel-card"><strong>Built for better procurement.</strong><p>Focused sourcing, responsive communication, and product information aligned with professional use.</p></div></div></div><div id="hero-following-stats" class="container stats" aria-label="Business highlights"><div class="stat"><strong>0308260088951</strong><span>NIB registered</span></div><div class="stat"><strong>500m²</strong><span>Distribution hub</span></div><div class="stat"><strong>7+</strong><span>Brand principal</span></div><div class="stat"><strong>2–25°C</strong><span>Handling range</span></div></div></section>
 <section class="section" id="about"><div class="container about-grid"><div class="about-copy"><div class="eyebrow">About AIL LABS</div><h2>Clear supply. Confident decisions.</h2><p>AIL LABS adalah perusahaan B2B aesthetic supply yang membantu klinik, dokter, distributor, dan partner brand menemukan solusi produk yang relevan dengan kebutuhan mereka.</p><p>Kami menggabungkan akses produk, komunikasi yang rapi, dan dukungan procurement agar setiap inquiry dapat bergerak dari percakapan awal menuju keputusan bisnis yang lebih jelas.</p><a class="button button-light" href="/about.html">More about us <span aria-hidden="true">→</span></a></div><aside class="about-aside"><strong>Professional by design.</strong><p>Berbasis di Indonesia untuk melayani kebutuhan aesthetic supply secara lebih terarah secara nasional.</p><div style="margin-top:24px;color:#5ed7df;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase">Sourcing · Support · Supply</div></aside></div></section>
 <section class="section" id="solutions"><div class="container"><div class="section-head"><div class="eyebrow">Product & solution categories</div><h2>One partner, several ways to build your supply.</h2><p class="section-intro">Mulai dari produk ready supply hingga pengembangan brand, kami membantu menyusun jalur yang sesuai dengan model bisnis Anda.</p></div><div class="category-grid"><a class="category" href="/catalog.html"><span class="number">01 / READY SUPPLY</span><h3>Aesthetic essentials</h3><p>Serum, cream, masker, consumables, dan pilihan produk untuk kebutuhan profesional.</p></a><a class="category" href="/private-label.html"><span class="number">02 / PRIVATE LABEL</span><h3>Build your own line</h3><p>Eksplorasi private label dan OEM dengan komunikasi yang lebih terstruktur.</p></a><a class="category" href="/procurement.html"><span class="number">03 / PROCUREMENT</span><h3>Procurement support</h3><p>Dokumen, sourcing, dan koordinasi untuk partner yang membutuhkan detail lebih lengkap.</p></a></div></div></section>
 <section class="section" id="why"><div class="container"><div class="section-head"><div class="eyebrow">Why AIL LABS</div><h2>Professional supply without the unnecessary friction.</h2></div><div class="feature-grid"><div class="feature"><strong>Responsive communication</strong><p>Respons yang jelas dan terarah untuk membantu tim Anda menilai pilihan dengan cepat.</p></div><div class="feature"><strong>Procurement mindset</strong><p>Informasi produk dan alur inquiry disiapkan untuk kebutuhan klinik, distributor, dan partner bisnis.</p></div><div class="feature"><strong>Regional distribution hub</strong><p>Berbasis di Indonesia, dengan jangkauan partner di berbagai wilayah.</p></div></div></div></section>
