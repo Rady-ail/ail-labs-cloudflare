@@ -98,6 +98,73 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
  :is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card){transition:none!important}
 }
 </style>
+
+<style id="ail-hero-3d-precision">
+/* Hero 3D precision pass: stable center, circular rings and independent layers */
+.hero-panel[data-hero-3d]{
+  position:relative;display:block;isolation:isolate;overflow:hidden;
+  min-height:clamp(390px,42vw,480px);
+  perspective:1200px;transform-origin:50% 50%;
+  contain:paint;
+}
+.hero-panel[data-hero-3d]::before{width:clamp(210px,54%,270px);height:clamp(210px,54%,270px);right:-8%;top:-14%}
+.hero-panel[data-hero-3d]::after{width:clamp(150px,38%,190px);height:clamp(150px,38%,190px);left:-8%;bottom:-12%}
+.hero-panel[data-hero-3d] .panel-label{z-index:4;top:22px;left:24px;right:24px;line-height:1.4}
+.hero-panel[data-hero-3d] .hero-ring{
+  position:absolute;width:min(66%,300px);height:auto;aspect-ratio:1;
+  inset:auto;left:50%;top:43%;border-radius:50%;
+  transform:translate(-50%,-50%) rotateX(62deg) rotateZ(18deg);
+  transform-origin:center;animation:none!important;pointer-events:none;z-index:1;
+}
+.hero-panel[data-hero-3d] .hero-ring.two{
+  width:min(48%,220px);height:auto;aspect-ratio:1;
+  inset:auto;left:50%;top:43%;
+  transform:translate(-50%,-50%) rotateY(58deg) rotateZ(-15deg);
+  animation:none!important;
+}
+.hero-panel[data-hero-3d] .hero-orb-3d{
+  position:absolute;left:50%;top:43%;z-index:2;
+  width:clamp(148px,40%,184px);height:auto;aspect-ratio:1;
+  display:grid;place-items:center;padding:0;box-sizing:border-box;
+  transform:translate3d(calc(-50% + var(--ox,0px)),calc(-50% + var(--oy,0px)),24px)
+    rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transform-origin:center center;animation:none!important;
+  transition:transform .16s ease-out;
+}
+.hero-panel[data-hero-3d] .hero-orb-3d::before{
+  content:"";position:absolute;inset:9px;border:1px solid rgba(10,167,181,.24);
+  border-radius:50%;box-shadow:0 0 28px rgba(10,167,181,.12);pointer-events:none;
+  animation:none!important;
+}
+.hero-panel[data-hero-3d] .hero-orb-3d img{
+  display:block;width:70%;height:70%;max-width:70%;max-height:70%;
+  padding:0;margin:0;object-fit:contain;object-position:center;
+  border-radius:20px;transform:none;flex:none;
+}
+.hero-panel[data-hero-3d] .panel-card{
+  z-index:5;right:20px;bottom:20px;left:20px;
+  padding:18px 20px;border-radius:20px!important;
+}
+.hero-panel[data-hero-3d] .panel-card strong{font-size:clamp(17px,2vw,20px);line-height:1.25}
+.hero-panel[data-hero-3d] .panel-card p{max-width:54ch;line-height:1.55}
+@media(max-width:899px){
+  .hero-panel[data-hero-3d]{min-height:clamp(370px,112vw,430px)}
+  .hero-panel[data-hero-3d] .hero-ring{width:min(70%,260px)}
+  .hero-panel[data-hero-3d] .hero-ring.two{width:min(52%,190px)}
+  .hero-panel[data-hero-3d] .hero-orb-3d{width:clamp(142px,43%,164px)}
+  .hero-panel[data-hero-3d] .panel-label{top:20px;left:20px}
+  .hero-panel[data-hero-3d] .panel-card{right:14px;bottom:14px;left:14px;padding:16px}
+}
+@media(max-width:380px){
+  .hero-panel[data-hero-3d]{min-height:370px}
+  .hero-panel[data-hero-3d] .hero-orb-3d{width:140px}
+  .hero-panel[data-hero-3d] .panel-card{right:12px;bottom:12px;left:12px;padding:14px}
+}
+@media(prefers-reduced-motion:reduce){
+  .hero-panel[data-hero-3d] .hero-orb-3d{transition:none!important}
+}
+</style>
+
 </head>
 <body>
 <header class="site-header"><div class="container header-inner"><a class="brand" href="/" aria-label="AIL LABS home"><img src="/images/logo.png" alt="AIL LABS"><span><span class="brand-name">AIL LABS</span><span class="brand-sub">B2B AESTHETIC SUPPLY</span></span></a><nav class="nav" aria-label="Navigasi utama"><a href="/" aria-current="page">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation <span aria-hidden="true">↗</span></a></nav><button id="mobileMenuBtn" class="menu-btn" type="button" aria-label="Buka menu" aria-expanded="false" >☰</button></div><div id="mobileMenu" class="mobile-menu"><div class="container"><a href="/">Home</a><a href="/catalog.html">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a class="button button-primary" href="/contact.html">Request Quotation</a></div></div></header>
