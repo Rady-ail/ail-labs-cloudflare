@@ -41,7 +41,50 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 @keyframes ailGlassSheen{0%,18%{left:-70%;opacity:0}32%{opacity:.55}58%,100%{left:140%;opacity:0}}
 @media(hover:none){:is(.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]):hover{transform:none}}
 @media(prefers-reduced-motion:reduce){:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])::before,:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,[class*="bg-ail-clinical"][class*="rounded-2xl"],main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])::after{animation:none}.card{transition:none}}
-</style></head><body><header class="site-header sticky top-0 z-50"><div class="mx-auto flex h-[74px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"><a href="/" class="brand flex items-center gap-3" aria-label="AIL LABS Home"><img src="/images/logo.png" alt="AIL LABS" class="h-10 w-10 rounded-xl object-contain shadow-sm"><span><strong>AIL LABS</strong><small>B2B AESTHETIC SUPPLY</small></span></a><nav class="hidden items-center gap-1 lg:flex"><a href="/" class="nav-link">Home</a><a href="/catalog.html" class="nav-link" aria-current="page">Katalog</a><a href="/private-label.html" class="nav-link">Private Label / OEM</a><a href="/procurement.html" class="nav-link">Procurement</a><a href="/compliance.html" class="nav-link">Compliance</a><a href="/about.html" class="nav-link">About</a><a href="/contact.html" class="nav-cta">Request Quotation <span>↗</span></a></nav><button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden" type="button" aria-label="Buka menu" aria-expanded="false">☰</button></div><div id="mobileMenu" class="mobile-menu hidden lg:hidden"><div class="mx-auto max-w-7xl px-4 pb-5 pt-2 sm:px-6"><a href="/">Home</a><a href="/catalog.html" aria-current="page">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a href="/contact.html" class="mobile-cta">Request Quotation →</a></div></div></header><main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><div class="mb-6 rounded-[28px] border border-slate-200 bg-white p-8 card"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#0F4C4A]">Katalog</div><h1 class="mt-3 text-3xl font-black sm:text-5xl">Katalog</h1><p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600">Katalog live untuk procurement profesional. Produk ditarik dari API; frontend tidak membuat SKU manual.</p></div><section id="catalog" aria-labelledby="catalog-title" class="pt-12">
+</style><style id="ail-ios-inspired-system">
+/* iOS-inspired design language: native-feeling type, layered glass, consistent geometry */
+:root{
+ --ail-radius-card:26px;
+ --ail-glass-surface:rgba(255,255,255,.68);
+ --ail-glass-border:rgba(255,255,255,.88);
+ --ail-glass-shadow:0 14px 38px rgba(8,47,50,.075),0 3px 10px rgba(8,47,50,.035),inset 0 1px 0 rgba(255,255,255,.95);
+ --ail-glass-shadow-hover:0 22px 48px rgba(8,47,50,.12),0 6px 14px rgba(8,47,50,.045),inset 0 1px 0 rgba(255,255,255,.98);
+ --ail-font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Inter,ui-sans-serif,system-ui,sans-serif;
+}
+html{font-family:var(--ail-font-ui);-webkit-text-size-adjust:100%;text-size-adjust:100%;font-synthesis:none}
+body{font-family:var(--ail-font-ui)!important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;letter-spacing:-.018em}
+h1,h2,h3,h4,h5,h6{font-family:var(--ail-font-ui);letter-spacing:-.04em;line-height:1.08;text-wrap:balance;font-weight:720}
+h1{letter-spacing:-.052em;line-height:1.02}
+h2{letter-spacing:-.045em;line-height:1.08}
+p,li,label,input,select,textarea,button{font-family:var(--ail-font-ui)}
+p{line-height:1.62}
+button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]){
+ border-radius:var(--ail-radius-card)!important;
+ background-color:var(--ail-glass-surface);
+ border:1px solid var(--ail-glass-border)!important;
+ box-shadow:var(--ail-glass-shadow);
+ backdrop-filter:blur(26px) saturate(175%);
+ -webkit-backdrop-filter:blur(26px) saturate(175%);
+}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"])> :not(style):not(script){position:relative;z-index:1}
+:is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]){transition:transform .32s cubic-bezier(.2,.75,.2,1),box-shadow .32s ease,border-color .32s ease,background-color .32s ease}
+@media(hover:hover) and (pointer:fine){
+ :is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card,main section div[class*="rounded-2xl"][class*="border-slate-200"][class*="bg-white"],main div[class*="rounded-2xl"][class*="bg-white"],main div[class*="rounded-3xl"][class*="bg-white"]):hover{transform:translateY(-3px);box-shadow:var(--ail-glass-shadow-hover);border-color:rgba(10,167,181,.28)!important}
+}
+:is(.button,.button-primary,.button-light,.button-orange,.mobile-cta,.mobile-menu-btn,.category-pill,button[type="submit"]){transition:transform .2s ease,box-shadow .2s ease,background-color .2s ease;border-radius:999px}
+:is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid rgba(10,167,181,.42);outline-offset:3px}
+::selection{background:rgba(10,167,181,.2);color:#082f32}
+@media(max-width:640px){
+ :root{--ail-radius-card:23px}
+ h1{letter-spacing:-.045em}
+ body{letter-spacing:-.012em}
+}
+@media(prefers-reduced-motion:reduce){
+ :is(.panel-card,.category,.feature,.step,.compliance-card,.cta,.stat,.about-aside,.card){transition:none!important}
+}
+</style>
+</head><body><header class="site-header sticky top-0 z-50"><div class="mx-auto flex h-[74px] max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8"><a href="/" class="brand flex items-center gap-3" aria-label="AIL LABS Home"><img src="/images/logo.png" alt="AIL LABS" class="h-10 w-10 rounded-xl object-contain shadow-sm"><span><strong>AIL LABS</strong><small>B2B AESTHETIC SUPPLY</small></span></a><nav class="hidden items-center gap-1 lg:flex"><a href="/" class="nav-link">Home</a><a href="/catalog.html" class="nav-link" aria-current="page">Katalog</a><a href="/private-label.html" class="nav-link">Private Label / OEM</a><a href="/procurement.html" class="nav-link">Procurement</a><a href="/compliance.html" class="nav-link">Compliance</a><a href="/about.html" class="nav-link">About</a><a href="/contact.html" class="nav-cta">Request Quotation <span>↗</span></a></nav><button id="mobileMenuBtn" class="mobile-menu-btn lg:hidden" type="button" aria-label="Buka menu" aria-expanded="false">☰</button></div><div id="mobileMenu" class="mobile-menu hidden lg:hidden"><div class="mx-auto max-w-7xl px-4 pb-5 pt-2 sm:px-6"><a href="/">Home</a><a href="/catalog.html" aria-current="page">Katalog</a><a href="/private-label.html">Private Label / OEM</a><a href="/procurement.html">Procurement</a><a href="/compliance.html">Compliance</a><a href="/about.html">About</a><a href="/contact.html" class="mobile-cta">Request Quotation →</a></div></div></header><main class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><div class="mb-6 rounded-[28px] border border-slate-200 bg-white p-8 card"><div class="text-[10px] font-bold uppercase tracking-[.18em] text-[#0F4C4A]">Katalog</div><h1 class="mt-3 text-3xl font-black sm:text-5xl">Katalog</h1><p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600">Katalog live untuk procurement profesional. Produk ditarik dari API; frontend tidak membuat SKU manual.</p></div><section id="catalog" aria-labelledby="catalog-title" class="pt-12">
   <div class="rounded-[28px] border border-slate-200/80 bg-white p-6 card sm:p-8">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
       <div>
