@@ -117,10 +117,27 @@ router.post('/', async (req, res) => {
       text,
     });
 
+    // Record provider acceptance for follow-up. Email success must not be
+    // turned into a failed response if this secondary status update fails.
+    if (RFQ_PERSISTENCE_ENABLED && rfqId) {
+      try {
+        await pool.query(
+          `UPDATE rfq_requests
+              SET status = 'email_sent',
+                  email_message_id = $2,
+                  updated_at = now()
+            WHERE id = $1`,
+          [rfqId, result?.messageId || result?.id || null]
+        );
+      } catch (updateError) {
+        console.error('[quotation] RFQ success status update failed:', updateError?.message || updateError);
+      }
+    }
+
     return res.status(201).json({
       ok: true,
       message: 'Request quotation berhasil dikirim.',
-      id: result?.id || null,
+      id: result?.messageId || result?.id || null,
       rfq_id: rfqId,
     });
   } catch (error) {
