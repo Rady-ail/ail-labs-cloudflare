@@ -1,54 +1,36 @@
-# CLAUDE.md — ail-labs-katalog
+# AIL LABS — B2B Sales & Procurement OS
+Cloudflare Workers + Hono + D1 + KV, vanilla frontend.
 
-Panduan perilaku untuk Claude saat mengerjakan repo ini. Digabung dari prinsip umum coding-agent (terinspirasi observasi Andrej Karpathy soal kesalahan umum LLM saat coding) + catatan khusus penggunaan library **Motion (motion.dev)** di proyek ini.
+## Deploy via Cloudflare Dashboard
+1. Connect this repository in Workers & Pages → Create application → Connect to Git.
+2. Select `main`, build command `npm run build`, and deploy; static assets are `public/`.
+3. Create D1 and KV, bind them as `DB` and `RATE_LIMIT`; set their IDs in dashboard/config.
+4. Apply `migrations/0001_core.sql` and later migrations to D1.
+5. Add the first admin using the bootstrap SQL below, then verify `/api/health`.
 
-**Catatan:** panduan ini condong ke hati-hati daripada cepat. Untuk perubahan sepele, gunakan penilaian wajar.
+## Variables / secrets
+Required bindings: `DB`, `RATE_LIMIT`.
+Variables: `PUBLIC_BASE_URL`, `RESEND_FROM`, `MAIL_ALERT_TO`, `TURNSTILE_SITE_KEY`.
+Secrets: `RESEND_API_KEY`, `TURNSTILE_SECRET`.
+No API token or wrangler login is required for this Git-connected deployment.
 
-## 1. Pikir dulu sebelum menulis kode
+## First admin
+Generate a SHA-256 password hash locally and insert:
+`INSERT INTO admin_users(id,username,password_hash) VALUES('UUID','OWNER_USERNAME','SHA256_HEX');`
+Only the hash is stored.
 
-Jangan menebak diam-diam, jangan sembunyikan kebingungan, dan sampaikan trade-off secara terbuka.
+## Local
+`npm install`
+`npm test`
+`npm run build`
+`npx wrangler d1 migrations apply DB --local`
+`npm run dev`
 
-- Nyatakan asumsi secara eksplisit sebelum mulai. Kalau ragu, tanya dulu.
-- Kalau permintaan bisa ditafsirkan lebih dari satu cara, tawarkan opsinya — jangan pilih sendiri diam-diam.
-- Kalau ada cara yang lebih sederhana, katakan itu, dan boleh membantah pendekatan yang diminta kalau memang beralasan.
-- Kalau ada yang tidak jelas, berhenti sebentar, sebutkan apa yang membingungkan, lalu tanya.
+## Phase 0–1
+Public catalog → consent lead → server scoring → RFQ → admin pipeline → CSV → hourly alert scaffold.
 
-## 2. Sesederhana mungkin
+## Public contact
+info@ail-aesthetic-labs.my.id — Banjarmasin, Kalimantan Selatan.
 
-Kode seminimal mungkin yang menyelesaikan masalah — tidak lebih.
-
-- Jangan menambah fitur di luar yang diminta.
-- Jangan membuat abstraksi untuk kode yang cuma dipakai sekali.
-- Jangan menambah "fleksibilitas"/"konfigurasi" yang tidak diminta.
-- Jangan menangani skenario error yang mustahil terjadi.
-- Kalau hasilnya 200 baris padahal bisa 50, tulis ulang lebih ringkas.
-
-## 3. Perubahan yang presisi (surgical)
-
-Sentuh hanya bagian yang benar-benar perlu diubah; rapikan hanya kekacauan yang kamu buat sendiri.
-
-- Jangan "membenahi" kode, komentar, atau format di sekitarnya yang tidak diminta.
-- Jangan refactor sesuatu yang belum rusak.
-- Ikuti gaya kode yang sudah ada, meskipun kamu pribadi akan menulis dengan cara lain.
-- Kalau nemu dead code yang tidak terkait, laporkan saja — jangan langsung dihapus.
-- Kalau perubahanmu bikin sesuatu jadi tidak terpakai (import/variabel/fungsi), hapus yang itu saja.
-
-Uji sederhana: setiap baris yang diubah harus bisa ditelusuri langsung ke permintaan pengguna.
-
-## 4. Eksekusi berbasis kriteria sukses
-
-Ubah setiap tugas menjadi kriteria yang bisa diverifikasi, lalu iterasi sampai terpenuhi.
-
-- "Tambah validasi" → "Tulis test untuk input tidak valid, lalu buat sampai lolos."
-- "Perbaiki bug" → "Tulis test yang mereproduksi bug-nya, lalu buat sampai lolos."
-- "Refactor X" → "Pastikan test lolos sebelum dan sesudah perubahan."
-
-Untuk tugas multi-langkah, nyatakan rencana singkat sebelum eksekusi:
-```
-1. [Langkah] → verifikasi: [pengecekan]
-2. [Langkah] → verifikasi: [pengecekan]
-```
-
----
-
-## 5. Pakai Motion (motion.dev) di proyek ini
+## Privacy
+No silent camera/location collection. Human verification is Turnstile. Email OTP is the Phase 1 contact verification path; WhatsApp is click-to-chat only. Add a public privacy policy page before production promotion.

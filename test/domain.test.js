@@ -1,0 +1,5 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {scoreLead,leadTier,canTransition,validEmail,validPhone} from '../src/domain.js';
+test('scoring',()=>assert.equal(scoreLead([{type:'catalog_view'},{type:'product_view'},{type:'catalog_download'},{type:'inquiry'},{type:'contact_verified'},{type:'quotation_request'}]),100));
+test('tiers',()=>{assert.equal(leadTier(70),'HOT');assert.equal(leadTier(69),'WARM');assert.equal(leadTier(40),'WARM');assert.equal(leadTier(39),'COLD')});
+test('transitions',()=>{assert.equal(canTransition('lead','New','Contacted'),true);assert.equal(canTransition('lead','New','Won'),false);assert.equal(canTransition('rfq','Draft','Sent'),true);assert.equal(canTransition('rfq','Draft','Ordered'),false)});
+test('inputs',()=>{assert.equal(validEmail('a@b.com'),true);assert.equal(validEmail('bad'),false);assert.equal(validPhone('+628123456789'),true);assert.equal(validPhone('08123'),false)});

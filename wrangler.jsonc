@@ -1,25 +1,11 @@
 {
-  "name": "ail-labs-katalog-v2",
-  "main": "src/worker.js",
-  "workers_dev": true,
-  "routes": [
-    { "pattern": "ail-aesthetic-labs.my.id", "custom_domain": true },
-  ],
-  "compatibility_date": "2026-10-03",
-  "keep_vars": true,
-  "compatibility_flags": ["nodejs_compat"],
-  "vars": {
-    "ALLOWED_ORIGIN": "https://ail-aesthetic-labs.my.id",
-    "GOOGLE_CALLBACK_URL": "https://ail-aesthetic-labs.my.id/api/customer/auth/google/callback",
-    "PAYPAL_MODE": "live"
-  },
-  "assets": {
-    "directory": "./public",
-    "binding": "ASSETS",
-    "run_worker_first": ["/api/*"]
-  },
-  "triggers": {
-    "crons": ["*/15 * * * *"]
-  },
-  "observability": { "enabled": true }
+  "name":"ail-labs-b2b-os",
+  "main":"src/index.js",
+  "compatibility_date":"2026-10-06",
+  "assets":{"directory":"./public","binding":"ASSETS","run_worker_first":["/api/*"]},
+  "d1_databases":[{"binding":"DB","database_name":"ail-labs-b2b","database_id":"REPLACE_IN_CLOUDFLARE_DASHBOARD"}],
+  "kv_namespaces":[{"binding":"RATE_LIMIT","id":"REPLACE_IN_CLOUDFLARE_DASHBOARD"}],
+  "vars":{"PUBLIC_BASE_URL":"https://ail-aesthetic-labs.my.id"},
+  "triggers":{"crons":["0 * * * *"]},
+  "observability":{"enabled":true}
 }
