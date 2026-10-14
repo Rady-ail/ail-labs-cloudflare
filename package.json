@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server.js",
     "dev": "npx wrangler dev",
-    "build": "node scripts/validate-build.js",
+    "build": "node scripts/copy-inter-font.js && node scripts/validate-build.js",
     "deploy": "npx wrangler deploy",
     "seed": "node scripts/seed.js",
     "postinstall": "node scripts/patch-workers-express.js"
@@ -29,7 +29,8 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
-    "serverless-http": "^3.2.0"
+    "serverless-http": "^3.2.0",
+    "@fontsource-variable/inter": "^5.2.8"
   },
   "engines": {
     "node": ">=18"
