@@ -2086,7 +2086,7 @@ async function loadVisitors(){
       const entry = new Date(v.entry_time).toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
       const mins = Math.floor((v.duration_seconds||0)/60);
       const secs = (v.duration_seconds||0)%60;
-      const coords = (v.latitude != null && v.longitude != null) ? `${Number(v.latitude).toFixed(5)}, ${Number(v.longitude).toFixed(5)'}` : '-';
+      const coords = (v.latitude != null && v.longitude != null) ? `${Number(v.latitude).toFixed(5)}, ${Number(v.longitude).toFixed(5)}` : '-';
       return `
         <tr>
           <td class="muted">${esc(v.page_visited||"/")}</td>
