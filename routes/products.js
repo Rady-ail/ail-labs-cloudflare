@@ -21,6 +21,9 @@ function invalidateProductsCache() {
 // Guest & pelanggan pending/rejected/blocked tetap bisa lihat nama & kandungan produk,
 // tapi field harga dikembalikan null supaya frontend bisa tampilkan "Login untuk lihat harga".
 router.get('/', async (req, res) => {
+  // Response varies by customer approval; never let a browser/shared cache reuse approved prices.
+  res.set('Cache-Control', 'private, no-store');
+  res.vary('Cookie');
   try {
     const priceVisible = !!(req.customer && req.customer.status === 'approved');
     const cacheKey = priceVisible ? 'approved' : 'guest';
@@ -58,6 +61,7 @@ router.get('/', async (req, res) => {
 
 // GET /api/products/admin - daftar lengkap untuk admin (termasuk nonaktif)
 router.get('/admin', requireAdmin, async (req, res) => {
+  res.set('Cache-Control', 'private, no-store');
   try {
     const { rows } = await pool.query(`
       SELECT p.*, c.name AS category_name
