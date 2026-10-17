@@ -17,11 +17,15 @@ CREATE TABLE IF NOT EXISTS products (
   kandungan     TEXT NOT NULL DEFAULT '',
   kemasan       TEXT NOT NULL DEFAULT '',
   harga         INTEGER NOT NULL DEFAULT 0,
+  foto_url      TEXT,
   aktif         BOOLEAN NOT NULL DEFAULT true,
   sort_order    INTEGER NOT NULL DEFAULT 0,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- Foto produk bersifat opsional; aman dijalankan ulang pada database lama.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS foto_url TEXT;
 
 CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_name ON products USING gin (to_tsvector('simple', name || ' ' || kandungan));
