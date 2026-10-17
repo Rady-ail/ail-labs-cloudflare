@@ -1109,6 +1109,17 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
 
 <script>
 const fmt = n => "Rp " + Number(n||0).toLocaleString('id-ID');
+// Escape helpers used by every admin table/modal renderer.
+// Without these, renderCategoryTable() and renderProductTable() throw
+// ReferenceError after the API returns data, leaving database tables blank.
+function esc(value){
+  return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+}
+function escAttr(value){
+  return esc(value).replace(/\u0060/g, '&#96;');
+}
 let CATEGORIES = [];
 let PRODUCTS = [];
 let ORDERS = [];
