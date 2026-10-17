@@ -67,6 +67,9 @@ app.use(cors({
 }));
 if (!isCloudflareWorker) app.use(compression());
 app.use(express.json({
+  // Product photos are resized to 900px in the admin browser before upload.
+  // Keep a bounded limit so compressed photos are accepted without unbounded JSON bodies.
+  limit: '2mb',
   verify: (req, res, buf) => { req.rawBody = Buffer.from(buf); }
 }));
 const passport = require('passport');
