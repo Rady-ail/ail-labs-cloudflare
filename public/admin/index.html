@@ -1109,6 +1109,17 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
 
 <script>
 const fmt = n => "Rp " + Number(n||0).toLocaleString('id-ID');
+// Escape helpers used by every admin table/modal renderer.
+// Without these, renderCategoryTable() and renderProductTable() throw
+// ReferenceError after the API returns data, leaving database tables blank.
+function esc(value){
+  return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[ch]));
+}
+function escAttr(value){
+  return esc(value).replace(/\u0060/g, '&#96;');
+}
 let CATEGORIES = [];
 let PRODUCTS = [];
 let ORDERS = [];
@@ -1578,9 +1589,29 @@ function clearProcurementAI(){
 }
 
 /* ---------------- INIT ---------------- */
+function showAdminLoadError(tbodyId, colspan, label, err){
+  const tbody=document.getElementById(tbodyId);
+  if(!tbody) return;
+  const message=esc((err && err.message) || 'Kesalahan tidak diketahui');
+  tbody.innerHTML='<tr><td colspan="'+colspan+'" class="empty" style="white-space:normal;text-align:left;padding:18px;">Gagal memuat '+label+': <strong>'+message+'</strong><br><button class="btn btn-secondary btn-small" style="margin-top:10px" onclick="initApp()">Coba muat ulang</button></td></tr>';
+}
 async function initApp(){
-  await Promise.all([loadCategories(), loadProducts(), loadPlatformHealth()]);
+  const productBody=document.getElementById('productTableBody');
+  const categoryBody=document.getElementById('categoryTableBody');
+  if(productBody) productBody.innerHTML='<tr><td colspan="8" class="empty">Memuat produk dari database...</td></tr>';
+  if(categoryBody) categoryBody.innerHTML='<tr><td colspan="4" class="empty">Memuat kategori dari database...</td></tr>';
+  const results=await Promise.allSettled([loadCategories(),loadProducts(),loadPlatformHealth()]);
+  const errors=[];
+  if(results[0].status==='rejected'){
+    showAdminLoadError('categoryTableBody',4,'kategori',results[0].reason);
+    errors.push('kategori: '+((results[0].reason&&results[0].reason.message)||'gagal'));
+  }
+  if(results[1].status==='rejected'){
+    showAdminLoadError('productTableBody',8,'produk',results[1].reason);
+    errors.push('produk: '+((results[1].reason&&results[1].reason.message)||'gagal'));
+  }
   renderStats();
+  if(errors.length) showToast('Database admin tidak termuat — '+errors.join(' | '));
 }
 
 async function loadPlatformHealth(){
