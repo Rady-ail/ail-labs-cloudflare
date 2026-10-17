@@ -18,7 +18,9 @@ function validateProductPhoto(value) {
   if (value.length > MAX_PRODUCT_PHOTO_CHARS) throw new Error('Ukuran foto terlalu besar. Pilih gambar yang lebih kecil.');
   if (/^data:image\/(?:jpeg|png|webp|gif);base64,[A-Za-z0-9+/]+=*$/.test(value)) return value;
   if (/^https:\/\//i.test(value)) return value;
-  throw new Error('Format foto harus berupa gambar JPEG, PNG, WebP, GIF, atau URL HTTPS.');
+  // Preserve the existing catalog's same-origin image paths when editing legacy products.
+  if (/^\/images(?:\/products)?\/(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9._/-]+$/.test(value)) return value;
+  throw new Error('Format foto harus berupa gambar JPEG, PNG, WebP, GIF, path gambar katalog, atau URL HTTPS.');
 }
 function invalidateProductsCache() {
   productsCache = { guest: null, approved: null };
