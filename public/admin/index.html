@@ -756,7 +756,7 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
   <h2>Login Admin</h2>
   <p class="sub">AIL LABS — Panel Admin Katalog</p>
   <label>Username</label>
-  <input type="text" id="loginUser" placeholder="admin">
+  <input type="text" id="loginUser" placeholder="rady@" autocomplete="username">
   <label>Password</label>
   <input type="password" id="loginPass" placeholder="••••••••">
   <p id="loginError"></p>
@@ -1254,16 +1254,29 @@ async function api(path, opts={}){
 }
 
 /* ---------------- AUTH ---------------- */
-async function checkSession(){
-  const me = await api('/auth/me');
-  if(me.loggedIn){
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('appScreen').style.display='block';
-    document.getElementById('whoLabel').textContent = 'Login sebagai ' + me.username;
-    await initApp();
-  } else {
-    document.getElementById('loginScreen').style.display='block';
-    document.getElementById('appScreen').style.display='none';
+async function checkSession(showError = false){
+  const loginScreen = document.getElementById('loginScreen');
+  const appScreen = document.getElementById('appScreen');
+  const errEl = document.getElementById('loginError');
+  try {
+    const me = await api('/auth/me');
+    if(me.loggedIn){
+      loginScreen.style.display='none';
+      appScreen.style.display='block';
+      document.getElementById('whoLabel').textContent = 'Login sebagai ' + me.username;
+      errEl.textContent = '';
+      await initApp();
+      return true;
+    }
+    loginScreen.style.display='block';
+    appScreen.style.display='none';
+    if(showError) errEl.textContent = 'Login diterima, tetapi sesi admin belum aktif. Periksa konfigurasi sesi server lalu coba lagi.';
+    return false;
+  } catch(err) {
+    loginScreen.style.display='block';
+    appScreen.style.display='none';
+    if(showError) errEl.textContent = 'Sesi admin gagal diperiksa. Periksa koneksi dan coba lagi.';
+    return false;
   }
 }
 
@@ -1274,7 +1287,7 @@ async function doLogin(){
   errEl.textContent = '';
   try{
     await api('/auth/login', {method:'POST', body: JSON.stringify({username, password})});
-    checkSession();
+    await checkSession(true);
   } catch(err){
     errEl.textContent = err.message;
   }
