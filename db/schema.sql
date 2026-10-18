@@ -316,3 +316,29 @@ END $ail$;
 --
 -- UNIQUE index sengaja BELUM dibuat otomatis di tahap ini karena schema repo tidak
 -- boleh mengasumsikan kondisi data legacy produksi yang belum diaudit.
+
+
+-- =========================================================
+-- B2B QUOTATION REQUESTS — additive, idempotent
+-- =========================================================
+CREATE TABLE IF NOT EXISTS rfq_requests (
+  id BIGSERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  name TEXT NOT NULL,
+  company TEXT NOT NULL,
+  position TEXT NOT NULL DEFAULT '',
+  whatsapp TEXT NOT NULL,
+  email TEXT NOT NULL,
+  nib TEXT NOT NULL DEFAULT '',
+  customer_category TEXT NOT NULL DEFAULT '',
+  product TEXT NOT NULL DEFAULT '',
+  qty TEXT NOT NULL DEFAULT '',
+  notes TEXT NOT NULL DEFAULT '',
+  status TEXT NOT NULL DEFAULT 'New'
+    CHECK (status IN ('New','Contacted','Qualified','Proposal','Won','Lost')),
+  notification_status TEXT NOT NULL DEFAULT 'not_configured'
+    CHECK (notification_status IN ('pending','sent','failed','not_configured'))
+);
+CREATE INDEX IF NOT EXISTS idx_rfq_requests_created_at ON rfq_requests(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_rfq_requests_status ON rfq_requests(status);

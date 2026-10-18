@@ -10,6 +10,8 @@
   "compatibility_flags": ["nodejs_compat"],
   "vars": {
     "ALLOWED_ORIGIN": "https://ail-aesthetic-labs.my.id",
+    "ADMIN_EMAIL": "rady@ail-aesthetic-labs.my.id",
+    "MAIL_FROM": "AIL LABS <info@ail-aesthetic-labs.my.id>",
     "GOOGLE_CALLBACK_URL": "https://ail-aesthetic-labs.my.id/api/customer/auth/google/callback",
     "PAYPAL_MODE": "live"
   },

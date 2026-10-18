@@ -126,6 +126,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           ADMIN_SESSION_SECRET: ${{ secrets.ADMIN_SESSION_SECRET || secrets.SESSION_SECRET }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
@@ -135,6 +136,8 @@ jobs:
               DATABASE_URL: process.env.DATABASE_URL,
               ADMIN_SESSION_SECRET: process.env.ADMIN_SESSION_SECRET,
             };
+            const resendKey = process.env.RESEND_API_KEY;
+            if (resendKey) secrets.RESEND_API_KEY = resendKey;
             const googleId = process.env.GOOGLE_CLIENT_ID;
             const googleSecret = process.env.GOOGLE_CLIENT_SECRET;
             if (!secrets.DATABASE_URL || !secrets.ADMIN_SESSION_SECRET) {

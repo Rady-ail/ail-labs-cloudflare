@@ -801,6 +801,7 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
       <button data-tab="produk" class="active" onclick="switchTab('produk')">Produk</button>
       <button data-tab="kategori" onclick="switchTab('kategori')">Kategori</button>
       <button data-tab="pesanan" onclick="switchTab('pesanan')">Pesanan Masuk</button>
+      <button data-tab="quotation" onclick="switchTab('quotation')">Quotation B2B</button>
       <button data-tab="pelanggan" onclick="switchTab('pelanggan')">Pelanggan</button>
       <button data-tab="analytics" onclick="switchTab('analytics')">Analytics</button>
       <button data-tab="procurement-ai" onclick="switchTab('procurement-ai')">Procurement AI</button>
@@ -849,6 +850,21 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
         <table>
           <thead><tr><th>Tanggal</th><th>Nama/Klinik</th><th>Item</th><th>Total</th><th>Status</th></tr></thead>
           <tbody id="orderTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- REQUEST QUOTATION B2B -->
+    <section class="panel" id="panel-quotation">
+      <div class="section-heading"><div><h2>Request quotation B2B</h2><p>Permintaan dari formulir publik tersimpan di database; status dan notifikasi dapat dipantau di sini.</p></div></div>
+      <div class="toolbar">
+        <button class="btn btn-secondary" onclick="loadQuotationRequests()">🔄 Muat Ulang</button>
+        <span class="muted" id="rfqCount">0 request</span>
+      </div>
+      <div class="table-wrap glass">
+        <table>
+          <thead><tr><th>Tanggal</th><th>Kontak</th><th>Kebutuhan</th><th>Catatan</th><th>Status</th><th>Email</th></tr></thead>
+          <tbody id="rfqTableBody"><tr><td colspan="6" class="empty">Pilih tab ini untuk memuat request.</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -1235,6 +1251,7 @@ function escAttr(value){
 let CATEGORIES = [];
 let PRODUCTS = [];
 let ORDERS = [];
+let RFQ_REQUESTS = [];
 
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1305,6 +1322,7 @@ function switchTab(tab){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel-'+tab).classList.add('active');
   if(tab==='pesanan') loadOrders();
+  if(tab==='quotation') loadQuotationRequests();
   if(tab==='pelanggan') loadCustomers();
   if(tab==='analytics') loadAnalytics();
   if(tab==='procurement-ai') resetProcurementResult();
@@ -2087,6 +2105,58 @@ async function loadOrders(){
 async function updateOrderStatus(id, status){
   try{ await api('/orders/'+id+'/status', {method:'PUT', body:JSON.stringify({status})}); showToast('Status diperbarui'); }
   catch(err){ showToast(err.message); }
+}
+
+/* ---------------- REQUEST QUOTATION B2B ---------------- */
+const RFQ_STATUS_VALUES = ['New', 'Contacted', 'Qualified', 'Proposal', 'Won', 'Lost'];
+const RFQ_STATUS_LABELS = {
+  New:'Baru', Contacted:'Dihubungi', Qualified:'Terverifikasi',
+  Proposal:'Penawaran', Won:'Berhasil', Lost:'Tidak lanjut'
+};
+const RFQ_NOTIFICATION_LABELS = {
+  sent:'Terkirim', failed:'Gagal', pending:'Menunggu', not_configured:'Belum aktif'
+};
+async function loadQuotationRequests(){
+  const tbody = document.getElementById('rfqTableBody');
+  const count = document.getElementById('rfqCount');
+  if(tbody) tbody.innerHTML='<tr><td colspan="6" class="empty">Memuat request quotation...</td></tr>';
+  try{
+    const data = await api('/quotation/admin');
+    RFQ_REQUESTS = Array.isArray(data.requests) ? data.requests : [];
+    if(count) count.textContent = RFQ_REQUESTS.length + ' request';
+    if(!tbody) return;
+    if(RFQ_REQUESTS.length===0){
+      tbody.innerHTML='<tr><td colspan="6" class="empty">Belum ada request quotation.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = RFQ_REQUESTS.map(r=>{
+      const date = r.created_at ? new Date(r.created_at).toLocaleString('id-ID') : '-';
+      const contact = '<b>'+esc(r.name)+'</b><div class="muted">'+esc(r.company)+'</div>' +
+        (r.position ? '<div class="muted">'+esc(r.position)+'</div>' : '') +
+        '<div><a href="mailto:'+escAttr(r.email)+'">'+esc(r.email)+'</a></div>' +
+        '<div class="muted">'+esc(r.whatsapp)+'</div>' +
+        (r.nib ? '<div class="muted">NIB: '+esc(r.nib)+'</div>' : '');
+      const needs = (r.product ? '<b>'+esc(r.product)+'</b>' : '<span class="muted">Belum ditentukan</span>') +
+        (r.qty ? '<div class="muted">Jumlah: '+esc(r.qty)+'</div>' : '') +
+        (r.customer_category ? '<div class="muted">'+esc(r.customer_category)+'</div>' : '');
+      const notes = r.notes ? esc(r.notes) : '<span class="muted">—</span>';
+      const status = RFQ_STATUS_VALUES.map(s=>'<option value="'+s+'" '+(r.status===s?'selected':'')+'>'+RFQ_STATUS_LABELS[s]+'</option>').join('');
+      const notification = RFQ_NOTIFICATION_LABELS[r.notification_status] || 'Tidak diketahui';
+      const notificationClass = r.notification_status==='sent' ? 'on' : r.notification_status==='failed' ? 'off' : 'warn';
+      return '<tr><td class="muted">'+esc(date)+'</td><td>'+contact+'</td><td>'+needs+'</td><td style="white-space:normal;min-width:180px;max-width:320px">'+notes+'</td><td><select onchange="updateQuotationStatus('+Number(r.id)+',this.value)">'+status+'</select></td><td><span class="pill '+notificationClass+'">'+esc(notification)+'</span></td></tr>';
+    }).join('');
+  } catch(err){
+    if(count) count.textContent='Gagal memuat';
+    if(tbody) tbody.innerHTML='<tr><td colspan="6" class="empty" style="white-space:normal;text-align:left;padding:18px;">Gagal memuat request quotation: <strong>'+esc(err.message)+'</strong><br><button class="btn btn-secondary btn-small" style="margin-top:10px" onclick="loadQuotationRequests()">Coba muat ulang</button></td></tr>';
+  }
+}
+async function updateQuotationStatus(id, status){
+  if(!RFQ_STATUS_VALUES.includes(status)) return;
+  try{
+    await api('/quotation/admin/'+Number(id)+'/status',{method:'PATCH',body:JSON.stringify({status})});
+    showToast('Status quotation diperbarui');
+    await loadQuotationRequests();
+  }catch(err){ showToast(err.message); }
 }
 
 /* ---------------- PELANGGAN ---------------- */
