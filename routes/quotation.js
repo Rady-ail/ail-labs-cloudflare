@@ -37,6 +37,8 @@ function sameOrigin(req) {
 }
 async function ensureTable() {
   if (tableReady) return;
+  // Neon serverless prepared statements reject multiple SQL commands in one query.
+  // Keep each idempotent DDL statement separate so first-time setup succeeds.
   await pool.query(`
     CREATE TABLE IF NOT EXISTS rfq_requests (
       id BIGSERIAL PRIMARY KEY,
@@ -56,10 +58,10 @@ async function ensureTable() {
         CHECK (status IN ('New','Contacted','Qualified','Proposal','Won','Lost')),
       notification_status TEXT NOT NULL DEFAULT 'not_configured'
         CHECK (notification_status IN ('pending','sent','failed','not_configured'))
-    );
-    CREATE INDEX IF NOT EXISTS idx_rfq_requests_created_at ON rfq_requests(created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_rfq_requests_status ON rfq_requests(status);
+    )
   `);
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_rfq_requests_created_at ON rfq_requests(created_at DESC)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_rfq_requests_status ON rfq_requests(status)');
   tableReady = true;
 }
 
