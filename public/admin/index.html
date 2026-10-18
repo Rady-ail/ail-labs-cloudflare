@@ -2142,7 +2142,8 @@ async function loadQuotationRequests(){
       const notes = r.notes ? esc(r.notes) : '<span class="muted">—</span>';
       const status = RFQ_STATUS_VALUES.map(s=>'<option value="'+s+'" '+(r.status===s?'selected':'')+'>'+RFQ_STATUS_LABELS[s]+'</option>').join('');
       const notification = RFQ_NOTIFICATION_LABELS[r.notification_status] || 'Tidak diketahui';
-      return '<tr><td class="muted">'+esc(date)+'</td><td>'+contact+'</td><td>'+needs+'</td><td style="white-space:normal;min-width:180px;max-width:320px">'+notes+'</td><td><select onchange="updateQuotationStatus('+Number(r.id)+',this.value)">'+status+'</select></td><td><span class="status-pill">'+esc(notification)+'</span></td></tr>';
+      const notificationClass = r.notification_status==='sent' ? 'on' : r.notification_status==='failed' ? 'off' : 'warn';
+      return '<tr><td class="muted">'+esc(date)+'</td><td>'+contact+'</td><td>'+needs+'</td><td style="white-space:normal;min-width:180px;max-width:320px">'+notes+'</td><td><select onchange="updateQuotationStatus('+Number(r.id)+',this.value)">'+status+'</select></td><td><span class="pill '+notificationClass+'">'+esc(notification)+'</span></td></tr>';
     }).join('');
   } catch(err){
     if(count) count.textContent='Gagal memuat';
