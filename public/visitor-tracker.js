@@ -70,22 +70,14 @@ class VisitorTracker {
   // ============ SESSION MANAGEMENT ============
   getOrCreateSession() {
     let sessionId = localStorage.getItem('ail_session_id');
-    let isNew = false;
     if (!sessionId) {
       sessionId = 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2, 11);
       localStorage.setItem('ail_session_id', sessionId);
-      isNew = true;
     }
-    if (isNew) this.trackNewVisitor(sessionId);
+    // trackPageView() is called by init() immediately after construction and
+    // creates/updates the visitor row. Do not POST here too: two concurrent
+    // first-visit INSERTs race on the unique session_id constraint.
     return sessionId;
-  }
-
-  trackNewVisitor(sessionId) {
-    this.send('/api/visitors/track', {
-      session_id: sessionId,
-      page_visited: window.location.pathname,
-      referrer: document.referrer || 'direct'
-    });
   }
 
   // ============ PAGE TRACKING ============
