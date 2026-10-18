@@ -47,6 +47,27 @@
     };
     $('ailBack').onclick=()=>{err('ailError2','');show(0)};
   }
-  async function check(){try{const t=token();if(t){const r=await fetch('/api/leads/status',{headers:{'X-Lead-Token':t},cache:'no-store'});const d=await r.json().catch(()=>({}));if(d.verified)return;localStorage.removeItem(KEY)}}catch(e){}build()}
+  async function check(){
+    // Never lock out public visitors when OTP delivery is not configured or the
+    // readiness endpoint is temporarily unavailable. Enable the gate only when
+    // both email and WhatsApp verification channels are ready on the server.
+    try {
+      const readiness = await fetch('/api/leads/verification-status', {cache:'no-store'});
+      const config = await readiness.json().catch(()=>({}));
+      if (!readiness.ok || config.enabled !== true) return;
+    } catch(e) {
+      return;
+    }
+    try {
+      const t=token();
+      if(t){
+        const r=await fetch('/api/leads/status',{headers:{'X-Lead-Token':t},cache:'no-store'});
+        const d=await r.json().catch(()=>({}));
+        if(d.verified)return;
+        localStorage.removeItem(KEY);
+      }
+    } catch(e) {}
+    build();
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',check,{once:true});else check();
 })();
