@@ -10,7 +10,7 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
-async function sendMail({ from, to, subject, text, html, attachments }) {
+async function sendMail({ from, to, subject, text, html, attachments, replyTo }) {
   if (!RESEND_API_KEY) {
     throw new Error('RESEND_API_KEY belum diset di environment variables.');
   }
@@ -22,6 +22,7 @@ async function sendMail({ from, to, subject, text, html, attachments }) {
     text,
   };
   if (html) payload.html = html;
+  if (replyTo) payload.reply_to = replyTo;
 
   if (attachments && attachments.length) {
     payload.attachments = attachments.map(att => ({
