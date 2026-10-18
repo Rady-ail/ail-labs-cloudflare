@@ -66,6 +66,14 @@ async function ensureTables() {
   tablesReady = true;
 }
 
+router.get('/verification-status', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const emailReady = !!(process.env.RESEND_API_KEY && (process.env.MAIL_FROM || process.env.RESEND_FROM));
+  const whatsappReady = !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_OTP_TEMPLATE_NAME);
+  // Expose only whether verification can run, never which credentials are missing.
+  res.json({ enabled: emailReady && whatsappReady });
+});
+
 router.get('/status', async (req, res) => {
   try {
     await ensureTables();
