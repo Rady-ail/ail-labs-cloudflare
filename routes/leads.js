@@ -36,46 +36,33 @@ function requestIp(req) {
 }
 async function ensureTables() {
   if (tablesReady) return;
-  await pool.query(`
-    CREATE TABLE IF NOT EXISTS lead_captures (
-      id SERIAL PRIMARY KEY, session_id TEXT, name TEXT NOT NULL, company TEXT NOT NULL,
-      phone TEXT NOT NULL, email TEXT NOT NULL, email_verified_at TIMESTAMPTZ NOT NULL,
-      phone_verified_at TIMESTAMPTZ,
-      consent_at TIMESTAMPTZ NOT NULL, marketing_consent BOOLEAN NOT NULL DEFAULT false,
-      lead_token_hash TEXT UNIQUE NOT NULL, ip_address TEXT, country TEXT, region TEXT, city TEXT,
-      user_agent TEXT, first_page TEXT, referrer TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(), business_type TEXT, interest_category TEXT, lead_source TEXT, landing_page TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, lead_score INTEGER NOT NULL DEFAULT 20, status TEXT NOT NULL DEFAULT 'New', notes TEXT, last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now()
-    );
-    CREATE INDEX IF NOT EXISTS idx_lead_captures_email ON lead_captures(email);
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS phone_verified_at TIMESTAMPTZ;
-    CREATE INDEX IF NOT EXISTS idx_lead_captures_created_at ON lead_captures(created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_lead_captures_country ON lead_captures(country);
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS business_type TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS interest_category TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_source TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS landing_page TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_source TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_medium TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_campaign TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_score INTEGER NOT NULL DEFAULT 20;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'New';
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS notes TEXT;
-    ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now();
-    CREATE INDEX IF NOT EXISTS idx_lead_captures_score ON lead_captures(lead_score DESC);
-    CREATE INDEX IF NOT EXISTS idx_lead_captures_status ON lead_captures(status);
-    CREATE TABLE IF NOT EXISTS lead_email_otps (
-      id SERIAL PRIMARY KEY, email TEXT NOT NULL, otp_hash TEXT NOT NULL,
-      expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
-      request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ
-    );
-    CREATE INDEX IF NOT EXISTS idx_lead_otps_email_created ON lead_email_otps(email, created_at DESC);
-    CREATE TABLE IF NOT EXISTS lead_whatsapp_otps (
-      id SERIAL PRIMARY KEY, phone TEXT NOT NULL, otp_hash TEXT NOT NULL,
-      expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,
-      request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ
-    );
-    CREATE INDEX IF NOT EXISTS idx_lead_wa_otps_phone_created ON lead_whatsapp_otps(phone, created_at DESC);
-  `);
+  // Neon serverless prepared statements accept one SQL command per query only.
+  // Run idempotent DDL sequentially so first-time visitor verification can initialize.
+  const statements = [
+    "CREATE TABLE IF NOT EXISTS lead_captures (\n      id SERIAL PRIMARY KEY, session_id TEXT, name TEXT NOT NULL, company TEXT NOT NULL,\n      phone TEXT NOT NULL, email TEXT NOT NULL, email_verified_at TIMESTAMPTZ NOT NULL,\n      phone_verified_at TIMESTAMPTZ,\n      consent_at TIMESTAMPTZ NOT NULL, marketing_consent BOOLEAN NOT NULL DEFAULT false,\n      lead_token_hash TEXT UNIQUE NOT NULL, ip_address TEXT, country TEXT, region TEXT, city TEXT,\n      user_agent TEXT, first_page TEXT, referrer TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(),\n      last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(), business_type TEXT, interest_category TEXT, lead_source TEXT, landing_page TEXT, utm_source TEXT, utm_medium TEXT, utm_campaign TEXT, lead_score INTEGER NOT NULL DEFAULT 20, status TEXT NOT NULL DEFAULT 'New', notes TEXT, last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now()\n    );",
+    "CREATE INDEX IF NOT EXISTS idx_lead_captures_email ON lead_captures(email);",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS phone_verified_at TIMESTAMPTZ;",
+    "CREATE INDEX IF NOT EXISTS idx_lead_captures_created_at ON lead_captures(created_at DESC);",
+    "CREATE INDEX IF NOT EXISTS idx_lead_captures_country ON lead_captures(country);",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS business_type TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS interest_category TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_source TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS landing_page TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_source TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_medium TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS utm_campaign TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS lead_score INTEGER NOT NULL DEFAULT 20;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'New';",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS notes TEXT;",
+    "ALTER TABLE lead_captures ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ NOT NULL DEFAULT now();",
+    "CREATE INDEX IF NOT EXISTS idx_lead_captures_score ON lead_captures(lead_score DESC);",
+    "CREATE INDEX IF NOT EXISTS idx_lead_captures_status ON lead_captures(status);",
+    "CREATE TABLE IF NOT EXISTS lead_email_otps (\n      id SERIAL PRIMARY KEY, email TEXT NOT NULL, otp_hash TEXT NOT NULL,\n      expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,\n      request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ\n    );",
+    "CREATE INDEX IF NOT EXISTS idx_lead_otps_email_created ON lead_email_otps(email, created_at DESC);",
+    "CREATE TABLE IF NOT EXISTS lead_whatsapp_otps (\n      id SERIAL PRIMARY KEY, phone TEXT NOT NULL, otp_hash TEXT NOT NULL,\n      expires_at TIMESTAMPTZ NOT NULL, attempts INTEGER NOT NULL DEFAULT 0,\n      request_ip TEXT, created_at TIMESTAMPTZ NOT NULL DEFAULT now(), consumed_at TIMESTAMPTZ\n    );",
+    "CREATE INDEX IF NOT EXISTS idx_lead_wa_otps_phone_created ON lead_whatsapp_otps(phone, created_at DESC);"
+  ];
+  for (const statement of statements) await pool.query(statement);
   tablesReady = true;
 }
 
