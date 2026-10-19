@@ -1,0 +1,32 @@
+name: Product photo regression tests (lockfile-safe)
+
+on:
+  push:
+    branches:
+      - fix/product-image-upload-flow
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'routes/productPhoto.js'
+      - 'routes/products.js'
+      - 'public/admin/**'
+      - 'public/catalog.html'
+      - 'db/migrations/**'
+      - 'test/product-photo.test.js'
+      - '.github/workflows/product-photo-regression.yml'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci || npm install
+      - run: node --check public/admin/product-photo.js
+      - run: npm run build
+      - run: node --test test/product-photo.test.js
