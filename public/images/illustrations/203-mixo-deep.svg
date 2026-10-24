@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 800" width="1000" height="800" font-family="Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif" role="img" aria-label="Ilustrasi kemasan Mixo Deep">
+<title>Ilustrasi — Mixo Deep</title>
+<defs>
+<radialGradient id="bg" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="#ffffff"/><stop offset=".55" stop-color="#eef6f5"/><stop offset="1" stop-color="#dcecea"/></radialGradient>
+<linearGradient id="glass" x1="0" x2="1"><stop offset="0" stop-color="#e3eeed"/><stop offset=".35" stop-color="#ffffff"/><stop offset="1" stop-color="#d5e3e1"/></linearGradient>
+<linearGradient id="boxg" x1="0" x2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#eef3f2"/></linearGradient>
+<linearGradient id="pouch" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset="1" stop-color="#e6efee" stop-opacity=".95"/></linearGradient>
+<linearGradient id="steel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4f7f7"/><stop offset=".5" stop-color="#b7c2c1"/><stop offset="1" stop-color="#8d9a99"/></linearGradient>
+<linearGradient id="amber" x1="0" x2="1"><stop offset="0" stop-color="#7a3f12"/><stop offset=".4" stop-color="#b8692a"/><stop offset="1" stop-color="#6a3510"/></linearGradient>
+<filter id="blur" x="-20%" y="-50%" width="140%" height="200%"><feGaussianBlur stdDeviation="10"/></filter>
+</defs>
+<rect width="1000" height="800" fill="url(#bg)"/>
+<circle cx="500" cy="420" r="300" fill="#ebe6f4" opacity=".55"/>
+<ellipse cx="500" cy="590" rx="320.0" ry="44.800000000000004" fill="#082523" opacity="0.16" filter="url(#blur)"/><path d="M300,270 l30,-30 h360 v280 l-30,30 z" fill="#7a68a6" opacity=".9"/><path d="M300,270 l30,-30 h360 l-30,30 z" fill="#fff" opacity=".55"/><path d="M660,270 l30,-30 v280 l-30,30 z" fill="#082523" opacity=".18"/><rect x="300" y="270" width="360" height="280" fill="url(#boxg)"/><rect x="300" y="270" width="360" height="280" fill="#ebe6f4" opacity=".55"/><rect x="300" y="532" width="360" height="18" fill="#7a68a6" opacity=".85"/><rect x="332.4" y="337.2" width="295.2" height="117.6" rx="10" fill="#fff" fill-opacity=".92"/><rect x="332.4" y="337.2" width="6" height="117.6" rx="3" fill="#7a68a6"/><text x="483.0" y="375.2" text-anchor="middle" font-size="24" font-weight="800" fill="#082523" letter-spacing="-0.01em">Mixo Deep</text><text x="483.0" y="442.8" text-anchor="middle" font-size="14" font-weight="700" fill="#7a68a6" letter-spacing=".08em">1,0ML</text><g transform="rotate(-8 250 610)"><rect x="250" y="594" width="322.4" height="32" rx="8" fill="url(#glass)" stroke="#b9cfcd" stroke-width="1.5"/><rect x="343.6" y="599" width="218.4" height="22" rx="6" fill="#eef7f6" opacity=".95"/><rect x="135.6" y="604" width="124.8" height="12" rx="3" fill="#dfe6e5" stroke="#b9cfcd"/><rect x="114.79999999999998" y="588" width="12" height="44" rx="4" fill="#7a68a6"/><rect x="242" y="584" width="14" height="52" rx="4" fill="#dfe6e5" stroke="#b9cfcd"/><rect x="343.6" y="598" width="10" height="24" rx="2" fill="#082523" opacity=".85"/><path d="M572.4,601 h31.2 l15.6,5 v8 l-15.6,5 h-31.2 z" fill="#cfd8d7" stroke="#b9cfcd"/><rect x="619.2" y="608" width="150.79999999999998" height="4" rx="2" fill="url(#steel)"/><g stroke="#0b4b48" stroke-width="1.6" opacity=".55"><line x1="281.2" y1="626" x2="281.2" y2="614"/><line x1="307.2" y1="626" x2="307.2" y2="618"/><line x1="333.2" y1="626" x2="333.2" y2="614"/><line x1="359.20000000000005" y1="626" x2="359.20000000000005" y2="618"/><line x1="385.20000000000005" y1="626" x2="385.20000000000005" y2="614"/><line x1="411.2" y1="626" x2="411.2" y2="618"/><line x1="437.20000000000005" y1="626" x2="437.20000000000005" y2="614"/><line x1="463.20000000000005" y1="626" x2="463.20000000000005" y2="618"/><line x1="489.20000000000005" y1="626" x2="489.20000000000005" y2="614"/><line x1="515.2" y1="626" x2="515.2" y2="618"/></g></g>
+<rect x="0" y="664" width="1000" height="136" fill="#ffffff" opacity=".86"/>
+<rect x="0" y="664" width="1000" height="2" fill="#0b4b48" opacity=".12"/>
+<text x="48" y="722" text-anchor="start" font-size="30" font-weight="800" fill="#082523" letter-spacing="-0.01em">Mixo Deep</text>
+<text x="48" y="760" font-size="20" font-weight="600" fill="#5b6b69">1,0ml x1, jarum 27G x 2pcs</text>
+<rect x="28" y="28" width="132" height="38" rx="19" fill="#ffffff" opacity=".9" stroke="#0b4b48" stroke-opacity=".18"/>
+<text x="94" y="53" text-anchor="middle" font-size="15" font-weight="800" fill="#0b4b48" letter-spacing=".14em">ILUSTRASI</text>
+<rect x="844" y="28" width="128" height="38" rx="19" fill="#0b4b48"/>
+<text x="908.0" y="53" text-anchor="middle" font-size="15" font-weight="800" fill="#fff" letter-spacing=".1em">FILLER</text>
+<text x="972" y="770" text-anchor="end" font-size="13" font-weight="800" fill="#0b4b48" opacity=".55" letter-spacing=".22em">AIL LABS</text>
+</svg>
