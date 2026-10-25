@@ -15,7 +15,7 @@
   --dm-edge-light:rgba(255,255,255,.6);
   --dm-on-dark:#f3f1ec;
   --dm-on-dark-muted:#bdbab3;
-  --dm-on-dark-faint:#a9a69f;
+  --dm-on-dark-faint:#b3b0a9;
   --dm-cyan:#0aa7b5;
   --dm-cyan-bright:#5ed7df;
   --dm-cyan-deep:#087079;
@@ -264,7 +264,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus main :is(input,select,textarea):not([type=checkbox]):not([type=radio]){
   background:rgba(0,0,0,.24)!important;border:1px solid rgba(255,255,255,.18)!important;color:var(--dm-on-dark)!important;border-radius:14px!important;
 }
-#ail-domus main :is(input,textarea)::placeholder{color:#a9a69f!important;opacity:1}
+#ail-domus main :is(input,textarea)::placeholder{color:var(--dm-on-dark-faint)!important;opacity:1}
 #ail-domus main select option{color:var(--dm-ink);background:#fff}
 #ail-domus main :is(input,select,textarea):focus{border-color:var(--dm-cyan-bright)!important;background:rgba(0,0,0,.32)!important}
 
