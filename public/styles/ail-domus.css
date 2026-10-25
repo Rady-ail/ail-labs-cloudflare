@@ -30,7 +30,7 @@
   --dm-radius-md:18px;
   --dm-shadow:0 30px 70px rgba(30,32,33,.24),0 8px 20px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.10);
   --dm-blur:blur(28px) saturate(140%);
-  /* Stage 1 tokens: each value equals the raw value it replaces, so rendering is unchanged. */
+  /* Stage 1 tokens (stage 2 rounded .05/.07 fills, the 9px gauge tick and the 28px button glow onto them). */
   /* Text */
   --dm-on-dark-dim:#9b978f;
   --dm-on-chip:#d6d3cc;
@@ -60,6 +60,7 @@
   --dm-shadow-light:0 18px 40px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.6);
   --dm-shadow-btn:0 10px 24px rgba(29,28,26,.22);
   --dm-shadow-cyan:0 10px 26px var(--dm-cyan-glow);
+  --dm-shadow-orange:0 10px 26px var(--dm-orange-glow);
   --dm-shadow-modal:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
   --dm-blur-chip:blur(12px);
   --dm-blur-backdrop:blur(16px) saturate(120%);
@@ -121,8 +122,8 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .button-primary{background:var(--dm-ink)!important;color:var(--dm-on-dark)!important;box-shadow:var(--dm-shadow-btn)}
 #ail-domus .button-primary:hover{background:#2c2b29!important}
 #ail-domus .button-light{background:var(--dm-chip)!important;color:var(--dm-ink)!important;border-color:var(--dm-edge-light)!important;backdrop-filter:var(--dm-blur-chip);-webkit-backdrop-filter:var(--dm-blur-chip)}
-#ail-domus .button-orange{background:var(--dm-orange)!important;color:var(--dm-ink)!important;box-shadow:0 10px 28px var(--dm-orange-glow)}
-#ail-domus .button-cyan{background:var(--dm-cyan)!important;color:var(--dm-ink)!important;box-shadow:0 10px 28px var(--dm-cyan-glow)}
+#ail-domus .button-orange{background:var(--dm-orange)!important;color:var(--dm-ink)!important;box-shadow:var(--dm-shadow-orange)}
+#ail-domus .button-cyan{background:var(--dm-cyan)!important;color:var(--dm-ink)!important;box-shadow:var(--dm-shadow-cyan)}
 #ail-domus .hero-note{color:var(--dm-ink-soft)!important}
 #ail-domus .hero-note i{background:var(--dm-orange)!important;box-shadow:0 0 0 5px rgba(240,123,79,.22)!important}
 
@@ -199,7 +200,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .process{background:radial-gradient(700px 360px at 90% 0%,rgba(10,167,181,.14),transparent 70%),linear-gradient(170deg,#202325,#121415)!important;color:var(--dm-on-dark)!important}
 #ail-domus .process .eyebrow{background:var(--dm-fill-2);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
 #ail-domus .process .section-intro{color:var(--dm-on-dark-muted)!important}
-#ail-domus .step{background:rgba(255,255,255,.05)!important;background-color:rgba(255,255,255,.05)!important}
+#ail-domus .step{background:var(--dm-fill-1)!important;background-color:var(--dm-fill-1)!important}
 
 /* Compliance */
 #ail-domus .compliance-card .eyebrow{background:var(--dm-fill-2);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
@@ -393,7 +394,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-gauge__track--inner{stroke:var(--dm-fill-2);stroke-width:3.5}
 #ail-domus .dm-gauge__band{stroke:var(--dm-cyan);stroke-width:7;stroke-dasharray:1 1;filter:drop-shadow(0 0 6px rgba(10,167,181,.45))}
 #ail-domus .dm-gauge__cold{stroke:var(--dm-orange);stroke-width:3.5;stroke-dasharray:1 1}
-#ail-domus .dm-gauge__tick{fill:var(--dm-on-dark-faint);font-size:9px;font-weight:600}
+#ail-domus .dm-gauge__tick{fill:var(--dm-on-dark-faint);font-size:var(--ail-type-10);font-weight:600}
 #ail-domus .dm-gauge__unit{fill:var(--dm-on-dark-muted);font-size:var(--ail-type-10);font-weight:600;letter-spacing:.04em}
 #ail-domus .dm-gauge-legend{display:inline-flex;align-items:center;gap:6px;margin-top:6px;color:var(--dm-on-dark-muted);font-size:var(--ail-type-10);font-weight:600;letter-spacing:.04em}
 #ail-domus .dm-gauge-legend::before{content:"";width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-orange)}
@@ -497,7 +498,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-chain li+li::after{content:"";position:absolute;right:calc(100% + 2px);top:50%;width:12px;height:2px;background:linear-gradient(90deg,rgba(94,215,223,.2),var(--dm-cyan-bright))}
 
 /* Status pill: dot + word, never colour alone (cyan = in place, orange = in progress) */
-#ail-domus .dm-status{display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding:3px 9px;border-radius:var(--dm-radius-pill);background:rgba(255,255,255,.07);border:1px solid var(--dm-edge);color:var(--dm-on-dark)!important;font-size:var(--ail-type-10);font-weight:700;letter-spacing:.05em;white-space:nowrap;vertical-align:1px}
+#ail-domus .dm-status{display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding:3px 9px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark)!important;font-size:var(--ail-type-10);font-weight:700;letter-spacing:.05em;white-space:nowrap;vertical-align:1px}
 #ail-domus .dm-status::before{content:"";width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-cyan-bright)}
 #ail-domus .dm-status.is-progress::before{background:var(--dm-orange)}
 #ail-domus [data-status] .font-bold{display:flex;align-items:center;gap:8px}
@@ -532,7 +533,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 /* Working-hours status (home CTA, contact) */
 #ail-domus .dm-hours{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 0!important;color:var(--dm-on-dark-muted)!important;font-size:var(--ail-type-12)!important;font-weight:600}
 #ail-domus .dm-hours:empty{display:none}
-#ail-domus .dm-hours__status{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:var(--dm-radius-pill);background:rgba(255,255,255,.07);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:var(--ail-type-11);font-weight:700}
+#ail-domus .dm-hours__status{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:var(--ail-type-11);font-weight:700}
 #ail-domus .dm-hours__status i{width:7px;height:7px;border-radius:50%;background:var(--dm-orange)}
 #ail-domus .dm-hours__status.is-open i{background:var(--dm-cyan-bright);box-shadow:var(--dm-halo-cyan)}
 
