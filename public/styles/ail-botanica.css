@@ -1,7 +1,8 @@
 /* AIL LABS — "Botanica" skin: botanical green, ivory and champagne, layered over Domus.
    Loaded after ail-domus.css on every public page. Presentation only: no markup or logic changes.
-   Colour rules: fills use --dm-cyan (leaf) and --dm-orange (champagne) with ink labels;
-   on ivory, text accents use --dm-cyan-deep; on deep green, --dm-cyan-bright and --dm-orange-light. */
+   Colour rules: fills use --dm-cyan (teal-leaf) and --dm-orange (apricot) with ink labels;
+   on ivory, text accents use --dm-cyan-deep; on green stages, --dm-cyan-bright and --dm-orange-light.
+   Brand cyan and orange stay present as light: glows, dots, rules and the CGI lighting. */
 @import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&display=swap");
 
 :root{
@@ -141,6 +142,94 @@ html:has(#ail-domus){background:var(--bt-ivory-2)}
 #ail-domus #ail-promo-popup-root .ail-promo-top{background:linear-gradient(90deg,var(--bt-leaf),var(--bt-sage) 45%,var(--bt-champagne))!important}
 #ail-domus :is(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline-color:var(--bt-champagne)!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
 
+/* ───────── Brighter pass with brand cyan + orange bias ───────── */
+:root{
+  --bt-cyan:#0aa7b5;
+  --bt-cyan-bright:#6fe0e6;
+  --bt-orange:#f07b4f;
+  --bt-orange-light:#ffad88;
+  --bt-ivory:#fbf8f1;
+  --bt-ivory-2:#f1eadc;
+  --dm-ink:#123a33;
+  --dm-ink-soft:#355e56;
+  --dm-cyan:#3fb3a4;
+  --dm-cyan-bright:#8fe6e0;
+  --dm-cyan-deep:#0b7377;
+  --dm-cyan-glow:rgba(10,167,181,.32);
+  --dm-orange:#eda070;
+  --dm-orange-light:#ffc29e;
+  --dm-orange-glow:rgba(240,123,79,.3);
+  --dm-smoke:rgba(30,78,68,.84);
+  --dm-black:#16413a;
+  --dm-on-dark-muted:#d2e3dd;
+  --dm-on-dark-faint:#b7cdc6;
+  --dm-edge:rgba(255,236,214,.2);
+  --bt-stage:
+    radial-gradient(560px 360px at 92% 8%,rgba(240,123,79,.30),transparent 66%),
+    radial-gradient(620px 420px at 4% 100%,rgba(10,167,181,.34),transparent 70%),
+    radial-gradient(460px 300px at 60% 55%,rgba(212,183,124,.14),transparent 70%),
+    linear-gradient(155deg,#2f6d60 0%,#1f5247 55%,#173f37 100%);
+}
+#ail-domus{
+  background:
+    radial-gradient(1000px 640px at 88% -6%,rgba(10,167,181,.14),transparent 62%),
+    radial-gradient(900px 600px at -6% 90%,rgba(240,123,79,.12),transparent 64%),
+    radial-gradient(700px 500px at 40% 40%,rgba(95,168,131,.08),transparent 70%),
+    linear-gradient(172deg,var(--bt-ivory) 0%,var(--bt-ivory-2) 100%) fixed!important;
+}
+#ail-domus .site-header{background:rgba(251,248,241,.74)!important}
+#ail-domus.bt-scrolled .site-header{background:rgba(251,248,241,.92)!important}
+#ail-domus .mobile-menu{background:rgba(251,248,241,.97)!important}
+#ail-domus :is(.nav-cta,.nav .button-primary) span{color:var(--bt-orange-light)!important}
+.bt-progress{height:3px;background:linear-gradient(90deg,var(--bt-cyan),var(--bt-champagne) 55%,var(--bt-orange))}
+
+/* Status dots and rules: cyan for "live", orange for "action" */
+#ail-domus .eyebrow::before,#ail-domus main>.card:first-child>div:first-child::before{background:var(--bt-cyan)!important;box-shadow:0 0 10px rgba(10,167,181,.7)!important}
+#ail-domus .hero-note i{background:var(--bt-orange)!important;box-shadow:0 0 0 5px rgba(240,123,79,.2)!important}
+.bt-hint::before{background:var(--bt-cyan-bright);box-shadow:0 0 10px rgba(111,224,230,.9)}
+.bt-hint{background:rgba(18,58,51,.45);border-color:rgba(111,224,230,.25);color:#eaf7f5}
+
+/* Stages */
+#ail-domus .hero-panel[data-hero-3d]::after{background:radial-gradient(circle,rgba(10,167,181,.26),transparent 70%)!important}
+#ail-domus .hero-panel .panel-card{background:rgba(16,52,46,.72)!important;border-color:rgba(111,224,230,.2)!important}
+#ail-domus main>.card:first-child{border-color:rgba(111,224,230,.22)!important;box-shadow:0 40px 90px rgba(18,58,51,.22),0 0 0 1px rgba(240,123,79,.06) inset,inset 0 1px 0 rgba(255,255,255,.12)!important}
+#ail-domus main>.card:first-child>div:first-child{color:#eaf7f5!important;border-color:rgba(111,224,230,.28)!important}
+
+/* Cards and bands */
+#ail-domus #hero-following-stats .stat:first-child strong{color:var(--bt-cyan-bright)!important}
+#ail-domus #hero-following-stats .stat:last-child strong{color:var(--bt-orange-light)!important}
+#ail-domus .category{border-top:2px solid var(--bt-cyan)!important}
+#ail-domus .category:nth-child(2){border-top-color:var(--bt-champagne)!important}
+#ail-domus .category:nth-child(3){border-top-color:var(--bt-orange)!important}
+#ail-domus .feature{border-top-color:var(--bt-cyan)!important}
+#ail-domus .feature:nth-child(2){border-top-color:var(--bt-orange)!important}
+#ail-domus :is(.category .number,.step-num){color:var(--bt-orange-light)!important}
+#ail-domus .process{background:radial-gradient(760px 380px at 92% 0%,rgba(240,123,79,.22),transparent 70%),radial-gradient(640px 360px at 0% 100%,rgba(10,167,181,.26),transparent 70%),linear-gradient(168deg,#2b6658,#183f37)!important}
+#ail-domus .cta{background:
+  radial-gradient(520px 260px at 92% 20%,rgba(240,123,79,.3),transparent 70%),
+  radial-gradient(520px 260px at 8% 100%,rgba(10,167,181,.32),transparent 70%),
+  linear-gradient(150deg,rgba(45,104,92,.95),rgba(24,63,55,.97))!important}
+#ail-domus main section .bg-ail-ink{background:radial-gradient(640px 300px at 100% 0%,rgba(240,123,79,.2),transparent 70%),radial-gradient(520px 300px at 0% 100%,rgba(10,167,181,.2),transparent 70%),linear-gradient(160deg,#2c675a,#183f37)!important}
+#ail-domus main section .bg-\[\#FBF7EF\]{background:radial-gradient(600px 280px at 100% 0%,rgba(240,123,79,.22),transparent 70%),var(--dm-smoke)!important;border-top-color:var(--bt-orange)!important}
+#ail-domus .about-aside div[style]{color:var(--bt-cyan-bright)!important}
+@media(hover:hover) and (pointer:fine){
+  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:rgba(10,167,181,.55)!important;box-shadow:0 34px 80px rgba(18,58,51,.24),0 0 0 1px rgba(10,167,181,.16) inset,0 18px 50px rgba(240,123,79,.1)!important}
+  #ail-domus main section .card .card:hover{border-color:rgba(111,224,230,.5)!important}
+}
+#ail-domus .button-orange{background:linear-gradient(135deg,#f6a57c,#ef8a5c)!important;color:#1a1310!important;box-shadow:0 12px 30px rgba(240,123,79,.32)!important}
+#ail-domus main .bg-ail-teal{background:linear-gradient(135deg,#4fc4c4,#3fb3a4)!important;border-color:transparent!important;color:#0d2a26!important;box-shadow:0 10px 26px rgba(10,167,181,.3)!important}
+#ail-domus .contact-line a:hover{color:var(--bt-cyan)!important}
+
+/* Footer and overlays */
+#ail-domus .site-footer,#ail-domus>footer.border-t{background:radial-gradient(700px 300px at 100% 0%,rgba(240,123,79,.16),transparent 70%),radial-gradient(700px 300px at 0% 100%,rgba(10,167,181,.18),transparent 70%),linear-gradient(170deg,#24594d,#163a33)!important}
+#ail-domus .footer-title{color:var(--bt-cyan-bright)!important}
+#ail-domus .copyright,#ail-domus>footer.border-t .text-slate-400{color:#a9c4bc!important}
+#ail-domus #ailLeadGate .ail-card,#ail-domus #ail-promo-popup-root .ail-promo-dialog{background:radial-gradient(520px 240px at 100% 0%,rgba(240,123,79,.22),transparent 70%),radial-gradient(420px 220px at 0% 100%,rgba(10,167,181,.24),transparent 70%),linear-gradient(160deg,#2d695c,#183f37)!important}
+#ail-domus #ailLeadGate .ail-card{border-top-color:var(--bt-cyan)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-top{background:linear-gradient(90deg,var(--bt-cyan),var(--bt-champagne) 50%,var(--bt-orange))!important}
+#ail-domus #ail-promo-popup-root .ail-promo-discount-value{color:var(--bt-orange-light)!important}
+#ail-domus ::selection{background:rgba(10,167,181,.28);color:var(--dm-ink)}
+
 /* ───────── Motion: reveal and tilt (only once the script marks the page ready) ───────── */
 .bt-ready .bt-reveal{opacity:0;translate:0 32px;scale:.985;transition:opacity .9s cubic-bezier(.2,.75,.2,1),translate .9s cubic-bezier(.2,.75,.2,1),scale .9s cubic-bezier(.2,.75,.2,1);transition-delay:var(--bt-delay,0ms)}
 .bt-ready .bt-reveal.bt-in{opacity:1;translate:0 0;scale:1}
@@ -148,7 +237,7 @@ html:has(#ail-domus){background:var(--bt-ivory-2)}
   #ail-domus .bt-tilt{transform:perspective(900px) rotateX(var(--bt-rx,0deg)) rotateY(var(--bt-ry,0deg)) translateY(var(--bt-lift,0px))!important;transition:transform .5s cubic-bezier(.2,.75,.2,1),box-shadow .4s ease,border-color .4s ease!important;transform-style:preserve-3d}
   #ail-domus .bt-tilt.bt-tilting{transition:transform .12s linear,box-shadow .4s ease,border-color .4s ease!important}
   #ail-domus .bt-tilt::after{content:""!important;display:block!important;position:absolute;inset:0;z-index:2!important;border-radius:inherit;pointer-events:none;opacity:var(--bt-glare,0);transition:opacity .4s ease;
-    background:radial-gradient(420px circle at var(--bt-gx,50%) var(--bt-gy,50%),rgba(236,220,180,.22),transparent 45%)!important;animation:none!important;top:0!important;left:0!important;width:auto!important;height:auto!important;transform:none!important}
+    background:radial-gradient(420px circle at var(--bt-gx,50%) var(--bt-gy,50%),rgba(111,224,230,.2),rgba(255,173,136,.08) 30%,transparent 50%)!important;animation:none!important;top:0!important;left:0!important;width:auto!important;height:auto!important;transform:none!important}
 }
 
 @media(prefers-reduced-motion:reduce){

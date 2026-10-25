@@ -7,6 +7,7 @@ import * as THREE from '/vendor/three/three.module.min.js';
 const C = {
   forest: 0x0f2a23, moss: 0x21493c, leaf: 0x5fa883, sage: 0xa9d3b8,
   champagne: 0xd4b77c, champagne2: 0xecdcb4, ivory: 0xf7f2e8, blush: 0xe8bfae,
+  cyan: 0x2fc3cc, cyanSoft: 0x8fe3e8, orange: 0xf58a5c, orangeSoft: 0xffb48f,
 };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const coarse = matchMedia('(pointer: coarse)').matches || innerWidth < 720;
@@ -47,14 +48,15 @@ function sparkles(count, spread, color = C.champagne2, size = 0.05, opacity = 0.
 // Studio environment: dark forest room lit by ivory, champagne and sage softboxes (reflections carry the palette).
 function studioEnvironment(renderer) {
   const room = new THREE.Scene();
-  room.add(new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x0c241e, side: THREE.BackSide })));
+  room.add(new THREE.Mesh(new THREE.BoxGeometry(20, 20, 20), new THREE.MeshBasicMaterial({ color: 0x163a33, side: THREE.BackSide })));
   const box = (color, intensity, w, h, pos, look) => {
     const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(intensity), side: THREE.DoubleSide }));
     m.position.set(...pos); m.lookAt(...look); room.add(m);
   };
-  box(C.ivory, 7, 6, 4, [0, 7, 4], [0, 0, 0]);
+  box(C.ivory, 8.5, 6, 4, [0, 7, 4], [0, 0, 0]);
   box(C.champagne, 4.5, 3, 8, [-8, 1, 2], [0, 0, 0]);
-  box(C.sage, 3.2, 3, 8, [8, 0, -2], [0, 0, 0]);
+  box(C.cyan, 3.4, 3, 8, [8, 0, -2], [0, 0, 0]);
+  box(C.orange, 3, 4, 3, [-5, -4, -6], [0, 0, 0]);
   box(C.ivory, 2.4, 10, 1.2, [0, -3, 8], [0, 0, 0]);
   const pm = new THREE.PMREMGenerator(renderer);
   const rt = pm.fromScene(room, 0.03);
@@ -63,9 +65,10 @@ function studioEnvironment(renderer) {
 }
 
 function addLights(scene) {
-  scene.add(new THREE.HemisphereLight(C.ivory, C.forest, 0.55));
+  scene.add(new THREE.HemisphereLight(C.ivory, 0x1d4a44, 0.85));
   const key = new THREE.DirectionalLight(C.champagne2, 2.2); key.position.set(3, 4, 5); scene.add(key);
-  const rim = new THREE.DirectionalLight(C.sage, 1.6); rim.position.set(-4, 1.5, -3); scene.add(rim);
+  const rim = new THREE.DirectionalLight(C.cyan, 2.1); rim.position.set(-4, 1.5, -3); scene.add(rim);
+  const warm = new THREE.DirectionalLight(C.orange, 1.5); warm.position.set(4, -2.5, -2); scene.add(warm);
 }
 
 // Seam-free icosphere: Three's polyhedron geometry is non-indexed, so weld it before smooth normals.
@@ -96,7 +99,7 @@ function sceneDroplet(ctx) {
   const base = geo.attributes.position.array.slice();
   const drop = new THREE.Mesh(geo, glass({
     color: 0xffffff, thickness: 0.9, iridescence: 1, iridescenceIOR: 1.28, iridescenceThicknessRange: [120, 520],
-    attenuationColor: new THREE.Color(0xeaf5ee), attenuationDistance: 6, roughness: 0.02, ior: 1.33, specularIntensity: 1,
+    attenuationColor: new THREE.Color(0xdff6f6), attenuationDistance: 6, roughness: 0.02, ior: 1.33, specularIntensity: 1,
   }));
   drop.scale.setScalar(1.18); group.add(drop);
   const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.42, 3), new THREE.MeshPhysicalMaterial({ color: C.champagne, metalness: 1, roughness: 0.18, emissive: C.champagne, emissiveIntensity: 0.12, clearcoat: 1 }));
@@ -108,7 +111,8 @@ function sceneDroplet(ctx) {
   const rg = new THREE.BufferGeometry(); rg.setAttribute('position', new THREE.BufferAttribute(rp, 3));
   const ring = new THREE.Points(rg, new THREE.PointsMaterial({ color: C.champagne2, size: 0.045, map: dot(), transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending }));
   ring.rotation.set(1.15, 0.2, 0.35); group.add(ring);
-  const dust = sparkles(coarse ? 120 : 260, [5, 3.4, 2], C.sage, 0.035, 0.5); scene.add(dust);
+  const dust = sparkles(coarse ? 120 : 260, [5, 3.4, 2], C.cyanSoft, 0.038, 0.6);
+  const ember = sparkles(coarse ? 50 : 110, [4.5, 3, 2], C.orangeSoft, 0.04, 0.55); scene.add(ember); scene.add(dust);
   let energy = 0;
   return {
     update(t, dt, s) {
@@ -127,7 +131,7 @@ function sceneDroplet(ctx) {
       sats.forEach((m, i) => { const k = t * (0.35 + i * 0.12) + i * 2.1; m.position.set(Math.cos(k) * (1.75 + i * 0.18), 0.42 + Math.sin(k * 1.3) * 0.55, Math.sin(k) * 1.3); });
       for (let i = 0; i < ringCount; i++) { const [ph, r, h, sp] = seeds[i], k = ph + t * sp; rp[i * 3] = Math.cos(k) * r; rp[i * 3 + 1] = h + Math.sin(k * 3 + ph) * 0.05; rp[i * 3 + 2] = Math.sin(k) * r; }
       rg.attributes.position.needsUpdate = true;
-      dust.rotation.y = t * 0.02;
+      dust.rotation.y = t * 0.02; ember.rotation.y = -t * 0.025;
     },
   };
 }
@@ -137,7 +141,7 @@ function sceneCarousel(ctx) {
   const { scene, camera, canvas } = ctx;
   camera.position.set(0, 2.2, 10.2); camera.lookAt(0, 0.35, 0);
   const lathe = pts => new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), 56);
-  const liquids = [C.sage, C.champagne, C.blush, 0xf3ead8, C.leaf].map(c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.18, transmission: 0.55, thickness: 0.6, clearcoat: 0.6, transparent: true, envMapIntensity: 1 }));
+  const liquids = [C.cyanSoft, C.orangeSoft, C.sage, C.champagne, 0xf3ead8].map(c => new THREE.MeshPhysicalMaterial({ color: c, roughness: 0.18, transmission: 0.55, thickness: 0.6, clearcoat: 0.6, transparent: true, envMapIntensity: 1 }));
   const shell = glass({ thickness: 0.3, roughness: 0.04, side: THREE.DoubleSide });
   const amber = glass({ color: 0xe7c48a, attenuationColor: new THREE.Color(0xb8844a), attenuationDistance: 0.6, thickness: 0.4 });
   const gold = metal(C.champagne, 0.22), pearl = satin(C.ivory, 0.3), rubber = satin(C.moss, 0.55);
@@ -172,14 +176,14 @@ function sceneCarousel(ctx) {
   // Plinth: glowing disc + soft halo
   const halo = document.createElement('canvas'); halo.width = halo.height = 256;
   const hg = halo.getContext('2d'), grd = hg.createRadialGradient(128, 128, 10, 128, 128, 128);
-  grd.addColorStop(0, 'rgba(236,220,180,.55)'); grd.addColorStop(0.45, 'rgba(95,168,131,.22)'); grd.addColorStop(1, 'rgba(15,42,35,0)');
+  grd.addColorStop(0, 'rgba(255,214,190,.6)'); grd.addColorStop(0.35, 'rgba(47,195,204,.3)'); grd.addColorStop(1, 'rgba(15,42,35,0)');
   hg.fillStyle = grd; hg.fillRect(0, 0, 256, 256);
   const tex = new THREE.CanvasTexture(halo); tex.colorSpace = THREE.SRGBColorSpace;
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
   floor.rotation.x = -Math.PI / 2; floor.position.y = -0.8; scene.add(floor);
   const orbit = new THREE.Mesh(new THREE.TorusGeometry(R, 0.006, 6, 180), new THREE.MeshBasicMaterial({ color: C.champagne, transparent: true, opacity: 0.45 }));
   orbit.rotation.x = Math.PI / 2; orbit.position.y = -0.78; scene.add(orbit);
-  const fx = sparkles(coarse ? 90 : 200, [5, 2.5, 3], C.champagne2, 0.04, 0.6); fx.position.y = 0.8; scene.add(fx);
+  const fx = sparkles(coarse ? 90 : 200, [5, 2.5, 3], C.cyanSoft, 0.04, 0.7); fx.position.y = 0.8; scene.add(fx);
   let spin = 0, vel = 0.25, drag = null;
   canvas.addEventListener('pointerdown', e => { drag = { x: e.clientX }; });
   addEventListener('pointerup', () => { drag = null; });
@@ -210,8 +214,8 @@ function sceneMolecule(ctx) {
   const N = coarse ? 28 : 42, atoms = [], bonds = [];
   const kinds = [
     { mat: new THREE.MeshPhysicalMaterial({ color: C.ivory, roughness: 0.22, clearcoat: 1, sheen: 0.5, sheenColor: new THREE.Color(C.champagne2) }), r: 0.2 },
-    { mat: metal(C.champagne, 0.2), r: 0.14 },
-    { mat: new THREE.MeshPhysicalMaterial({ color: C.leaf, roughness: 0.3, clearcoat: 1, emissive: C.leaf, emissiveIntensity: 0.08 }), r: 0.16 },
+    { mat: new THREE.MeshPhysicalMaterial({ color: C.orange, roughness: 0.22, metalness: 0.35, clearcoat: 1, emissive: C.orange, emissiveIntensity: 0.12 }), r: 0.14 },
+    { mat: new THREE.MeshPhysicalMaterial({ color: C.cyan, roughness: 0.25, clearcoat: 1, emissive: C.cyan, emissiveIntensity: 0.15 }), r: 0.16 },
     { mat: glass({ color: 0xe9f5ee, thickness: 0.4, iridescence: 0.6 }), r: 0.24 },
   ];
   const push = (kind, target) => { const id = atoms.length; atoms.push({ kind, target, start: new THREE.Vector3().randomDirection().multiplyScalar(rand(3.5, 6)), delay: rand(0, 1.4) }); return id; };
@@ -234,8 +238,8 @@ function sceneMolecule(ctx) {
   root.add(bondMesh);
   const halo = new THREE.Mesh(new THREE.TorusGeometry(2.8, 0.008, 8, 200), new THREE.MeshBasicMaterial({ color: C.champagne, transparent: true, opacity: 0.4 }));
   halo.rotation.x = Math.PI / 2.2; scene.add(halo);
-  const halo2 = halo.clone(); halo2.scale.setScalar(0.82); halo2.rotation.set(Math.PI / 1.9, 0.5, 0); halo2.material = new THREE.MeshBasicMaterial({ color: C.sage, transparent: true, opacity: 0.3 }); scene.add(halo2);
-  const fx = sparkles(coarse ? 120 : 240, [5, 3.5, 3], C.sage, 0.04, 0.55); scene.add(fx);
+  const halo2 = halo.clone(); halo2.scale.setScalar(0.82); halo2.rotation.set(Math.PI / 1.9, 0.5, 0); halo2.material = new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, opacity: 0.3 }); scene.add(halo2);
+  const fx = sparkles(coarse ? 120 : 240, [5, 3.5, 3], C.cyanSoft, 0.042, 0.65); scene.add(fx);
   const pos = atoms.map(() => new THREE.Vector3()), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), up = new THREE.Vector3(0, 1, 0), v = new THREE.Vector3(), sc = new THREE.Vector3();
   let born = 0;
   canvas.addEventListener('click', () => { atoms.forEach(a => { a.start.randomDirection().multiplyScalar(rand(3.5, 6)); a.delay = rand(0, 1); }); born = ctx.time; });
@@ -272,7 +276,7 @@ function sceneGlobe(ctx) {
   camera.position.set(0, 0, 7.4);
   const R = 1.45, outer = new THREE.Group(), inner = new THREE.Group(); outer.add(inner); scene.add(outer);
   const ll = (lat, lon, r = R) => { const p = (90 - lat) * Math.PI / 180, th = (lon + 180) * Math.PI / 180; return new THREE.Vector3(-r * Math.sin(p) * Math.cos(th), r * Math.cos(p), r * Math.sin(p) * Math.sin(th)); };
-  inner.add(new THREE.Mesh(new THREE.SphereGeometry(R * 0.985, 64, 48), new THREE.MeshPhysicalMaterial({ color: 0x1d4f41, roughness: 0.5, metalness: 0.1, clearcoat: 0.6, clearcoatRoughness: 0.25, emissive: 0x0f2a23, emissiveIntensity: 0.4 })));
+  inner.add(new THREE.Mesh(new THREE.SphereGeometry(R * 0.985, 64, 48), new THREE.MeshPhysicalMaterial({ color: 0x2a6b62, roughness: 0.45, metalness: 0.1, clearcoat: 0.7, clearcoatRoughness: 0.2, emissive: 0x123f3c, emissiveIntensity: 0.5 })));
   const n = coarse ? 2600 : 5200, dp = new Float32Array(n * 3);
   for (let i = 0; i < n; i++) { const y = 1 - (i / (n - 1)) * 2, r = Math.sqrt(1 - y * y), th = i * 2.399963; dp[i * 3] = Math.cos(th) * r * R; dp[i * 3 + 1] = y * R; dp[i * 3 + 2] = Math.sin(th) * r * R; }
   const dg = new THREE.BufferGeometry(); dg.setAttribute('position', new THREE.BufferAttribute(dp, 3));
@@ -283,7 +287,7 @@ function sceneGlobe(ctx) {
   // Fresnel atmosphere
   const atmo = new THREE.Mesh(new THREE.SphereGeometry(R * 1.16, 64, 48), new THREE.ShaderMaterial({
     transparent: true, side: THREE.BackSide, depthWrite: false, blending: THREE.AdditiveBlending,
-    uniforms: { c: { value: new THREE.Color(C.sage) } },
+    uniforms: { c: { value: new THREE.Color(C.cyan) } },
     vertexShader: 'varying vec3 vN;varying vec3 vV;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);gl_Position=projectionMatrix*mv;}',
     fragmentShader: 'uniform vec3 c;varying vec3 vN;varying vec3 vV;void main(){float f=pow(1.-abs(dot(vN,vV)),2.2);gl_FragColor=vec4(c,f*.75);}',
   }));
@@ -304,8 +308,8 @@ function sceneGlobe(ctx) {
     pulse.scale.setScalar(0.13); inner.add(pulse);
     lanes.push({ curve, geo, total: geo.index.count, pulse, delay: lanes.length * 0.18, speed: rand(0.18, 0.3), off: Math.random() });
   };
-  inbound.forEach(p => lane(ll(p[0], p[1]), hub, C.champagne, 0.55));
-  outbound.forEach(p => lane(hub, ll(p[0], p[1]), C.sage, 0.6));
+  inbound.forEach(p => lane(ll(p[0], p[1]), hub, C.orange, 0.55));
+  outbound.forEach(p => lane(hub, ll(p[0], p[1]), C.cyan, 0.6));
   const hubDot = new THREE.Mesh(new THREE.SphereGeometry(0.05, 20, 16), new THREE.MeshBasicMaterial({ color: C.champagne2 })); hubDot.position.copy(hub); inner.add(hubDot);
   const rings = [0, 1, 2].map(() => { const r = new THREE.Mesh(new THREE.RingGeometry(0.06, 0.075, 48), new THREE.MeshBasicMaterial({ color: C.champagne, transparent: true, side: THREE.DoubleSide, depthWrite: false })); r.position.copy(hub.clone().multiplyScalar(1.002)); r.lookAt(hub.clone().multiplyScalar(2)); inner.add(r); return r; });
   inner.quaternion.setFromUnitVectors(hub.clone().normalize(), new THREE.Vector3(-0.12, 0.12, 1).normalize());
@@ -334,9 +338,9 @@ function sceneCrystal(ctx) {
   g.add(crystal);
   const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.34, 0), new THREE.MeshPhysicalMaterial({ color: C.champagne, metalness: 1, roughness: 0.15, emissive: C.champagne, emissiveIntensity: 0.25, flatShading: true }));
   core.scale.y = 1.5; g.add(core);
-  const shell = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(2.05, 1)), new THREE.LineBasicMaterial({ color: C.sage, transparent: true, opacity: 0.22 }));
+  const shell = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.IcosahedronGeometry(2.05, 1)), new THREE.LineBasicMaterial({ color: C.cyanSoft, transparent: true, opacity: 0.3 }));
   g.add(shell);
-  const orbits = [[2.35, C.champagne, 0.5], [2.65, C.sage, -0.35], [2.95, C.champagne2, 0.25]].map(([r, c, sp], i) => {
+  const orbits = [[2.35, C.orange, 0.5], [2.65, C.cyan, -0.35], [2.95, C.champagne2, 0.25]].map(([r, c, sp], i) => {
     const o = new THREE.Group(); o.rotation.set(Math.PI / 2 + (i - 1) * 0.35, i * 0.6, 0);
     o.add(new THREE.Mesh(new THREE.TorusGeometry(r, 0.006, 6, 220), new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0.45 })));
     const bead = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), new THREE.MeshBasicMaterial({ color: c })); bead.position.x = r; o.add(bead);
@@ -351,7 +355,7 @@ function sceneCrystal(ctx) {
   }));
   scan.rotation.x = -Math.PI / 2; g.add(scan);
   // Verification wave
-  const wave = new THREE.Mesh(new THREE.TorusGeometry(1, 0.01, 6, 160), new THREE.MeshBasicMaterial({ color: C.sage, transparent: true, depthWrite: false }));
+  const wave = new THREE.Mesh(new THREE.TorusGeometry(1, 0.01, 6, 160), new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, depthWrite: false }));
   wave.rotation.x = Math.PI / 2; g.add(wave);
   // Hex lattice floor
   const hexes = [], hexGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.03, 6);
@@ -360,7 +364,7 @@ function sceneCrystal(ctx) {
     if (d < 3.6) hexes.push([x, z, d]);
   }
   const lattice = new THREE.InstancedMesh(hexGeo, new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.4, roughness: 0.4 }), hexes.length);
-  const m4 = new THREE.Matrix4(), col = new THREE.Color(), deep = new THREE.Color(0x1c4537), glow = new THREE.Color(C.champagne);
+  const m4 = new THREE.Matrix4(), col = new THREE.Color(), deep = new THREE.Color(0x24574c), glow = new THREE.Color(C.cyan);
   hexes.forEach(([x, z], i) => { m4.makeTranslation(x, 0, z); lattice.setMatrixAt(i, m4); lattice.setColorAt(i, deep); });
   lattice.position.y = -2.25; g.add(lattice);
   return {
@@ -418,9 +422,9 @@ function sceneBotanical(ctx) {
   const petalGeo = new THREE.SphereGeometry(0.22, 24, 16); petalGeo.scale(0.55, 0.18, 1);
   const petals = [];
   for (let i = 0; i < 9; i++) { const pv = new THREE.Group(); pv.rotation.y = (i / 9) * Math.PI * 2; const pm = new THREE.Mesh(petalGeo, new THREE.MeshPhysicalMaterial({ color: 0xf7efe0, roughness: 0.3, sheen: 1, sheenColor: new THREE.Color(C.blush), clearcoat: 0.6 })); pm.position.z = 0.22; pv.add(pm); bloom.add(pv); petals.push(pv); }
-  const heart = new THREE.Mesh(new THREE.IcosahedronGeometry(0.12, 3), new THREE.MeshPhysicalMaterial({ color: C.champagne, metalness: 1, roughness: 0.2, emissive: C.champagne, emissiveIntensity: 0.3 })); bloom.add(heart);
+  const heart = new THREE.Mesh(new THREE.IcosahedronGeometry(0.12, 3), new THREE.MeshPhysicalMaterial({ color: C.orange, metalness: 0.4, roughness: 0.2, emissive: C.orange, emissiveIntensity: 0.35 })); bloom.add(heart);
   const budsAt = [b1.curve.getPoint(1), b2.curve.getPoint(1)].map(p => { const m = new THREE.Mesh(new THREE.IcosahedronGeometry(0.09, 3), metal(C.champagne2, 0.2)); m.position.copy(p); plant.add(m); return m; });
-  const spores = sparkles(coarse ? 90 : 180, [3.2, 3, 1.6], C.champagne2, 0.045, 0.7); scene.add(spores);
+  const spores = sparkles(coarse ? 90 : 180, [3.2, 3, 1.6], C.cyanSoft, 0.045, 0.75); scene.add(spores);
   const sp = spores.geometry.attributes.position;
   let born = 0; canvas.addEventListener('click', () => { born = ctx.time; });
   return {
@@ -445,9 +449,9 @@ function sceneBotanical(ctx) {
 function sceneRipple(ctx) {
   const { scene, camera, canvas } = ctx;
   camera.position.set(0, 3.2, 5.6); camera.lookAt(0, -0.2, 0);
-  scene.fog = new THREE.Fog(0x0f2a23, 4.5, 9.5);
+  scene.fog = new THREE.Fog(0x1c4a42, 4.5, 9.5);
   const seg = coarse ? 64 : 104, geo = new THREE.PlaneGeometry(18, 12, Math.round(seg * 1.4), seg); geo.rotateX(-Math.PI / 2);
-  const surface = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: 0x27604f, roughness: 0.08, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.04, iridescence: 0.4, envMapIntensity: 1.8 }));
+  const surface = new THREE.Mesh(geo, new THREE.MeshPhysicalMaterial({ color: 0x2f7468, roughness: 0.08, metalness: 0.2, clearcoat: 1, clearcoatRoughness: 0.04, iridescence: 0.4, envMapIntensity: 1.8 }));
   surface.position.y = -0.9; scene.add(surface);
   const P = geo.attributes.position, base = P.array.slice();
   const drops = [];
@@ -455,8 +459,8 @@ function sceneRipple(ctx) {
   const bubble = new THREE.Mesh(icosphere(coarse ? 5 : 7), glass({ color: 0xf6efe0, thickness: 1.2, iridescence: 0.85, iridescenceIOR: 1.3 }));
   bubble.scale.setScalar(0.62); scene.add(bubble);
   const halo = new THREE.Mesh(new THREE.TorusGeometry(0.95, 0.012, 8, 120), metal(C.champagne, 0.2)); scene.add(halo);
-  const halo2 = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.006, 8, 120), new THREE.MeshBasicMaterial({ color: C.sage, transparent: true, opacity: 0.55 })); scene.add(halo2);
-  const fx = sparkles(coarse ? 70 : 150, [5, 1.6, 3], C.champagne2, 0.04, 0.6); fx.position.y = 0.8; scene.add(fx);
+  const halo2 = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.006, 8, 120), new THREE.MeshBasicMaterial({ color: C.cyan, transparent: true, opacity: 0.55 })); scene.add(halo2);
+  const fx = sparkles(coarse ? 70 : 150, [5, 1.6, 3], C.orangeSoft, 0.042, 0.7); fx.position.y = 0.8; scene.add(fx);
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.9), hit = new THREE.Vector3();
   const toWater = e => { const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); return ray.ray.intersectPlane(plane, hit); };
   let last = 0;
@@ -520,7 +524,7 @@ function mountStage() {
   } catch (e) { canvas.remove(); hint.remove(); stage.classList.remove('bt-stage'); return; }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, coarse ? 1.5 : 1.8));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.22;
   renderer.setClearColor(0x000000, 0);
 
   const scene = new THREE.Scene(), camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
@@ -542,9 +546,9 @@ function mountStage() {
     camera.position.z = baseZ * (camera.aspect < 1 ? Math.min(1.7, 1 / Math.max(camera.aspect, 0.55)) : 1);
     camera.updateProjectionMatrix();
   };
-  new ResizeObserver(resize).observe(canvas); resize();
-
-  let visible = true, running = false, last = performance.now(), t = 0, raf = 0;
+  let visible = true, running = false, last = performance.now(), t = 0, raf = 0, painted = false;
+  // A resize clears the canvas: repaint the still frame when the loop is not running (reduced motion, offscreen)
+  new ResizeObserver(() => { resize(); if (painted && !running) renderer.render(scene, camera); }).observe(canvas); resize();
   const frame = now => {
     raf = 0; if (!running) return;
     const dt = Math.min(0.05, (now - last) / 1000); last = now; t += dt; ctx.time = t;
@@ -564,7 +568,7 @@ function mountStage() {
 
   // First frame: a composed still (also the reduced-motion frame)
   t = reduced ? 6 : 0.016; ctx.time = t;
-  sceneApi.update(t, 0.016, state); renderer.render(scene, camera);
+  sceneApi.update(t, 0.016, state); renderer.render(scene, camera); painted = true;
   requestAnimationFrame(() => stage.classList.add('bt-live'));
   start();
 }
