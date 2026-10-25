@@ -1,27 +1,32 @@
-/* AIL LABS — "Domus" skin: warm taupe ground, smoked-glass panels, lime accent.
-   Presentation only. Scoped to <body id="ail-domus"> so it outranks the page's inline glass rules. */
+/* AIL LABS — "Domus" skin: greige ground, smoked-glass panels, brand cyan + orange accents.
+   Presentation only. Scoped to <body id="ail-domus"> so it outranks the page's inline glass rules.
+   Colour rules: pure cyan/orange are fills, dots, rings and rules; on the light ground, text accents use
+   --dm-cyan-deep; on smoke and black, text accents use --dm-cyan-bright and --dm-orange-light. */
 
 :root{
-  --dm-ground-1:#d9d3ca;
-  --dm-ground-2:#bdb5aa;
+  --dm-ground-1:#e6e4df;
+  --dm-ground-2:#d2cec7;
   --dm-ink:#1d1c1a;
   --dm-ink-soft:#4a4740;
-  --dm-ink-faint:#625e57;
-  --dm-smoke:rgba(34,32,29,.72);
-  --dm-smoke-2:rgba(46,44,40,.58);
-  --dm-black:#0f0f0e;
+  --dm-ink-faint:#5a5650;
+  --dm-smoke:rgba(28,30,31,.86);
+  --dm-black:#0f1112;
   --dm-edge:rgba(255,255,255,.14);
-  --dm-edge-light:rgba(255,255,255,.55);
-  --dm-on-dark:#f3f0ea;
-  --dm-on-dark-muted:#b9b3a9;
-  --dm-lime:#c8f169;
-  --dm-lime-deep:#9fd047;
-  --dm-lime-glow:rgba(200,241,105,.35);
-  --dm-chip:rgba(255,255,255,.38);
+  --dm-edge-light:rgba(255,255,255,.6);
+  --dm-on-dark:#f3f1ec;
+  --dm-on-dark-muted:#bdbab3;
+  --dm-cyan:#0aa7b5;
+  --dm-cyan-bright:#5ed7df;
+  --dm-cyan-deep:#087079;
+  --dm-cyan-glow:rgba(10,167,181,.30);
+  --dm-orange:#f07b4f;
+  --dm-orange-light:#ff9b74;
+  --dm-orange-glow:rgba(240,123,79,.26);
+  --dm-chip:rgba(255,255,255,.42);
   --dm-radius-xl:30px;
   --dm-radius-lg:24px;
   --dm-radius-md:18px;
-  --dm-shadow:0 30px 70px rgba(40,34,26,.28),0 8px 20px rgba(40,34,26,.12),inset 0 1px 0 rgba(255,255,255,.10);
+  --dm-shadow:0 30px 70px rgba(30,32,33,.24),0 8px 20px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.10);
   --dm-blur:blur(28px) saturate(140%);
 }
 
@@ -30,18 +35,19 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus{
   color:var(--dm-ink)!important;
   background:
-    radial-gradient(1100px 700px at 78% 8%,rgba(255,255,255,.42),transparent 60%),
-    radial-gradient(900px 600px at 10% 90%,rgba(120,110,96,.25),transparent 65%),
+    radial-gradient(900px 600px at 82% 6%,rgba(10,167,181,.10),transparent 62%),
+    radial-gradient(800px 560px at 6% 92%,rgba(240,123,79,.08),transparent 64%),
     linear-gradient(170deg,var(--dm-ground-1) 0%,var(--dm-ground-2) 100%) fixed!important;
 }
-#ail-domus ::selection{background:var(--dm-lime);color:var(--dm-ink)}
+#ail-domus ::selection{background:var(--dm-cyan);color:var(--dm-ink)}
 
 /* Header */
-#ail-domus .site-header{background:rgba(226,220,211,.62)!important;border-bottom:1px solid rgba(29,28,26,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
+#ail-domus .site-header{background:rgba(234,232,227,.66)!important;border-bottom:1px solid rgba(29,28,26,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
 #ail-domus .brand-name{color:var(--dm-ink)!important}
 #ail-domus .brand-sub{color:var(--dm-ink-faint)!important}
 #ail-domus .nav a:not(.button){color:var(--dm-ink-soft)!important;border-radius:999px}
 #ail-domus .nav a:not(.button):hover,#ail-domus .nav a[aria-current="page"]{background:var(--dm-chip)!important;color:var(--dm-ink)!important}
+#ail-domus .nav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--dm-cyan)}
 #ail-domus .menu-btn{background:var(--dm-chip)!important;border-color:var(--dm-edge-light)!important;color:var(--dm-ink)!important;border-radius:999px!important}
 #ail-domus .mobile-menu{border-top-color:rgba(29,28,26,.08)!important}
 #ail-domus .mobile-menu a{color:var(--dm-ink)!important;border-bottom-color:rgba(29,28,26,.08)!important}
@@ -49,52 +55,53 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 /* Type */
 #ail-domus :is(h1,h2,h3){color:inherit}
 #ail-domus .hero h1{font-weight:500!important;letter-spacing:-.055em!important;color:var(--dm-ink)!important}
-#ail-domus .hero h1 span{color:var(--dm-ink-faint)!important;font-weight:400}
+#ail-domus .hero h1 span{color:var(--dm-cyan-deep)!important;font-weight:400}
 #ail-domus .section h2{font-weight:500!important;letter-spacing:-.05em!important}
 #ail-domus :is(.hero-lead,.section-intro,.about-copy p){color:var(--dm-ink-soft)!important}
 
-/* Eyebrows become frosted chips, like the "@handle" tag */
+/* Eyebrows become frosted chips with a cyan status dot */
 #ail-domus .eyebrow{
   display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;
   background:var(--dm-chip);border:1px solid var(--dm-edge-light);
   color:var(--dm-ink-soft)!important;letter-spacing:.06em!important;
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 }
-#ail-domus .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-lime-deep);box-shadow:0 0 10px var(--dm-lime-glow)}
+#ail-domus .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-cyan);box-shadow:0 0 10px var(--dm-cyan-glow)}
 
-/* Buttons */
+/* Buttons: ink primary, glass secondary, brand fills carry ink labels (cyan 5.8:1, orange 6.2:1) */
 #ail-domus .button{border-radius:999px!important}
 #ail-domus .button-primary{background:var(--dm-ink)!important;color:var(--dm-on-dark)!important;box-shadow:0 10px 24px rgba(29,28,26,.22)}
-#ail-domus .button-primary:hover{background:#2c2a27!important}
+#ail-domus .button-primary:hover{background:#2c2b29!important}
 #ail-domus .button-light{background:var(--dm-chip)!important;color:var(--dm-ink)!important;border-color:var(--dm-edge-light)!important;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-#ail-domus :is(.button-orange,.button-cyan){background:var(--dm-lime)!important;color:var(--dm-ink)!important;box-shadow:0 10px 28px var(--dm-lime-glow)}
+#ail-domus .button-orange{background:var(--dm-orange)!important;color:var(--dm-ink)!important;box-shadow:0 10px 28px var(--dm-orange-glow)}
+#ail-domus .button-cyan{background:var(--dm-cyan)!important;color:var(--dm-ink)!important;box-shadow:0 10px 28px var(--dm-cyan-glow)}
 #ail-domus .hero-note{color:var(--dm-ink-soft)!important}
-#ail-domus .hero-note i{background:var(--dm-lime-deep)!important;box-shadow:0 0 0 5px rgba(200,241,105,.28)!important}
+#ail-domus .hero-note i{background:var(--dm-orange)!important;box-shadow:0 0 0 5px rgba(240,123,79,.22)!important}
 
 /* Hero: giant faint wordmark behind, smoked dashboard panel */
 #ail-domus .hero{position:relative;overflow:hidden}
 #ail-domus .hero::before{
   content:"AIL LABS";position:absolute;left:50%;top:38px;transform:translateX(-50%);z-index:0;pointer-events:none;
   font-size:clamp(90px,19vw,280px);font-weight:700;letter-spacing:-.06em;line-height:1;white-space:nowrap;
-  color:rgba(255,255,255,.26);
+  color:rgba(255,255,255,.34);
 }
 #ail-domus .hero>.container{position:relative;z-index:1}
 #ail-domus .hero-panel[data-hero-3d]::before{
-  background:linear-gradient(150deg,rgba(58,55,50,.86),rgba(24,23,21,.92))!important;
+  background:linear-gradient(150deg,rgba(48,51,52,.90),rgba(18,20,21,.94))!important;
   border-color:var(--dm-edge)!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important;
 }
 #ail-domus .hero-panel{border-radius:var(--dm-radius-xl)!important;box-shadow:var(--dm-shadow)!important}
-#ail-domus .hero-panel[data-hero-3d]::after{background:radial-gradient(circle,rgba(200,241,105,.22),transparent 70%)!important}
+#ail-domus .hero-panel[data-hero-3d]::after{background:radial-gradient(circle,rgba(10,167,181,.26),transparent 70%)!important}
 #ail-domus .hero-panel .panel-label{color:var(--dm-on-dark-muted)!important}
-#ail-domus .hero-panel .hero-ring{border-color:rgba(200,241,105,.42)!important}
-#ail-domus .hero-panel .hero-ring.two{border-color:rgba(255,255,255,.18)!important}
+#ail-domus .hero-panel .hero-ring{border-color:rgba(94,215,223,.45)!important}
+#ail-domus .hero-panel .hero-ring.two{border-color:rgba(240,123,79,.45)!important}
 #ail-domus .hero-panel .orb{
-  background:radial-gradient(circle at 34% 24%,rgba(255,255,255,.28),rgba(255,255,255,.06) 55%,rgba(200,241,105,.10))!important;
+  background:radial-gradient(circle at 34% 24%,rgba(255,255,255,.28),rgba(255,255,255,.06) 55%,rgba(10,167,181,.12))!important;
   border-color:rgba(255,255,255,.22)!important;
   box-shadow:0 22px 48px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.25)!important;
 }
-#ail-domus .hero-panel .orb::before{border-color:rgba(200,241,105,.40)!important;box-shadow:0 0 32px var(--dm-lime-glow)!important}
+#ail-domus .hero-panel .orb::before{border-color:rgba(94,215,223,.42)!important;box-shadow:0 0 32px var(--dm-cyan-glow)!important}
 #ail-domus .hero-panel .panel-card{background:var(--dm-black)!important;border-color:rgba(255,255,255,.10)!important;border-radius:var(--dm-radius-md)!important}
 #ail-domus .hero-panel .panel-card strong{color:var(--dm-on-dark)}
 #ail-domus .hero-panel .panel-card p{color:var(--dm-on-dark-muted)!important}
@@ -109,33 +116,39 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.feature,.about-aside,.panel-card)::before{background:none!important;animation:none!important}
 #ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.feature,.about-aside,.panel-card)::after{display:none!important}
 @media(hover:hover) and (pointer:fine){
-  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:rgba(200,241,105,.45)!important;box-shadow:0 34px 80px rgba(40,34,26,.34),0 0 0 1px rgba(200,241,105,.10) inset!important}
+  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:rgba(94,215,223,.48)!important;box-shadow:0 34px 80px rgba(30,32,33,.30),0 0 0 1px rgba(94,215,223,.10) inset!important}
 }
 #ail-domus :is(.category,.step) p,#ail-domus .compliance-list li{color:var(--dm-on-dark-muted)!important}
-#ail-domus :is(.category .number,.step-num){color:var(--dm-lime)!important}
+#ail-domus :is(.category .number,.step-num){color:var(--dm-orange-light)!important}
+/* Category trio keeps the brand rhythm: a thin accent rule cyan / cyan+orange / orange */
+#ail-domus .category{border-top:2px solid var(--dm-cyan)!important}
+#ail-domus .category:nth-child(2){border-top-color:var(--dm-cyan-bright)!important}
+#ail-domus .category:nth-child(3){border-top-color:var(--dm-orange)!important}
 
 /* Stats: dark tiles, first one is the black "energy" card */
 #ail-domus #hero-following-stats .stat strong{color:var(--dm-on-dark)!important}
 #ail-domus #hero-following-stats .stat span{color:var(--dm-on-dark-muted)!important}
 #ail-domus #hero-following-stats .stat:first-child{background:var(--dm-black)!important}
-#ail-domus #hero-following-stats .stat:first-child strong{color:var(--dm-lime)!important}
+#ail-domus #hero-following-stats .stat:first-child strong{color:var(--dm-cyan-bright)!important}
+#ail-domus #hero-following-stats .stat:last-child strong{color:var(--dm-orange-light)!important}
 
 /* About */
 #ail-domus .about-aside{background:var(--dm-black)!important;background-color:var(--dm-black)!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:var(--dm-radius-lg)!important;box-shadow:var(--dm-shadow)!important}
 #ail-domus .about-aside p{color:var(--dm-on-dark-muted)!important}
-#ail-domus .about-aside div[style]{color:var(--dm-lime)!important}
+#ail-domus .about-aside div[style]{color:var(--dm-cyan-bright)!important}
 
-/* Features: light frosted glass for rhythm between the dark sections */
+/* Features: light frosted glass for rhythm between the dark sections; rules alternate cyan / orange */
 #ail-domus .feature{
-  background:rgba(255,255,255,.34)!important;background-color:rgba(255,255,255,.34)!important;
-  border:1px solid var(--dm-edge-light)!important;border-top:2px solid var(--dm-lime-deep)!important;
+  background:rgba(255,255,255,.42)!important;background-color:rgba(255,255,255,.42)!important;
+  border:1px solid var(--dm-edge-light)!important;border-top:2px solid var(--dm-cyan)!important;
   border-radius:var(--dm-radius-lg)!important;color:var(--dm-ink)!important;
-  box-shadow:0 18px 40px rgba(40,34,26,.12),inset 0 1px 0 rgba(255,255,255,.6)!important;
+  box-shadow:0 18px 40px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.6)!important;
 }
+#ail-domus .feature:nth-child(2){border-top-color:var(--dm-orange)!important}
 #ail-domus .feature p{color:var(--dm-ink-soft)!important}
 
-/* Process: deep warm-black band */
-#ail-domus .process{background:linear-gradient(170deg,#24221f,#151412)!important;color:var(--dm-on-dark)!important}
+/* Process: deep graphite band */
+#ail-domus .process{background:radial-gradient(700px 360px at 90% 0%,rgba(10,167,181,.14),transparent 70%),linear-gradient(170deg,#202325,#121415)!important;color:var(--dm-on-dark)!important}
 #ail-domus .process .eyebrow{background:rgba(255,255,255,.08);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
 #ail-domus .process .section-intro{color:var(--dm-on-dark-muted)!important}
 #ail-domus .step{background:rgba(255,255,255,.05)!important;background-color:rgba(255,255,255,.05)!important}
@@ -145,8 +158,11 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .compliance-list li{border-bottom-color:rgba(255,255,255,.10)!important}
 #ail-domus .compliance-list b{color:var(--dm-on-dark)!important}
 
-/* CTA */
-#ail-domus .cta{background:radial-gradient(600px 280px at 85% 30%,rgba(200,241,105,.16),transparent 70%),linear-gradient(150deg,rgba(46,44,40,.92),rgba(18,17,16,.95))!important}
+/* CTA: the old cyan-soft → orange-soft band, re-lit as two glows on smoke */
+#ail-domus .cta{background:
+  radial-gradient(520px 260px at 92% 20%,rgba(240,123,79,.20),transparent 70%),
+  radial-gradient(520px 260px at 8% 100%,rgba(10,167,181,.22),transparent 70%),
+  linear-gradient(150deg,rgba(40,43,44,.94),rgba(16,18,19,.96))!important}
 #ail-domus .cta h2{color:var(--dm-on-dark)}
 #ail-domus .cta .section-intro{color:var(--dm-on-dark-muted)!important}
 #ail-domus .cta .eyebrow{background:rgba(255,255,255,.08);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
@@ -156,17 +172,18 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .contact-line{border-bottom-color:rgba(29,28,26,.12)!important}
 #ail-domus .contact-line small{color:var(--dm-ink-faint)!important}
 #ail-domus .contact-line :is(a,span){color:var(--dm-ink)!important}
+#ail-domus .contact-line a:hover{color:var(--dm-cyan-deep)!important}
 
 /* Footer */
-#ail-domus .site-footer{background:#151412!important}
+#ail-domus .site-footer{background:#121415!important}
 #ail-domus .site-footer .brand-name{color:var(--dm-on-dark)!important}
 #ail-domus .site-footer p{color:var(--dm-on-dark-muted)!important}
-#ail-domus .footer-title{color:var(--dm-lime)!important}
-#ail-domus .footer-links{color:#d9d4cb!important}
-#ail-domus .copyright{color:#9a948a!important;border-top-color:rgba(255,255,255,.10)!important}
+#ail-domus .footer-title{color:var(--dm-cyan-bright)!important}
+#ail-domus .footer-links{color:#dad7d0!important}
+#ail-domus .copyright{color:#9b978f!important;border-top-color:rgba(255,255,255,.10)!important}
 
-/* Focus: lime ring with a dark halo, visible on taupe and on smoke */
-#ail-domus :is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--dm-lime)!important;outline-offset:2px!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
+/* Focus: cyan-bright ring with a dark halo, visible on greige and on smoke */
+#ail-domus :is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--dm-cyan-bright)!important;outline-offset:2px!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
 
 @media(max-width:640px){
   #ail-domus .hero::before{top:20px}
