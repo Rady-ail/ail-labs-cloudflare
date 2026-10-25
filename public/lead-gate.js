@@ -1,4 +1,5 @@
-(() => {\n  if (location.pathname === '/compliance.html') return;
+(() => {
+  if (location.pathname === '/compliance.html') return;
   const KEY='ail_verified_lead_token_v1', SESSION_KEY='ail_session_id';
   const getSessionId=()=>localStorage.getItem(SESSION_KEY)||'', token=()=>localStorage.getItem(KEY)||'';
   const style=document.createElement('style'); style.textContent=`
