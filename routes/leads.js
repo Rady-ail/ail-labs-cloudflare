@@ -32,7 +32,7 @@ function sameOrigin(req) {
   return !origin || allow.includes(origin);
 }
 function requestIp(req) {
-  return clean((req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '').split(',')[0], 100);
+  return clean(require('../utils/clientIp').clientIp(req), 100);
 }
 async function ensureTables() {
   if (tablesReady) return;

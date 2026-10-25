@@ -5,6 +5,8 @@ const pool = require('../db/pool');
 const { requireAdmin } = require('./authMiddleware');
 const { transporter } = require('../db/mailer');
 const { notifyNewOrder } = require('../services/zapierNotifyService');
+const { rateLimit } = require('../utils/rateLimit');
+const limitReceipts = rateLimit({ windowMs: 10 * 60 * 1000, max: 20 });
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -77,7 +79,7 @@ router.get('/', requireAdmin, async (req, res) => {
 
 // POST /api/orders/send-receipt - kirim salinan PDF struk ke email admin
 // (dipanggil otomatis dari index.html setelah "Kirim ke WhatsApp" diklik, publik)
-router.post('/send-receipt', upload.single('file'), async (req, res) => {
+router.post('/send-receipt', limitReceipts, upload.single('file'), async (req, res) => {
   try {
     const { invoice } = req.body || {};
     const recipient = String(process.env.ADMIN_EMAIL || '').trim();
