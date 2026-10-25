@@ -227,6 +227,87 @@ router.get('/traffic-sources', async (req, res) => {
   }
 });
 
+// ============ GET REGION REPORT (wilayah peminat) ============
+// Pengunjung per negara/provinsi/kota dari kolom visitors.country/region/city
+// (diisi dari Cloudflare). Baris lama sebelum fitur ini aktif masuk
+// "Tidak diketahui", dan coverage menunjukkan persentase yang terbaca.
+router.get('/regions', async (req, res) => {
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 365);
+
+    const regions = await pool.query(`
+      WITH base AS (
+        SELECT session_id,
+               COALESCE(NULLIF(country, ''), 'Tidak diketahui') AS country,
+               COALESCE(NULLIF(region, ''), 'Tidak diketahui') AS region
+        FROM visitors
+        WHERE entry_time > now() - make_interval(days => $1)
+      ),
+      ev AS (
+        SELECT e.session_id,
+               COUNT(*) FILTER (WHERE e.event_type = 'view_product') AS product_views,
+               COUNT(*) FILTER (WHERE e.event_type = 'add_to_cart') AS add_to_cart
+        FROM user_events e
+        JOIN base b ON b.session_id = e.session_id
+        GROUP BY e.session_id
+      )
+      SELECT b.country, b.region,
+             COUNT(DISTINCT b.session_id)::int AS visitors,
+             COALESCE(SUM(ev.product_views), 0)::int AS product_views,
+             COALESCE(SUM(ev.add_to_cart), 0)::int AS add_to_cart
+      FROM base b
+      LEFT JOIN ev ON ev.session_id = b.session_id
+      GROUP BY b.country, b.region
+      ORDER BY visitors DESC, b.region
+      LIMIT 100
+    `, [days]);
+
+    const cities = await pool.query(`
+      SELECT COALESCE(NULLIF(country, ''), 'Tidak diketahui') AS country,
+             COALESCE(NULLIF(region, ''), 'Tidak diketahui') AS region,
+             COALESCE(NULLIF(city, ''), 'Tidak diketahui') AS city,
+             COUNT(DISTINCT session_id)::int AS visitors
+      FROM visitors
+      WHERE entry_time > now() - make_interval(days => $1)
+      GROUP BY 1, 2, 3
+      ORDER BY visitors DESC, city
+      LIMIT 50
+    `, [days]);
+
+    // Lead per wilayah dari lead_captures. Tabel ini dibuat lazy oleh routes/leads.js,
+    // jadi kegagalan di sini tidak boleh menggagalkan laporan utama.
+    let leads = [];
+    try {
+      const l = await pool.query(`
+        SELECT COALESCE(NULLIF(country, ''), 'Tidak diketahui') AS country,
+               COALESCE(NULLIF(region, ''), 'Tidak diketahui') AS region,
+               COUNT(*)::int AS leads
+        FROM lead_captures
+        WHERE created_at > now() - make_interval(days => $1)
+        GROUP BY 1, 2
+      `, [days]);
+      leads = l.rows;
+    } catch (_) { leads = []; }
+    const leadKey = (r) => r.country + '|' + r.region;
+    const leadMap = new Map(leads.map(r => [leadKey(r), r.leads]));
+
+    const rows = regions.rows.map(r => ({ ...r, leads: leadMap.get(leadKey(r)) || 0 }));
+    const total = rows.reduce((s, r) => s + r.visitors, 0);
+    const known = rows.filter(r => r.region !== 'Tidak diketahui').reduce((s, r) => s + r.visitors, 0);
+
+    res.json({
+      days,
+      total_visitors: total,
+      coverage_percent: total ? Math.round((known / total) * 100) : 0,
+      regions: rows,
+      cities: cities.rows,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Gagal mengambil laporan wilayah.' });
+  }
+});
+
 // ============ GET BOUNCE RATE ============
 router.get('/bounce-rate', async (req, res) => {
   try {
