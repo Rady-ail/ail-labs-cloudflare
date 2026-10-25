@@ -29,6 +29,32 @@ check_2xx() {
   fi
 }
 
+check_contains() {
+  local label=$1
+  local path=$2
+  local needle=$3
+  request "$path"
+  if [[ "$status" =~ ^2[0-9][0-9]$ ]] && grep -qF -- "$needle" "$response_file"; then
+    printf 'PASS %-24s %s\n' "$label" "$status"
+  else
+    printf 'FAIL %-24s %s (missing: %s)\n' "$label" "$status" "$needle"
+    failures=$((failures + 1))
+  fi
+}
+
+check_absent() {
+  local label=$1
+  local path=$2
+  local needle=$3
+  request "$path"
+  if [[ "$status" =~ ^2[0-9][0-9]$ ]] && ! grep -qF -- "$needle" "$response_file"; then
+    printf 'PASS %-24s %s\n' "$label" "$status"
+  else
+    printf 'FAIL %-24s %s (found or unreachable: %s)\n' "$label" "$status" "$needle"
+    failures=$((failures + 1))
+  fi
+}
+
 check_2xx 'home' '/'
 check_2xx 'admin' '/admin/'
 check_2xx 'thalacXail' '/thalacXail'
@@ -38,6 +64,22 @@ check_2xx 'procurement' '/procurement.html'
 check_2xx 'compliance' '/compliance.html'
 check_2xx 'about' '/about.html'
 check_2xx 'contact' '/contact.html'
+
+# Domus skin and widget islands are served and wired into the pages.
+check_2xx 'domus-css' '/styles/ail-domus.css'
+check_2xx 'islands-js' '/islands/ail-islands.js'
+check_2xx 'motion-js' '/vendor/motion-11.18.2.min.js'
+check_2xx 'react-js' '/vendor/react.production.min.js'
+check_2xx 'react-dom-js' '/vendor/react-dom.production.min.js'
+check_contains 'home-domus' '/' 'id="ail-domus"'
+check_contains 'home-gauge' '/' 'data-island="temp-gauge"'
+check_contains 'procurement-stepper' '/procurement.html' 'data-island="stepper"'
+check_contains 'contact-hours' '/contact.html' 'data-island="hours"'
+
+# The postcode stays off every public page.
+for page in / /catalog.html /private-label.html /procurement.html /compliance.html /about.html /contact.html; do
+  check_absent "no-postcode ${page}" "$page" '70582'
+done
 
 request '/api/products'
 if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
