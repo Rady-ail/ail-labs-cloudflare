@@ -129,6 +129,10 @@ jobs:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          WHATSAPP_TOKEN: ${{ secrets.WHATSAPP_TOKEN }}
+          WHATSAPP_PHONE_NUMBER_ID: ${{ secrets.WHATSAPP_PHONE_NUMBER_ID }}
+          WHATSAPP_OTP_TEMPLATE_NAME: ${{ secrets.WHATSAPP_OTP_TEMPLATE_NAME }}
+          WHATSAPP_OTP_TEMPLATE_LANGUAGE: ${{ secrets.WHATSAPP_OTP_TEMPLATE_LANGUAGE }}
         run: |
           set -euo pipefail
           node -e '
@@ -138,6 +142,10 @@ jobs:
             };
             const resendKey = process.env.RESEND_API_KEY;
             if (resendKey) secrets.RESEND_API_KEY = resendKey;
+            // Optional B2B OTP gate (WhatsApp channel). Names only are logged, never values.
+            const otpNames = ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_OTP_TEMPLATE_NAME", "WHATSAPP_OTP_TEMPLATE_LANGUAGE"];
+            for (const name of otpNames) if (process.env[name]) secrets[name] = process.env[name];
+            console.error("Optional OTP secrets provided by GitHub: " + (["RESEND_API_KEY", ...otpNames].filter(n => process.env[n]).join(", ") || "none"));
             const googleId = process.env.GOOGLE_CLIENT_ID;
             const googleSecret = process.env.GOOGLE_CLIENT_SECRET;
             if (!secrets.DATABASE_URL || !secrets.ADMIN_SESSION_SECRET) {
@@ -156,6 +164,19 @@ jobs:
             }
             process.stdout.write(JSON.stringify(secrets));
           ' | npx wrangler secret bulk
+
+      - name: List runtime secret names
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -uo pipefail
+          # Names only (wrangler never returns secret values). The OTP gate needs RESEND_API_KEY,
+          # WHATSAPP_TOKEN, WHATSAPP_PHONE_NUMBER_ID and WHATSAPP_OTP_TEMPLATE_NAME.
+          npx wrangler secret list --format json 2>/dev/null \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const names=JSON.parse(s).map(x=>x.name).sort();console.log("Runtime secret names: "+names.join(", "));const need=["RESEND_API_KEY","WHATSAPP_TOKEN","WHATSAPP_PHONE_NUMBER_ID","WHATSAPP_OTP_TEMPLATE_NAME"];const missing=need.filter(n=>!names.includes(n));console.log("OTP gate secrets missing: "+(missing.join(", ")||"none"))}catch{console.log("Could not list runtime secret names.")}})' \
+            || echo 'Could not list runtime secret names.'
 
       - name: Deploy Worker with runtime secrets
         id: deploy_final
