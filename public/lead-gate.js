@@ -13,12 +13,12 @@
   #ailLeadGate .ail-check{display:flex;gap:9px;align-items:flex-start;margin-top:13px;font-size:10px;line-height:1.5;color:#607474}
   #ailLeadGate .ail-check input{width:17px;height:17px;margin:0;flex:0 0 auto} #ailLeadGate .ail-error{min-height:18px;margin-top:10px;color:#b42318;font-size:11px;font-weight:700}
   #ailLeadGate .ail-step{display:none}#ailLeadGate .ail-step.active{display:block} body.ail-lead-locked{overflow:hidden}`; document.head.appendChild(style);
-  function build(){
+  function build(wa){
     if(document.getElementById('ailLeadGate'))return;
     const wrap=document.createElement('div'); wrap.id='ailLeadGate';
     wrap.innerHTML=`<div class="ail-card" role="dialog" aria-modal="true" aria-labelledby="ailLeadTitle">
       <div class="ail-brand">AIL LABS · B2B ACCESS</div><h2 id="ailLeadTitle">Verifikasi kontak untuk melanjutkan.</h2>
-      <p>Akses website AIL LABS memerlukan data kontak B2B yang dapat dihubungi. Email dan WhatsApp diverifikasi dengan kode sekali pakai sebelum akses diberikan.</p>
+      <p>Akses website AIL LABS memerlukan data kontak B2B yang dapat dihubungi. ${wa?'Email dan WhatsApp diverifikasi':'Email diverifikasi'} dengan kode sekali pakai sebelum akses diberikan.</p>
       <div class="ail-step active"><div class="ail-grid">
         <label>Nama lengkap<input id="ailName" autocomplete="name" maxlength="120" required></label>
         <label>Perusahaan / Institusi<input id="ailCompany" autocomplete="organization" maxlength="160" required></label><label>Jenis bisnis<select id="ailBusiness"><option value="">Pilih</option><option>Clinic</option><option>Doctor</option><option>Distributor</option><option>Importer</option><option>Manufacturer</option><option>Aesthetic professional</option><option>Other</option></select></label>
@@ -27,10 +27,10 @@
       </div>
       <label class="ail-check"><input id="ailConsent" type="checkbox"><span>Saya setuju AIL LABS memproses data ini untuk verifikasi identitas kontak, komunikasi bisnis, dan keamanan website. Lihat <a href="/compliance.html" target="_blank" rel="noopener">compliance</a>.</span></label>
       <label class="ail-check"><input id="ailMarketing" type="checkbox"><span>Saya bersedia menerima informasi produk/promosi AIL LABS. (Opsional)</span></label>
-      <div class="ail-error" id="ailError"></div><button id="ailSend" type="button">Kirim kode ke Email + WhatsApp</button>
-      <div class="ail-note">Email wajib diverifikasi. Nomor WhatsApp wajib diverifikasi dengan kode OTP. Nomor hanya dapat lolos jika kode diterima pada nomor tersebut.</div></div>
-      <div class="ail-step"><p>Kode 6 digit telah dikirim ke <strong id="ailEmailPreview"></strong> dan WhatsApp Anda. Berlaku 10 menit.</p>
-        <div class="ail-grid"><label>Kode verifikasi email<input id="ailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label><label>Kode verifikasi WhatsApp<input id="ailWaOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label></div>
+      <div class="ail-error" id="ailError"></div><button id="ailSend" type="button">${wa?'Kirim kode ke Email + WhatsApp':'Kirim kode ke Email'}</button>
+      <div class="ail-note">${wa?'Email wajib diverifikasi. Nomor WhatsApp wajib diverifikasi dengan kode OTP. Nomor hanya dapat lolos jika kode diterima pada nomor tersebut.':'Email wajib diverifikasi dengan kode OTP. Nomor telepon digunakan tim kami untuk menindaklanjuti permintaan Anda.'}</div></div>
+      <div class="ail-step"><p>Kode 6 digit telah dikirim ke <strong id="ailEmailPreview"></strong>${wa?' dan WhatsApp Anda':''}. Berlaku 10 menit.</p>
+        <div class="ail-grid"><label>Kode verifikasi email<input id="ailOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>${wa?'<label>Kode verifikasi WhatsApp<input id="ailWaOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="123456"></label>':''}</div>
         <div class="ail-error" id="ailError2"></div><button id="ailVerify" type="button">Verifikasi & buka website</button>
         <button id="ailBack" type="button" style="margin-top:8px;background:#eaf4f3;color:#082f32">Kembali</button></div></div>`;
     document.body.appendChild(wrap); document.body.classList.add('ail-lead-locked');
@@ -39,23 +39,25 @@
       const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim();
       if(!name||!company||!businessType||!email||!phone||!$('ailConsent').checked){err('ailError','Lengkapi data dan centang persetujuan pemrosesan data.');return}
       $('ailSend').disabled=true;err('ailError','Mengirim kode verifikasi…');
-      try{const r=await fetch('/api/leads/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||(document.referrer?'referral':'direct'),utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:true,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'Kode verifikasi gagal dikirim.');$('ailEmailPreview').textContent=email;err('ailError','Kode email dan WhatsApp terkirim. Cek inbox email dan WhatsApp Anda.');show(1)}catch(e){err('ailError',e.message||'Terjadi kesalahan.')}finally{$('ailSend').disabled=false}
+      try{const r=await fetch('/api/leads/request-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||(document.referrer?'referral':'direct'),utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:true,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'Kode verifikasi gagal dikirim.');$('ailEmailPreview').textContent=email;err('ailError',wa?'Kode email dan WhatsApp terkirim. Cek inbox email dan WhatsApp Anda.':'Kode terkirim. Cek inbox email Anda.');show(1)}catch(e){err('ailError',e.message||'Terjadi kesalahan.')}finally{$('ailSend').disabled=false}
     };
     $('ailVerify').onclick=async()=>{
-      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim(),otp=$('ailOtp').value.trim(),waOtp=$('ailWaOtp').value.trim();
+      const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim(),otp=$('ailOtp').value.trim(),waOtp=wa?$('ailWaOtp').value.trim():'';
       $('ailVerify').disabled=true;err('ailError2','Memverifikasi…');
-      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,otp,wa_otp:waOtp,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||'direct',utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{const b=$('ailVerify');if(b)b.disabled=false}
+      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,otp,...(wa?{wa_otp:waOtp}:{}),session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||'direct',utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{const b=$('ailVerify');if(b)b.disabled=false}
     };
     $('ailBack').onclick=()=>{err('ailError2','');show(0)};
   }
   async function check(){
     // Never lock out public visitors when OTP delivery is not configured or the
     // readiness endpoint is temporarily unavailable. Enable the gate only when
-    // both email and WhatsApp verification channels are ready on the server.
+    // email verification is ready on the server; WhatsApp OTP is added when configured.
+    let wa=false;
     try {
       const readiness = await fetch('/api/leads/verification-status', {cache:'no-store'});
       const config = await readiness.json().catch(()=>({}));
       if (!readiness.ok || config.enabled !== true) return;
+      wa = config.whatsapp === true;
     } catch(e) {
       return;
     }
@@ -68,7 +70,7 @@
         localStorage.removeItem(KEY);
       }
     } catch(e) {}
-    build();
+    build(wa);
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',check,{once:true});else check();
 })();

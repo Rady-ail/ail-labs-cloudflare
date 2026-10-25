@@ -66,12 +66,18 @@ async function ensureTables() {
   tablesReady = true;
 }
 
+// Email OTP is required for the gate; WhatsApp OTP is added on top once its credentials exist.
+function otpChannels() {
+  const email = !!(process.env.RESEND_API_KEY && (process.env.MAIL_FROM || process.env.RESEND_FROM));
+  const whatsapp = email && !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_OTP_TEMPLATE_NAME);
+  return { email, whatsapp };
+}
+
 router.get('/verification-status', (req, res) => {
   res.set('Cache-Control', 'no-store');
-  const emailReady = !!(process.env.RESEND_API_KEY && (process.env.MAIL_FROM || process.env.RESEND_FROM));
-  const whatsappReady = !!(process.env.WHATSAPP_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID && process.env.WHATSAPP_OTP_TEMPLATE_NAME);
-  // Expose only whether verification can run, never which credentials are missing.
-  res.json({ enabled: emailReady && whatsappReady });
+  const { email, whatsapp } = otpChannels();
+  // Expose only which verification steps run, never which credentials are missing.
+  res.json({ enabled: email, whatsapp });
 });
 
 router.get('/status', async (req, res) => {
@@ -118,27 +124,31 @@ router.post('/request-otp', async (req, res) => {
     );
     if (recent.rows[0].count >= 3) return res.status(429).json({ ok: false, error: 'Terlalu banyak permintaan kode. Coba lagi dalam beberapa menit.' });
 
+    const channels = otpChannels();
+    if (!channels.email) return res.status(503).json({ ok: false, error: 'Verifikasi email sedang dikonfigurasi. Silakan coba lagi nanti.' });
     const otp = String(crypto.randomInt(100000, 1000000));
     const waOtp = String(crypto.randomInt(100000, 1000000));
     const waTemplate = clean(process.env.WHATSAPP_OTP_TEMPLATE_NAME, 120);
     const waLanguage = clean(process.env.WHATSAPP_OTP_TEMPLATE_LANGUAGE || 'en_US', 20);
-    if (!process.env.WHATSAPP_TOKEN || !process.env.WHATSAPP_PHONE_NUMBER_ID || !waTemplate)
-      return res.status(503).json({ ok: false, error: 'Verifikasi WhatsApp sedang dikonfigurasi. Silakan coba lagi nanti.' });
 
-    const recentWa = await pool.query(
-      `SELECT COUNT(*)::int AS count FROM lead_whatsapp_otps WHERE (phone = $1 OR request_ip = $2) AND created_at > now() - interval '15 minutes'`,
-      [phone, ip]
-    );
-    if (recentWa.rows[0].count >= 3) return res.status(429).json({ ok: false, error: 'Terlalu banyak permintaan kode WhatsApp. Coba lagi dalam beberapa menit.' });
+    if (channels.whatsapp) {
+      const recentWa = await pool.query(
+        `SELECT COUNT(*)::int AS count FROM lead_whatsapp_otps WHERE (phone = $1 OR request_ip = $2) AND created_at > now() - interval '15 minutes'`,
+        [phone, ip]
+      );
+      if (recentWa.rows[0].count >= 3) return res.status(429).json({ ok: false, error: 'Terlalu banyak permintaan kode WhatsApp. Coba lagi dalam beberapa menit.' });
+    }
 
     await pool.query(
       `INSERT INTO lead_email_otps (email, otp_hash, expires_at, request_ip) VALUES ($1, $2, now() + interval '10 minutes', $3)`,
       [email, hash(otp), ip]
     );
-    await pool.query(
-      `INSERT INTO lead_whatsapp_otps (phone, otp_hash, expires_at, request_ip) VALUES ($1, $2, now() + interval '10 minutes', $3)`,
-      [phone, hash(waOtp), ip]
-    );
+    if (channels.whatsapp) {
+      await pool.query(
+        `INSERT INTO lead_whatsapp_otps (phone, otp_hash, expires_at, request_ip) VALUES ($1, $2, now() + interval '10 minutes', $3)`,
+        [phone, hash(waOtp), ip]
+      );
+    }
 
     const from = clean(process.env.MAIL_FROM || process.env.RESEND_FROM, 254);
     if (!from || !EMAIL_RE.test(from)) return res.status(503).json({ ok: false, error: 'Email verifikasi sedang dikonfigurasi.' });
@@ -147,17 +157,19 @@ router.post('/request-otp', async (req, res) => {
       from, to: email, subject: 'Kode verifikasi AIL LABS',
       text: `Kode verifikasi AIL LABS Anda: ${otp}\n\nKode berlaku 10 menit. Jangan bagikan kode ini kepada siapa pun.`,
     });
-    const waResult = await sendWhatsAppTemplate(
-      phone.replace(/^\+/, ''),
-      waTemplate,
-      waLanguage,
-      [waOtp]
-    );
-    if (!waResult.success) {
-      console.error('[lead/request-otp] WhatsApp OTP gagal:', waResult.reason || waResult.error);
-      return res.status(502).json({ ok: false, error: 'Kode WhatsApp belum dapat dikirim. Pastikan template OTP WhatsApp sudah aktif.' });
+    if (channels.whatsapp) {
+      const waResult = await sendWhatsAppTemplate(
+        phone.replace(/^\+/, ''),
+        waTemplate,
+        waLanguage,
+        [waOtp]
+      );
+      if (!waResult.success) {
+        console.error('[lead/request-otp] WhatsApp OTP gagal:', waResult.reason || waResult.error);
+        return res.status(502).json({ ok: false, error: 'Kode WhatsApp belum dapat dikirim. Pastikan template OTP WhatsApp sudah aktif.' });
+      }
     }
-    res.status(201).json({ ok: true, message: 'Kode verifikasi telah dikirim ke email dan WhatsApp Anda.', expires_in: 600 });
+    res.status(201).json({ ok: true, whatsapp: channels.whatsapp, message: channels.whatsapp ? 'Kode verifikasi telah dikirim ke email dan WhatsApp Anda.' : 'Kode verifikasi telah dikirim ke email Anda.', expires_in: 600 });
   } catch (err) {
     console.error('[lead/request-otp]', err);
     res.status(502).json({ ok: false, error: 'Kode verifikasi belum dapat dikirim. Silakan coba lagi.' });
@@ -175,9 +187,11 @@ router.post('/verify-otp', async (req, res) => {
     const sessionId = clean(body.session_id, 120), otp = clean(body.otp, 12), waOtp = clean(body.wa_otp, 12);
     const consent = body.consent === true, marketingConsent = body.marketing_consent === true;
 
-    if (!name || !company || !email || !phone || !otp || !waOtp || !consent)
+    const channels = otpChannels();
+    if (!channels.email) return res.status(503).json({ ok: false, error: 'Verifikasi email sedang dikonfigurasi. Silakan coba lagi nanti.' });
+    if (!name || !company || !email || !phone || !otp || (channels.whatsapp && !waOtp) || !consent)
       return res.status(400).json({ ok: false, error: 'Data verifikasi belum lengkap.' });
-    if (!EMAIL_RE.test(email) || !PHONE_RE.test(phone) || !/^\d{6}$/.test(otp) || !/^\d{6}$/.test(waOtp))
+    if (!EMAIL_RE.test(email) || !PHONE_RE.test(phone) || !/^\d{6}$/.test(otp) || (channels.whatsapp && !/^\d{6}$/.test(waOtp)))
       return res.status(400).json({ ok: false, error: 'Data verifikasi tidak valid.' });
 
     const { rows } = await pool.query(
@@ -192,19 +206,22 @@ router.post('/verify-otp', async (req, res) => {
       await pool.query('UPDATE lead_email_otps SET attempts = attempts + 1 WHERE id = $1', [challenge.id]);
       return res.status(400).json({ ok: false, error: 'Kode verifikasi salah.' });
     }
-    const waRows = await pool.query(
-      `SELECT * FROM lead_whatsapp_otps WHERE phone = $1 AND consumed_at IS NULL AND expires_at > now() ORDER BY created_at DESC LIMIT 1`,
-      [phone]
-    );
-    const waChallenge = waRows.rows[0];
-    if (!waChallenge) return res.status(400).json({ ok: false, error: 'Kode WhatsApp tidak ditemukan atau sudah kedaluwarsa.' });
-    if (waChallenge.attempts >= MAX_ATTEMPTS) return res.status(429).json({ ok: false, error: 'Terlalu banyak percobaan kode WhatsApp.' });
-    if (hash(waOtp) !== waChallenge.otp_hash) {
-      await pool.query('UPDATE lead_whatsapp_otps SET attempts = attempts + 1 WHERE id = $1', [waChallenge.id]);
-      return res.status(400).json({ ok: false, error: 'Kode WhatsApp salah.' });
+    let waChallenge = null;
+    if (channels.whatsapp) {
+      const waRows = await pool.query(
+        `SELECT * FROM lead_whatsapp_otps WHERE phone = $1 AND consumed_at IS NULL AND expires_at > now() ORDER BY created_at DESC LIMIT 1`,
+        [phone]
+      );
+      waChallenge = waRows.rows[0];
+      if (!waChallenge) return res.status(400).json({ ok: false, error: 'Kode WhatsApp tidak ditemukan atau sudah kedaluwarsa.' });
+      if (waChallenge.attempts >= MAX_ATTEMPTS) return res.status(429).json({ ok: false, error: 'Terlalu banyak percobaan kode WhatsApp.' });
+      if (hash(waOtp) !== waChallenge.otp_hash) {
+        await pool.query('UPDATE lead_whatsapp_otps SET attempts = attempts + 1 WHERE id = $1', [waChallenge.id]);
+        return res.status(400).json({ ok: false, error: 'Kode WhatsApp salah.' });
+      }
     }
     await pool.query('UPDATE lead_email_otps SET consumed_at = now() WHERE id = $1', [challenge.id]);
-    await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = now() WHERE id = $1', [waChallenge.id]);
+    if (waChallenge) await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = now() WHERE id = $1', [waChallenge.id]);
 
     const token = crypto.randomBytes(32).toString('hex');
     const ip = requestIp(req);
@@ -223,9 +240,9 @@ router.post('/verify-otp', async (req, res) => {
     const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
     const result = await pool.query(
       `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,phone_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
-       VALUES ($1,$2,$3,$4,$5,now(),now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
+       VALUES ($1,$2,$3,$4,$5,now(),CASE WHEN $23::boolean THEN now() END,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
        RETURNING id,name,company,email,phone,phone_verified_at,city,region,country,interest_category,lead_score,status`,
-      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score]
+      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score,Boolean(waChallenge)]
     );
     res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
   } catch (err) {
