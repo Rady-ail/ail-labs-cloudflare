@@ -1,0 +1,250 @@
+/* AIL LABS — "Botanica" skin: botanical green, ivory and champagne, layered over Domus.
+   Loaded after ail-domus.css on every public page. Presentation only: no markup or logic changes.
+   Colour rules: fills use --dm-cyan (teal-leaf) and --dm-orange (apricot) with ink labels;
+   on ivory, text accents use --dm-cyan-deep; on green stages, --dm-cyan-bright and --dm-orange-light.
+   Brand cyan and orange stay present as light: glows, dots, rules and the CGI lighting. */
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&display=swap");
+
+:root{
+  --bt-ivory:#f7f2e8;
+  --bt-ivory-2:#ece4d3;
+  --bt-forest:#0f2a23;
+  --bt-forest-2:#173a30;
+  --bt-moss:#21493c;
+  --bt-leaf:#5fa883;
+  --bt-sage:#a9d3b8;
+  --bt-champagne:#d4b77c;
+  --bt-champagne-2:#ecdcb4;
+  --bt-serif:"Fraunces","Cormorant Garamond",Georgia,"Times New Roman",serif;
+
+  --dm-ground-1:var(--bt-ivory);
+  --dm-ground-2:var(--bt-ivory-2);
+  --dm-ink:#14302a;
+  --dm-ink-soft:#3c5a51;
+  --dm-ink-faint:#506a61;
+  --dm-smoke:rgba(15,42,35,.86);
+  --dm-black:#0b201b;
+  --dm-edge:rgba(236,220,180,.16);
+  --dm-edge-light:rgba(255,255,255,.66);
+  --dm-on-dark:#f7f2e8;
+  --dm-on-dark-muted:#c4d2c8;
+  --dm-on-dark-faint:#a9bcb0;
+  --dm-cyan:var(--bt-leaf);
+  --dm-cyan-bright:var(--bt-sage);
+  --dm-cyan-deep:#2c6b51;
+  --dm-cyan-glow:rgba(95,168,131,.34);
+  --dm-orange:var(--bt-champagne);
+  --dm-orange-light:var(--bt-champagne-2);
+  --dm-orange-glow:rgba(212,183,124,.32);
+  --dm-chip:rgba(255,253,247,.55);
+  --dm-shadow:0 30px 70px rgba(15,42,35,.22),0 8px 20px rgba(15,42,35,.10),inset 0 1px 0 rgba(255,255,255,.10);
+  --bt-stage:
+    radial-gradient(620px 380px at 88% 18%,rgba(212,183,124,.22),transparent 68%),
+    radial-gradient(560px 420px at 8% 100%,rgba(95,168,131,.26),transparent 70%),
+    linear-gradient(155deg,#1b4135 0%,#0f2a23 58%,#0a1f1a 100%);
+}
+
+/* ───────── Ground: ivory paper with soft botanical light and fine grain ───────── */
+html:has(#ail-domus){background:var(--bt-ivory-2)}
+#ail-domus{
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3 0 0 0 0 .28 0 0 0 0 .2 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    radial-gradient(1000px 640px at 86% -4%,rgba(95,168,131,.16),transparent 62%),
+    radial-gradient(900px 600px at -4% 88%,rgba(212,183,124,.18),transparent 64%),
+    linear-gradient(172deg,var(--bt-ivory) 0%,var(--bt-ivory-2) 100%) fixed!important;
+}
+#ail-domus ::selection{background:var(--bt-champagne);color:var(--dm-ink)}
+
+/* ───────── Display type: editorial serif for headlines, sans stays for UI ───────── */
+#ail-domus :is(.hero h1,.section h2,main>.card:first-child h1,main section h2,.cta h2,.about-aside strong,.panel-card strong){
+  font-family:var(--bt-serif)!important;font-weight:400!important;letter-spacing:-.025em!important;
+  font-variation-settings:"opsz" 120;
+}
+#ail-domus .hero h1{letter-spacing:-.035em!important;line-height:1!important;font-size:clamp(46px,6.2vw,92px)!important}
+#ail-domus .hero h1 span{font-style:italic;font-weight:300!important;color:var(--dm-cyan-deep)!important}
+
+/* ───────── Header ───────── */
+#ail-domus .site-header{background:rgba(247,242,232,.72)!important;border-bottom:1px solid rgba(20,48,42,.08)!important;transition:box-shadow .35s ease,background-color .35s ease}
+#ail-domus.bt-scrolled .site-header{background:rgba(247,242,232,.9)!important;box-shadow:0 10px 30px rgba(15,42,35,.08)}
+#ail-domus .mobile-menu{background:rgba(247,242,232,.97)!important}
+#ail-domus :is(.nav-cta,.nav .button-primary) span{color:var(--bt-champagne-2)!important}
+
+/* Scroll progress: a thin champagne-to-leaf thread under the header */
+.bt-progress{position:fixed;top:0;left:0;right:0;height:2px;z-index:60;pointer-events:none;transform-origin:0 50%;transform:scaleX(var(--bt-p,0));background:linear-gradient(90deg,var(--bt-leaf),var(--bt-champagne))}
+
+/* ───────── Home hero: wordmark and the CGI stage ───────── */
+#ail-domus .hero::before{color:rgba(255,255,255,.5);font-family:var(--bt-serif);font-weight:300;font-style:italic;letter-spacing:-.04em}
+#ail-domus .hero-panel[data-hero-3d]::before{background:var(--bt-stage)!important;border-color:var(--dm-edge)!important}
+#ail-domus .hero-panel[data-hero-3d]::after{background:radial-gradient(circle,rgba(212,183,124,.24),transparent 70%)!important}
+#ail-domus .hero-panel.bt-live .bt-hint{top:50px}
+#ail-domus .hero-panel .hero-ring{border-color:rgba(169,211,184,.45)!important}
+#ail-domus .hero-panel .hero-ring.two{border-color:rgba(212,183,124,.5)!important}
+#ail-domus .hero-panel .panel-card{background:rgba(9,28,23,.78)!important;border-color:rgba(236,220,180,.16)!important;backdrop-filter:blur(14px)!important;-webkit-backdrop-filter:blur(14px)!important}
+#ail-domus .hero-note i{background:var(--bt-champagne)!important;box-shadow:0 0 0 5px rgba(212,183,124,.24)!important}
+
+/* The 3D canvas lives inside the stage; the CSS orb stays as the no-WebGL fallback */
+.bt-canvas{position:absolute!important;inset:0;width:100%;height:100%;display:block;z-index:1!important;opacity:0;transition:opacity 1.1s ease;touch-action:pan-y}
+.bt-live .bt-canvas{opacity:1}
+#ail-domus .hero-panel.bt-live :is(.orb,.hero-ring){opacity:0;transition:opacity .6s ease}
+#ail-domus .hero-panel.bt-live{min-height:440px!important;justify-content:space-between}
+#ail-domus .hero-panel.bt-live .panel-label,#ail-domus .hero-panel.bt-live .panel-card{z-index:3}
+@media(min-width:900px){#ail-domus .hero-panel.bt-live{min-height:540px!important}}
+.bt-hint{position:absolute!important;z-index:3!important;right:16px;top:16px;display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:999px;
+  background:rgba(9,28,23,.5);border:1px solid rgba(236,220,180,.18);color:#e9dfc6;font-size:10px;font-weight:650;letter-spacing:.12em;text-transform:uppercase;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);pointer-events:none;opacity:0;transition:opacity .8s ease .6s}
+.bt-hint::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--bt-champagne);box-shadow:0 0 10px rgba(212,183,124,.8);animation:btPulse 2.4s ease-in-out infinite}
+.bt-live .bt-hint{opacity:1}
+@keyframes btPulse{50%{transform:scale(1.6);opacity:.5}}
+
+/* ───────── Inner pages: the intro card becomes a cinematic deep-green stage ───────── */
+#ail-domus main>.card:first-child{
+  background:var(--bt-stage)!important;border:1px solid rgba(236,220,180,.16)!important;
+  box-shadow:0 40px 90px rgba(15,42,35,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;color:var(--dm-on-dark)!important;
+}
+#ail-domus main>.card:first-child>div:first-child{background:rgba(255,255,255,.08)!important;border-color:rgba(236,220,180,.2)!important;color:#e9dfc6!important}
+#ail-domus main>.card:first-child>div:first-child::before{background:var(--bt-champagne)!important;box-shadow:0 0 10px rgba(212,183,124,.7)!important}
+#ail-domus main>.card:first-child h1{color:var(--dm-on-dark)!important;font-size:clamp(40px,7vw,78px)!important;line-height:1!important}
+#ail-domus main>.card:first-child p{color:var(--dm-on-dark-muted)!important;font-size:15px!important;line-height:1.7!important}
+#ail-domus main>.card:first-child.bt-stage{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;min-height:520px;padding-top:290px!important}
+#ail-domus main>.card:first-child.bt-stage>:not(canvas):not(.bt-hint){position:relative;z-index:2}
+#ail-domus main>.card:first-child.bt-stage .bt-canvas{height:330px;bottom:auto}
+#ail-domus main>.card:first-child.bt-stage .bt-canvas{-webkit-mask-image:linear-gradient(180deg,#000 72%,transparent);mask-image:linear-gradient(180deg,#000 72%,transparent)}
+@media(min-width:900px){
+  #ail-domus main>.card:first-child.bt-stage{min-height:480px;padding:56px!important;justify-content:center}
+  #ail-domus main>.card:first-child.bt-stage>:not(canvas):not(.bt-hint){max-width:52%}
+  #ail-domus main>.card:first-child.bt-stage .bt-canvas{left:38%;width:62%;height:100%;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 24%);mask-image:linear-gradient(90deg,transparent 0,#000 24%)}
+}
+
+/* ───────── Panels: graphite becomes deep forest glass ───────── */
+#ail-domus .process{background:radial-gradient(760px 380px at 92% 0%,rgba(212,183,124,.16),transparent 70%),radial-gradient(640px 360px at 0% 100%,rgba(95,168,131,.18),transparent 70%),linear-gradient(168deg,#173a30,#0b201b)!important}
+#ail-domus .cta{background:
+  radial-gradient(520px 260px at 92% 20%,rgba(212,183,124,.24),transparent 70%),
+  radial-gradient(520px 260px at 8% 100%,rgba(95,168,131,.26),transparent 70%),
+  linear-gradient(150deg,rgba(25,62,50,.95),rgba(11,32,27,.97))!important}
+#ail-domus main section .bg-ail-ink{background:radial-gradient(640px 300px at 100% 0%,rgba(212,183,124,.16),transparent 70%),linear-gradient(160deg,#1a3f34,#0b201b)!important}
+#ail-domus main section .bg-\[\#FBF7EF\]{background:radial-gradient(600px 280px at 100% 0%,rgba(212,183,124,.2),transparent 70%),var(--dm-smoke)!important}
+@media(hover:hover) and (pointer:fine){
+  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:rgba(212,183,124,.55)!important;box-shadow:0 34px 80px rgba(15,42,35,.28),0 0 0 1px rgba(212,183,124,.14) inset!important}
+  #ail-domus main section .card .card:hover{border-color:rgba(212,183,124,.5)!important}
+}
+#ail-domus .product-visual{background:radial-gradient(circle at 50% 38%,#fffdf8 0 24%,#efe7d6 58%,#ddd2bc 100%)!important}
+#ail-domus .product-visual::before{background:radial-gradient(circle,rgba(95,168,131,.18),transparent 66%)!important}
+
+/* Footer */
+#ail-domus .site-footer,#ail-domus>footer.border-t{background:linear-gradient(170deg,#12322a,#0a1d18)!important}
+#ail-domus .footer-title{color:var(--bt-champagne)!important}
+#ail-domus .copyright,#ail-domus>footer.border-t .text-slate-400{color:#93a89c!important}
+
+/* Lead gate & promo popup keep their logic; they take the forest + champagne light */
+#ail-domus #ailLeadGate,#ail-domus #ail-promo-popup-root{background:rgba(9,28,23,.6)!important}
+#ail-domus #ailLeadGate .ail-card{background:radial-gradient(520px 240px at 100% 0%,rgba(212,183,124,.18),transparent 70%),radial-gradient(420px 220px at 0% 100%,rgba(95,168,131,.16),transparent 70%),linear-gradient(160deg,#1b4135,#0b201b)!important;border-top-color:var(--bt-champagne)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-dialog{background:radial-gradient(520px 260px at 100% 0%,rgba(212,183,124,.2),transparent 70%),radial-gradient(520px 260px at 0% 100%,rgba(95,168,131,.2),transparent 70%),linear-gradient(160deg,#1b4135,#0b201b)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-top{background:linear-gradient(90deg,var(--bt-leaf),var(--bt-sage) 45%,var(--bt-champagne))!important}
+#ail-domus :is(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline-color:var(--bt-champagne)!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
+
+/* ───────── Brighter pass with brand cyan + orange bias ───────── */
+:root{
+  --bt-cyan:#0aa7b5;
+  --bt-cyan-bright:#6fe0e6;
+  --bt-orange:#f07b4f;
+  --bt-orange-light:#ffad88;
+  --bt-ivory:#fbf8f1;
+  --bt-ivory-2:#f1eadc;
+  --dm-ink:#123a33;
+  --dm-ink-soft:#355e56;
+  --dm-cyan:#3fb3a4;
+  --dm-cyan-bright:#8fe6e0;
+  --dm-cyan-deep:#0b7377;
+  --dm-cyan-glow:rgba(10,167,181,.32);
+  --dm-orange:#eda070;
+  --dm-orange-light:#ffc29e;
+  --dm-orange-glow:rgba(240,123,79,.3);
+  --dm-smoke:rgba(30,78,68,.84);
+  --dm-black:#16413a;
+  --dm-on-dark-muted:#d2e3dd;
+  --dm-on-dark-faint:#b7cdc6;
+  --dm-edge:rgba(255,236,214,.2);
+  --bt-stage:
+    radial-gradient(560px 360px at 92% 8%,rgba(240,123,79,.30),transparent 66%),
+    radial-gradient(620px 420px at 4% 100%,rgba(10,167,181,.34),transparent 70%),
+    radial-gradient(460px 300px at 60% 55%,rgba(212,183,124,.14),transparent 70%),
+    linear-gradient(155deg,#2f6d60 0%,#1f5247 55%,#173f37 100%);
+}
+#ail-domus{
+  background:
+    radial-gradient(1000px 640px at 88% -6%,rgba(10,167,181,.14),transparent 62%),
+    radial-gradient(900px 600px at -6% 90%,rgba(240,123,79,.12),transparent 64%),
+    radial-gradient(700px 500px at 40% 40%,rgba(95,168,131,.08),transparent 70%),
+    linear-gradient(172deg,var(--bt-ivory) 0%,var(--bt-ivory-2) 100%) fixed!important;
+}
+#ail-domus .site-header{background:rgba(251,248,241,.74)!important}
+#ail-domus.bt-scrolled .site-header{background:rgba(251,248,241,.92)!important}
+#ail-domus .mobile-menu{background:rgba(251,248,241,.97)!important}
+#ail-domus :is(.nav-cta,.nav .button-primary) span{color:var(--bt-orange-light)!important}
+.bt-progress{height:3px;background:linear-gradient(90deg,var(--bt-cyan),var(--bt-champagne) 55%,var(--bt-orange))}
+
+/* Status dots and rules: cyan for "live", orange for "action" */
+#ail-domus .eyebrow::before,#ail-domus main>.card:first-child>div:first-child::before{background:var(--bt-cyan)!important;box-shadow:0 0 10px rgba(10,167,181,.7)!important}
+#ail-domus .hero-note i{background:var(--bt-orange)!important;box-shadow:0 0 0 5px rgba(240,123,79,.2)!important}
+.bt-hint::before{background:var(--bt-cyan-bright);box-shadow:0 0 10px rgba(111,224,230,.9)}
+.bt-hint{background:rgba(18,58,51,.45);border-color:rgba(111,224,230,.25);color:#eaf7f5}
+
+/* Stages */
+#ail-domus .hero-panel[data-hero-3d]::after{background:radial-gradient(circle,rgba(10,167,181,.26),transparent 70%)!important}
+#ail-domus .hero-panel .panel-card{background:rgba(16,52,46,.72)!important;border-color:rgba(111,224,230,.2)!important}
+#ail-domus main>.card:first-child{border-color:rgba(111,224,230,.22)!important;box-shadow:0 40px 90px rgba(18,58,51,.22),0 0 0 1px rgba(240,123,79,.06) inset,inset 0 1px 0 rgba(255,255,255,.12)!important}
+#ail-domus main>.card:first-child>div:first-child{color:#eaf7f5!important;border-color:rgba(111,224,230,.28)!important}
+
+/* Cards and bands */
+#ail-domus #hero-following-stats .stat:first-child strong{color:var(--bt-cyan-bright)!important}
+#ail-domus #hero-following-stats .stat:last-child strong{color:var(--bt-orange-light)!important}
+#ail-domus .category{border-top:2px solid var(--bt-cyan)!important}
+#ail-domus .category:nth-child(2){border-top-color:var(--bt-champagne)!important}
+#ail-domus .category:nth-child(3){border-top-color:var(--bt-orange)!important}
+#ail-domus .feature{border-top-color:var(--bt-cyan)!important}
+#ail-domus .feature:nth-child(2){border-top-color:var(--bt-orange)!important}
+#ail-domus :is(.category .number,.step-num){color:var(--bt-orange-light)!important}
+#ail-domus .process{background:radial-gradient(760px 380px at 92% 0%,rgba(240,123,79,.22),transparent 70%),radial-gradient(640px 360px at 0% 100%,rgba(10,167,181,.26),transparent 70%),linear-gradient(168deg,#2b6658,#183f37)!important}
+#ail-domus .cta{background:
+  radial-gradient(520px 260px at 92% 20%,rgba(240,123,79,.3),transparent 70%),
+  radial-gradient(520px 260px at 8% 100%,rgba(10,167,181,.32),transparent 70%),
+  linear-gradient(150deg,rgba(45,104,92,.95),rgba(24,63,55,.97))!important}
+#ail-domus main section .bg-ail-ink{background:radial-gradient(640px 300px at 100% 0%,rgba(240,123,79,.2),transparent 70%),radial-gradient(520px 300px at 0% 100%,rgba(10,167,181,.2),transparent 70%),linear-gradient(160deg,#2c675a,#183f37)!important}
+#ail-domus main section .bg-\[\#FBF7EF\]{background:radial-gradient(600px 280px at 100% 0%,rgba(240,123,79,.22),transparent 70%),var(--dm-smoke)!important;border-top-color:var(--bt-orange)!important}
+#ail-domus .about-aside div[style]{color:var(--bt-cyan-bright)!important}
+@media(hover:hover) and (pointer:fine){
+  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:rgba(10,167,181,.55)!important;box-shadow:0 34px 80px rgba(18,58,51,.24),0 0 0 1px rgba(10,167,181,.16) inset,0 18px 50px rgba(240,123,79,.1)!important}
+  #ail-domus main section .card .card:hover{border-color:rgba(111,224,230,.5)!important}
+}
+#ail-domus .button-orange{background:linear-gradient(135deg,#f6a57c,#ef8a5c)!important;color:#1a1310!important;box-shadow:0 12px 30px rgba(240,123,79,.32)!important}
+#ail-domus main .bg-ail-teal{background:linear-gradient(135deg,#4fc4c4,#3fb3a4)!important;border-color:transparent!important;color:#0d2a26!important;box-shadow:0 10px 26px rgba(10,167,181,.3)!important}
+#ail-domus .contact-line a:hover{color:var(--bt-cyan)!important}
+
+/* Footer and overlays */
+#ail-domus .site-footer,#ail-domus>footer.border-t{background:radial-gradient(700px 300px at 100% 0%,rgba(240,123,79,.16),transparent 70%),radial-gradient(700px 300px at 0% 100%,rgba(10,167,181,.18),transparent 70%),linear-gradient(170deg,#24594d,#163a33)!important}
+#ail-domus .footer-title{color:var(--bt-cyan-bright)!important}
+#ail-domus .copyright,#ail-domus>footer.border-t .text-slate-400{color:#a9c4bc!important}
+#ail-domus #ailLeadGate .ail-card,#ail-domus #ail-promo-popup-root .ail-promo-dialog{background:radial-gradient(520px 240px at 100% 0%,rgba(240,123,79,.22),transparent 70%),radial-gradient(420px 220px at 0% 100%,rgba(10,167,181,.24),transparent 70%),linear-gradient(160deg,#2d695c,#183f37)!important}
+#ail-domus #ailLeadGate .ail-card{border-top-color:var(--bt-cyan)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-top{background:linear-gradient(90deg,var(--bt-cyan),var(--bt-champagne) 50%,var(--bt-orange))!important}
+#ail-domus #ail-promo-popup-root .ail-promo-discount-value{color:var(--bt-orange-light)!important}
+#ail-domus ::selection{background:rgba(10,167,181,.28);color:var(--dm-ink)}
+
+/* ───────── Motion: reveal and tilt (only once the script marks the page ready) ───────── */
+.bt-ready .bt-reveal{opacity:0;translate:0 32px;scale:.985;transition:opacity .9s cubic-bezier(.2,.75,.2,1),translate .9s cubic-bezier(.2,.75,.2,1),scale .9s cubic-bezier(.2,.75,.2,1);transition-delay:var(--bt-delay,0ms)}
+.bt-ready .bt-reveal.bt-in{opacity:1;translate:0 0;scale:1}
+@media(hover:hover) and (pointer:fine){
+  #ail-domus .bt-tilt{transform:perspective(900px) rotateX(var(--bt-rx,0deg)) rotateY(var(--bt-ry,0deg)) translateY(var(--bt-lift,0px))!important;transition:transform .5s cubic-bezier(.2,.75,.2,1),box-shadow .4s ease,border-color .4s ease!important;transform-style:preserve-3d}
+  #ail-domus .bt-tilt.bt-tilting{transition:transform .12s linear,box-shadow .4s ease,border-color .4s ease!important}
+  #ail-domus .bt-tilt::after{content:""!important;display:block!important;position:absolute;inset:0;z-index:2!important;border-radius:inherit;pointer-events:none;opacity:var(--bt-glare,0);transition:opacity .4s ease;
+    background:radial-gradient(420px circle at var(--bt-gx,50%) var(--bt-gy,50%),rgba(111,224,230,.2),rgba(255,173,136,.08) 30%,transparent 50%)!important;animation:none!important;top:0!important;left:0!important;width:auto!important;height:auto!important;transform:none!important}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .bt-ready .bt-reveal{opacity:1;translate:none;scale:none;transition:none}
+  #ail-domus .bt-tilt{transform:none!important}
+  .bt-canvas,.bt-hint{transition:none}
+  .bt-hint::before{animation:none}
+}
+@media(max-width:640px){#ail-domus .hero::before{color:rgba(255,255,255,.32)}}
+@media print{.bt-canvas,.bt-hint,.bt-progress{display:none!important}}
