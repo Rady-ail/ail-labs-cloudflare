@@ -80,7 +80,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .hero-note i{background:var(--dm-orange)!important;box-shadow:0 0 0 5px rgba(240,123,79,.22)!important}
 
 /* Hero: giant faint wordmark behind, smoked dashboard panel */
-#ail-domus .hero{position:relative;overflow:hidden}
+#ail-domus .hero{position:relative;overflow:visible}
 #ail-domus .hero::before{
   content:"AIL LABS";position:absolute;left:50%;top:38px;transform:translateX(-50%);z-index:0;pointer-events:none;
   font-size:clamp(90px,19vw,280px);font-weight:700;letter-spacing:-.06em;line-height:1;white-space:nowrap;
@@ -184,7 +184,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .copyright{color:#9b978f!important;border-top-color:rgba(255,255,255,.10)!important}
 
 /* Focus: cyan-bright ring with a dark halo, visible on greige and on smoke */
-#ail-domus :is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--dm-cyan-bright)!important;outline-offset:2px!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
+#ail-domus :is(a,button,input,select,textarea,[tabindex]:not([tabindex="-1"])):focus-visible{outline:2px solid var(--dm-cyan-bright)!important;outline-offset:2px!important;box-shadow:0 0 0 5px var(--dm-ink)!important}
 
 @media(max-width:640px){
   #ail-domus .hero::before{top:20px}
@@ -277,3 +277,59 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus>footer.border-t :is(.text-slate-500){color:var(--dm-on-dark-muted)!important}
 #ail-domus>footer.border-t :is(.text-slate-400){color:#9b978f!important}
 #ail-domus>footer.border-t b{color:var(--dm-on-dark)!important}
+
+/* ───────── Home hero stats: three tiles fill the row (the source grid had four columns for three stats) ───────── */
+#ail-domus #hero-following-stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+#ail-domus #hero-following-stats .stat:first-child{grid-column:1/-1}
+@media(min-width:640px){
+  #ail-domus #hero-following-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  #ail-domus #hero-following-stats .stat:first-child{grid-column:auto}
+}
+
+/* ───────── B2B access gate (lead-gate.js) — logic untouched, look only ───────── */
+#ail-domus #ailLeadGate{background:rgba(18,20,21,.62)!important;backdrop-filter:blur(16px) saturate(120%);-webkit-backdrop-filter:blur(16px) saturate(120%);font-family:var(--font-sf,inherit)!important}
+/* lead-gate.js ships `.ail-step.active{display:block}`, which loses to its own `#ailLeadGate .ail-step{display:none}`: show the active step */
+#ail-domus #ailLeadGate .ail-step.active{display:block!important}
+#ail-domus #ailLeadGate .ail-card{
+  background:radial-gradient(520px 240px at 100% 0%,rgba(10,167,181,.16),transparent 70%),radial-gradient(420px 220px at 0% 100%,rgba(240,123,79,.10),transparent 70%),linear-gradient(160deg,#26292a,#161819)!important;
+  border:1px solid var(--dm-edge)!important;border-top:2px solid var(--dm-cyan)!important;border-radius:var(--dm-radius-xl)!important;
+  box-shadow:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important;color:var(--dm-on-dark)!important;
+}
+#ail-domus #ailLeadGate .ail-brand{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--dm-edge);color:var(--dm-on-dark-muted)!important;font-weight:600!important;letter-spacing:.08em!important}
+#ail-domus #ailLeadGate .ail-brand::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-cyan);box-shadow:0 0 10px var(--dm-cyan-glow)}
+#ail-domus #ailLeadGate h2{margin-top:16px!important;color:var(--dm-on-dark)!important;font-weight:500!important}
+#ail-domus #ailLeadGate p,#ail-domus #ailLeadGate .ail-check{color:var(--dm-on-dark-muted)!important}
+#ail-domus #ailLeadGate p strong{color:var(--dm-on-dark)}
+#ail-domus #ailLeadGate label{color:var(--dm-on-dark)!important}
+#ail-domus #ailLeadGate :is(input:not([type=checkbox]),select){display:block;width:100%;margin-top:5px;padding:13px 14px;background:rgba(0,0,0,.26)!important;border:1px solid rgba(255,255,255,.18)!important;border-radius:14px!important;color:var(--dm-on-dark)!important;font:inherit;font-size:14px}
+#ail-domus #ailLeadGate select option{color:var(--dm-ink);background:#fff}
+#ail-domus #ailLeadGate input::placeholder{color:var(--dm-on-dark-faint)!important;opacity:1}
+#ail-domus #ailLeadGate :is(input:not([type=checkbox]),select):focus{border-color:var(--dm-cyan-bright)!important;box-shadow:0 0 0 3px rgba(94,215,223,.18)!important}
+#ail-domus #ailLeadGate input[type=checkbox]{accent-color:var(--dm-cyan)}
+#ail-domus #ailLeadGate a{color:var(--dm-cyan-bright)!important}
+#ail-domus #ailLeadGate button{border-radius:999px!important;background:var(--dm-cyan)!important;color:var(--dm-ink)!important;font-weight:700!important;box-shadow:0 10px 26px var(--dm-cyan-glow)}
+#ail-domus #ailLeadGate button:hover:not(:disabled){background:var(--dm-cyan-bright)!important}
+#ail-domus #ailLeadGate #ailBack{background:rgba(255,255,255,.08)!important;color:var(--dm-on-dark)!important;border:1px solid var(--dm-edge)!important;box-shadow:none}
+#ail-domus #ailLeadGate .ail-error{color:#ff8f8f!important}
+#ail-domus #ailLeadGate .ail-note{color:var(--dm-on-dark-faint)!important}
+
+/* ───────── Promo popup (promo-popup.js) — same smoke + cyan/orange language as the CTA band ───────── */
+#ail-domus #ail-promo-popup-root{background:rgba(18,20,21,.62)!important;backdrop-filter:blur(14px) saturate(120%)!important;-webkit-backdrop-filter:blur(14px) saturate(120%)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-dialog{
+  background:radial-gradient(520px 260px at 100% 0%,rgba(240,123,79,.18),transparent 70%),radial-gradient(520px 260px at 0% 100%,rgba(10,167,181,.20),transparent 70%),linear-gradient(160deg,#26292a,#161819)!important;
+  border:1px solid var(--dm-edge)!important;border-radius:var(--dm-radius-xl)!important;color:var(--dm-on-dark)!important;
+  box-shadow:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important;font-family:var(--font-sf,inherit)!important;
+}
+#ail-domus #ail-promo-popup-root .ail-promo-top{height:3px!important;background:linear-gradient(90deg,var(--dm-cyan),var(--dm-cyan-bright) 45%,var(--dm-orange))!important}
+#ail-domus #ail-promo-popup-root .ail-promo-close{border-radius:999px!important;background:rgba(255,255,255,.08)!important;border-color:var(--dm-edge)!important;color:var(--dm-on-dark)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-badge{background:rgba(255,255,255,.08)!important;border-color:var(--dm-edge)!important;color:var(--dm-on-dark-muted)!important;font-weight:600!important;letter-spacing:.08em!important}
+#ail-domus #ail-promo-popup-root .ail-promo-badge::before{background:var(--dm-cyan)!important;box-shadow:0 0 10px var(--dm-cyan-glow)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-title{color:var(--dm-on-dark)!important;font-weight:500!important;letter-spacing:-.05em!important}
+#ail-domus #ail-promo-popup-root .ail-promo-subtitle{color:var(--dm-on-dark-muted)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-discount{background:rgba(255,255,255,.06)!important;border:1px solid rgba(240,123,79,.40)!important;border-radius:var(--dm-radius-md)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-discount-label{color:var(--dm-on-dark-muted)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-discount-value{color:var(--dm-orange-light)!important;font-weight:700!important}
+#ail-domus #ail-promo-popup-root .ail-promo-note{color:var(--dm-on-dark-faint)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-cta{background:var(--dm-cyan)!important;border-color:var(--dm-cyan)!important;color:var(--dm-ink)!important;border-radius:999px!important;font-weight:700!important;box-shadow:0 10px 26px var(--dm-cyan-glow)!important}
+#ail-domus #ail-promo-popup-root .ail-promo-secondary{background:rgba(255,255,255,.08)!important;border-color:var(--dm-edge)!important;color:var(--dm-on-dark)!important;border-radius:999px!important}
+#ail-domus #ail-promo-popup-root .ail-promo-dialog:focus{outline:none!important;box-shadow:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important}
