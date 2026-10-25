@@ -86,6 +86,8 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 @media(max-width:639px){#ail-domus::before{opacity:.055;background-position:right -96px top 84px,center bottom}}
 @media print{#ail-domus::before{display:none}}
 #ail-domus ::selection{background:var(--dm-cyan);color:var(--dm-ink)}
+/* index and catalog set html{scroll-behavior:smooth} with no reduced-motion exception */
+@media(prefers-reduced-motion:reduce){html:has(#ail-domus){scroll-behavior:auto}}
 
 /* Header */
 #ail-domus .site-header{background:rgba(234,232,227,.66)!important;border-bottom:1px solid rgba(29,28,26,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
