@@ -1,7 +1,7 @@
 /* AIL LABS — "Domus" skin: greige ground, smoked-glass panels, brand cyan + orange accents.
    Presentation only. Scoped to <body id="ail-domus"> so it outranks the page's inline glass rules.
-   Colour rules: pure cyan/orange are fills, dots, rings and rules; on the light ground, text accents use
-   --dm-cyan-deep; on smoke and black, text accents use --dm-cyan-bright and --dm-orange-light. */
+   Colour rules: pure cyan/orange are fills, dots, rings and rules; on the light ground, normal-size text accents use
+   --dm-cyan-ink (AA 4.8:1 on ground-2) and --dm-cyan-deep is kept for large text and icons; on smoke and black, text accents use --dm-cyan-bright and --dm-orange-light. */
 
 :root{
   --dm-ground-1:#e6e4df;
@@ -19,6 +19,7 @@
   --dm-cyan:#0aa7b5;
   --dm-cyan-bright:#5ed7df;
   --dm-cyan-deep:#087079;
+  --dm-cyan-ink:#055e66;
   --dm-cyan-glow:rgba(10,167,181,.30);
   --dm-orange:#f07b4f;
   --dm-orange-light:#ff9b74;
@@ -184,7 +185,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .contact-line{border-bottom-color:rgba(29,28,26,.12)!important}
 #ail-domus .contact-line small{color:var(--dm-ink-faint)!important}
 #ail-domus .contact-line :is(a,span){color:var(--dm-ink)!important}
-#ail-domus .contact-line a:hover{color:var(--dm-cyan-deep)!important}
+#ail-domus .contact-line a:hover{color:var(--dm-cyan-ink)!important}
 
 /* Footer */
 #ail-domus .site-footer{background:#121415!important}
