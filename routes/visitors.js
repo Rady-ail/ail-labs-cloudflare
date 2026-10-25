@@ -22,6 +22,32 @@ let permissionColumnsReady = false;
   } catch (err) { console.error('Visitor permission migration failed:', err.message); }
 })();
 
+// Lokasi level wilayah (negara/provinsi/kota) untuk laporan peminat per daerah.
+// Diisi dari header internal x-ail-geo-* yang disuntik src/worker.js dari
+// request.cf. Hanya nama wilayah; tidak ada koordinat.
+const geoReady = (async () => {
+  try {
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS country TEXT');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS region TEXT');
+    await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS city TEXT');
+    await pool.query('CREATE INDEX IF NOT EXISTS idx_visitors_region ON visitors(country, region)');
+    return true;
+  } catch (err) { console.error('Visitor geo migration failed:', err.message); return false; }
+})();
+
+function readGeo(req) {
+  const pick = (name) => {
+    const raw = req.headers[name];
+    if (!raw) return null;
+    try { return decodeURIComponent(String(raw)).trim().slice(0, 120) || null; } catch (_) { return null; }
+  };
+  return {
+    country: pick('x-ail-geo-country') || (req.headers['cf-ipcountry'] ? String(req.headers['cf-ipcountry']).slice(0, 20) : null),
+    region: pick('x-ail-geo-region'),
+    city: pick('x-ail-geo-city'),
+  };
+}
+
 // ============ GET CURRENT ACTIVE VISITORS (admin) ============
 router.get('/active', requireAdmin, async (req, res) => {
   try {
@@ -96,24 +122,44 @@ router.post('/track', async (req, res) => {
     const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
     const userAgent = req.headers['user-agent'] || '';
 
+    const geoOk = await geoReady;
+    const geo = readGeo(req);
     const existing = await pool.query('SELECT id FROM visitors WHERE session_id = $1', [session_id]);
 
     let result;
     if (existing.rows.length > 0) {
-      result = await pool.query(
-        `UPDATE visitors
-         SET last_activity = now(), page_visited = $2, is_active = true
-         WHERE session_id = $1
-         RETURNING *`,
-        [session_id, page_visited || '/']
-      );
+      result = geoOk
+        ? await pool.query(
+            `UPDATE visitors
+             SET last_activity = now(), page_visited = $2, is_active = true,
+                 country = COALESCE(country, $3),
+                 region = COALESCE(region, $4),
+                 city = COALESCE(city, $5)
+             WHERE session_id = $1
+             RETURNING *`,
+            [session_id, page_visited || '/', geo.country, geo.region, geo.city]
+          )
+        : await pool.query(
+            `UPDATE visitors
+             SET last_activity = now(), page_visited = $2, is_active = true
+             WHERE session_id = $1
+             RETURNING *`,
+            [session_id, page_visited || '/']
+          );
     } else {
-      result = await pool.query(
-        `INSERT INTO visitors (session_id, ip_address, user_agent, page_visited, referrer)
-         VALUES ($1, $2, $3, $4, $5)
-         RETURNING *`,
-        [session_id, ip, userAgent, page_visited || '/', referrer || 'direct']
-      );
+      result = geoOk
+        ? await pool.query(
+            `INSERT INTO visitors (session_id, ip_address, user_agent, page_visited, referrer, country, region, city)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+             RETURNING *`,
+            [session_id, ip, userAgent, page_visited || '/', referrer || 'direct', geo.country, geo.region, geo.city]
+          )
+        : await pool.query(
+            `INSERT INTO visitors (session_id, ip_address, user_agent, page_visited, referrer)
+             VALUES ($1, $2, $3, $4, $5)
+             RETURNING *`,
+            [session_id, ip, userAgent, page_visited || '/', referrer || 'direct']
+          );
     }
 
     res.json(result.rows[0]);

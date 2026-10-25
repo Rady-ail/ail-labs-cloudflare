@@ -77,6 +77,12 @@ CREATE TABLE IF NOT EXISTS visitors (
   is_active       BOOLEAN NOT NULL DEFAULT true
 );
 
+-- Lokasi level wilayah dari Cloudflare (tanpa koordinat), untuk laporan per daerah
+ALTER TABLE visitors ADD COLUMN IF NOT EXISTS country TEXT;
+ALTER TABLE visitors ADD COLUMN IF NOT EXISTS region TEXT;
+ALTER TABLE visitors ADD COLUMN IF NOT EXISTS city TEXT;
+CREATE INDEX IF NOT EXISTS idx_visitors_region ON visitors(country, region);
+
 CREATE INDEX IF NOT EXISTS idx_visitors_session ON visitors(session_id);
 CREATE INDEX IF NOT EXISTS idx_visitors_active ON visitors(is_active);
 CREATE INDEX IF NOT EXISTS idx_visitors_entry_time ON visitors(entry_time DESC);

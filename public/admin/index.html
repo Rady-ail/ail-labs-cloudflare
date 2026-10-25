@@ -938,6 +938,30 @@ table{background:#fff!important;border-color:var(--glass-border)!important}th{ba
           </table>
         </div>
       </div>
+
+      <div class="chart-card glass">
+        <h4>Wilayah Pengunjung</h4>
+        <p id="regionCoverage" class="muted" style="margin:0 0 10px"></p>
+        <div class="toolbar" style="margin-bottom:10px">
+          <button class="btn btn-secondary" onclick="downloadRegionsCsv()">⬇️ Unduh CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Provinsi / Wilayah</th><th>Negara</th><th>Pengunjung</th><th>Porsi</th><th>Lihat Produk</th><th>Keranjang</th><th>Lead</th></tr></thead>
+            <tbody id="regionsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="chart-card glass">
+        <h4>Kota Teratas</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Kota</th><th>Provinsi / Wilayah</th><th>Negara</th><th>Pengunjung</th></tr></thead>
+            <tbody id="citiesBody"></tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- PROCUREMENT AI -->
@@ -2244,6 +2268,67 @@ async function loadAnalytics(){
   } catch(err){
     showToast(err.message);
   }
+  try{
+    renderRegions(await api('/analytics/regions?days='+days));
+  } catch(err){
+    document.getElementById('regionsBody').innerHTML = `<tr><td colspan="7" class="empty">Laporan wilayah gagal dimuat.</td></tr>`;
+  }
+}
+
+let lastRegionReport = null;
+
+function renderRegions(d){
+  lastRegionReport = d;
+  const total = Number(d.total_visitors)||0;
+  document.getElementById('regionCoverage').textContent = total
+    ? `${total} pengunjung dalam ${d.days} hari. Lokasi terbaca untuk ${d.coverage_percent}% di antaranya; sisanya tercatat sebelum fitur ini aktif atau lokasinya tidak tersedia.`
+    : '';
+  const body = document.getElementById('regionsBody');
+  if(!d.regions || d.regions.length===0){
+    body.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data wilayah. Lokasi baru tercatat untuk pengunjung setelah fitur ini aktif.</td></tr>`;
+  } else {
+    body.innerHTML = d.regions.map(r=>{
+      const share = total ? Math.round((r.visitors/total)*100) : 0;
+      return `
+        <tr>
+          <td><b>${esc(r.region)}</b></td>
+          <td>${esc(r.country)}</td>
+          <td>${r.visitors}</td>
+          <td>${share}%</td>
+          <td>${r.product_views||0}</td>
+          <td>${r.add_to_cart||0}</td>
+          <td>${r.leads||0}</td>
+        </tr>`;
+    }).join('');
+  }
+  const cb = document.getElementById('citiesBody');
+  if(!d.cities || d.cities.length===0){
+    cb.innerHTML = `<tr><td colspan="4" class="empty">Belum ada data kota.</td></tr>`;
+  } else {
+    cb.innerHTML = d.cities.map(r=>`
+      <tr>
+        <td><b>${esc(r.city)}</b></td>
+        <td>${esc(r.region)}</td>
+        <td>${esc(r.country)}</td>
+        <td>${r.visitors}</td>
+      </tr>`).join('');
+  }
+}
+
+function downloadRegionsCsv(){
+  if(!lastRegionReport || !lastRegionReport.regions || lastRegionReport.regions.length===0){ showToast('Belum ada data wilayah untuk diunduh'); return; }
+  const cell = v => '"' + String(v==null?'':v).replace(/"/g,'""') + '"';
+  const total = Number(lastRegionReport.total_visitors)||0;
+  const lines = [['Provinsi/Wilayah','Negara','Pengunjung','Porsi (%)','Lihat Produk','Keranjang','Lead'].map(cell).join(',')];
+  lastRegionReport.regions.forEach(r=>{
+    lines.push([r.region, r.country, r.visitors, total?Math.round((r.visitors/total)*100):0, r.product_views||0, r.add_to_cart||0, r.leads||0].map(cell).join(','));
+  });
+  const blob = new Blob(['﻿'+lines.join('\n')], {type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `wilayah-pengunjung-${lastRegionReport.days}hari.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 1000);
 }
 
 function renderAnalyticsStats(d){
