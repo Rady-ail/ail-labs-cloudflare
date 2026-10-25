@@ -195,9 +195,9 @@
     var p = useProducts();
     if (p.state === 'error') return null;
     if (p.state === 'loading') {
-      return h('p', { className: 'dm-live is-loading' }, h('i', { 'aria-hidden': 'true' }), 'Menyinkronkan katalog…');
+      return h('p', { className: 'dm-live is-loading' }, h('i', { className: 'dm-dot', 'aria-hidden': 'true' }), 'Menyinkronkan katalog…');
     }
-    return h('p', { className: 'dm-live' }, h('i', { 'aria-hidden': 'true' }),
+    return h('p', { className: 'dm-live' }, h('i', { className: 'dm-dot is-live', 'aria-hidden': 'true' }),
       fmt(p.data.total) + ' produk · ' + fmt(p.data.cats.length) + ' kategori · katalog live');
   }
 
@@ -275,8 +275,8 @@
     }, []);
     var open = st[0];
     return h(R.Fragment, null,
-      h('span', { className: 'dm-hours__status' + (open ? ' is-open' : '') },
-        h('i', { 'aria-hidden': 'true' }), open ? 'Dalam jam kerja' : 'Di luar jam kerja'),
+      h('span', { className: 'dm-pill dm-hours__status' + (open ? ' is-open' : '') },
+        h('i', { className: 'dm-dot' + (open ? ' is-live' : ' is-progress'), 'aria-hidden': 'true' }), open ? 'Dalam jam kerja' : 'Di luar jam kerja'),
       props.label ? h('span', { className: 'dm-hours__label' }, props.label) : null);
   }
 
@@ -305,7 +305,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(props.value).then(done, fallback);
       else fallback();
     };
-    return h('button', { type: 'button', className: 'dm-copy' + (st[0] ? ' is-done' : ''), onClick: copy, 'aria-label': (st[0] ? 'Tersalin: ' : 'Salin ') + props.value },
+    return h('button', { type: 'button', className: 'dm-pill dm-copy' + (st[0] ? ' is-done' : ''), onClick: copy, 'aria-label': (st[0] ? 'Tersalin: ' : 'Salin ') + props.value },
       h('span', { 'aria-hidden': 'true' }, st[0] ? 'Tersalin' : 'Salin'));
   }
 
