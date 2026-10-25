@@ -7,10 +7,11 @@
 // Interface sendMail() dibuat mirip Nodemailer supaya routes/orders.js
 // tidak perlu diubah sama sekali.
 
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const RESEND_API_URL = 'https://api.resend.com/emails';
 
 async function sendMail({ from, to, subject, text, html, attachments, replyTo }) {
+  // Read per call so a secret added after the module loaded is still picked up.
+  const RESEND_API_KEY = process.env.RESEND_API_KEY;
   if (!RESEND_API_KEY) {
     throw new Error('RESEND_API_KEY belum diset di environment variables.');
   }
