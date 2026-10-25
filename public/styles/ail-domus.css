@@ -333,3 +333,69 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus #ail-promo-popup-root .ail-promo-cta{background:var(--dm-cyan)!important;border-color:var(--dm-cyan)!important;color:var(--dm-ink)!important;border-radius:999px!important;font-weight:700!important;box-shadow:0 10px 26px var(--dm-cyan-glow)!important}
 #ail-domus #ail-promo-popup-root .ail-promo-secondary{background:rgba(255,255,255,.08)!important;border-color:var(--dm-edge)!important;color:var(--dm-on-dark)!important;border-radius:999px!important}
 #ail-domus #ail-promo-popup-root .ail-promo-dialog:focus{outline:none!important;box-shadow:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important}
+
+/* ───────── Widgets (islands/ail-islands.js + catalog card template) ───────── */
+
+/* Temperature range gauge inside the home "2–25°C" stat */
+#ail-domus #hero-following-stats .stat.has-gauge{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:12px;align-content:center}
+#ail-domus .stat.has-gauge>strong,#ail-domus .stat.has-gauge>span,#ail-domus .stat.has-gauge>.dm-gauge-legend{grid-column:1}
+#ail-domus .dm-gauge-slot{grid-column:2;grid-row:1/span 3;align-self:center;width:112px}
+#ail-domus .dm-gauge{display:block;width:100%;height:auto;overflow:visible}
+#ail-domus .dm-gauge path{fill:none;stroke-linecap:round}
+#ail-domus .dm-gauge__track{stroke:rgba(255,255,255,.12);stroke-width:7}
+#ail-domus .dm-gauge__track--inner{stroke:rgba(255,255,255,.08);stroke-width:3.5}
+#ail-domus .dm-gauge__band{stroke:var(--dm-cyan);stroke-width:7;stroke-dasharray:1 1;filter:drop-shadow(0 0 6px rgba(10,167,181,.45))}
+#ail-domus .dm-gauge__cold{stroke:var(--dm-orange);stroke-width:3.5;stroke-dasharray:1 1}
+#ail-domus .dm-gauge__tick{fill:var(--dm-on-dark-faint);font-size:9px;font-weight:600}
+#ail-domus .dm-gauge__unit{fill:var(--dm-on-dark-muted);font-size:10px;font-weight:600;letter-spacing:.04em}
+#ail-domus .dm-gauge-legend{display:inline-flex;align-items:center;gap:6px;margin-top:6px;color:var(--dm-on-dark-muted);font-size:10px;font-weight:600;letter-spacing:.04em}
+#ail-domus .dm-gauge-legend::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-orange)}
+/* Mobile: 500m² and 7+ share a row; the gauge tile takes the full row so its legend stays on one line */
+@media(max-width:639px){
+  #ail-domus #hero-following-stats .stat:first-child{grid-column:auto}
+  #ail-domus #hero-following-stats .stat[data-island="temp-gauge"]{grid-column:1/-1}
+  #ail-domus .dm-gauge-slot{width:96px}
+}
+
+/* Procurement stepper: cyan progress, orange numbering */
+#ail-domus .dm-stepper-wrap{margin-top:16px}
+#ail-domus .dm-stepper{position:relative;--dm-progress:0}
+#ail-domus .dm-stepper__list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--dm-steps),minmax(0,1fr));gap:16px}
+#ail-domus .dm-stepper__track{position:absolute;top:17px;left:calc(100% / var(--dm-steps) / 2);right:calc(100% / var(--dm-steps) / 2);height:2px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+#ail-domus .dm-stepper__fill{position:absolute;inset:0;background:linear-gradient(90deg,var(--dm-cyan),var(--dm-cyan-bright));transform-origin:left center;transform:scaleX(var(--dm-progress))}
+#ail-domus .dm-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px}
+#ail-domus .dm-step__node{position:relative;z-index:1;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#1c1e1f;border:1.5px solid rgba(255,255,255,.22);color:var(--dm-orange-light);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+#ail-domus .dm-step.is-active .dm-step__node{background:var(--dm-orange);border-color:var(--dm-orange);color:var(--dm-ink);box-shadow:0 0 0 5px rgba(240,123,79,.16),0 8px 22px rgba(240,123,79,.28)}
+#ail-domus .dm-step__title{margin:14px 0 4px!important;font-size:15px!important;font-weight:600!important;line-height:1.3!important;letter-spacing:-.02em!important;color:var(--dm-on-dark)!important}
+#ail-domus .dm-step__desc{margin:0;font-size:12px;line-height:1.55;color:var(--dm-on-dark-muted)}
+@media(max-width:639px){
+  #ail-domus .dm-stepper__list{grid-template-columns:1fr;gap:18px}
+  #ail-domus .dm-stepper__track{top:18px;bottom:18px;left:17px;right:auto;width:2px;height:auto}
+  #ail-domus .dm-stepper__fill{background:linear-gradient(180deg,var(--dm-cyan),var(--dm-cyan-bright));transform-origin:center top;transform:scaleY(var(--dm-progress))}
+  #ail-domus .dm-step{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:14px;align-items:start;text-align:left;padding:0}
+  #ail-domus .dm-step__node{grid-row:1/span 2}
+  #ail-domus .dm-step__title{margin:7px 0 2px!important}
+}
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-step__node{transition:none}}
+
+/* Catalog product card: hierarchy, ingredient and packaging chips, studio tile */
+#ail-domus article[data-product] h3{font-size:16px!important;line-height:1.3!important;letter-spacing:-.02em!important;font-weight:600!important}
+#ail-domus .dm-product-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#ail-domus .dm-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge);color:#d6d3cc;font-size:11px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ail-domus .dm-pack-icon{width:14px;height:14px;flex:none;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+#ail-domus .product-visual{box-shadow:inset 0 -22px 34px rgba(30,32,33,.08),inset 0 1px 0 rgba(255,255,255,.9)}
+/* Equal-height cards: the quote button sits on the card floor even when chips wrap */
+#ail-domus article[data-product]{display:flex;flex-direction:column}
+#ail-domus article[data-product] .quote-product-btn{min-height:44px;margin-top:auto!important}
+#ail-domus article[data-product] .dm-product-meta{margin-bottom:16px}
+
+/* Catalog loading skeleton (replaced by the catalog script on load or error) */
+#ail-domus .dm-skeleton{border-radius:10px;background:linear-gradient(90deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.06) 100%);background-size:200% 100%;animation:dmShimmer 1.4s ease-in-out infinite}
+#ail-domus .dm-skeleton--visual{aspect-ratio:5/4;border-radius:16px}
+#ail-domus .dm-skeleton--line{height:10px;margin-top:12px}
+#ail-domus .dm-skeleton--title{height:16px;width:80%}
+#ail-domus .dm-skeleton--heading{width:140px;height:18px;margin:0 0 20px}
+#ail-domus .dm-skeleton--btn{height:44px;margin-top:16px;border-radius:999px}
+#ail-domus .dm-skeleton-card{padding:16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge)}
+@keyframes dmShimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-skeleton{animation:none}}
