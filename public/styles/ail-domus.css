@@ -40,6 +40,17 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
     radial-gradient(800px 560px at 6% 92%,rgba(240,123,79,.08),transparent 64%),
     linear-gradient(170deg,var(--dm-ground-1) 0%,var(--dm-ground-2) 100%) fixed!important;
 }
+/* Silhouette backdrop: supply skyline along the bottom, molecule cluster top-right.
+   Ink at very low opacity so text contrast is unchanged; dark sections simply cover it. */
+#ail-domus{isolation:isolate}
+#ail-domus::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.07;
+  background:
+    url(/images/bg/ail-molecule.svg) right -48px top 96px/clamp(220px,26vw,380px) auto no-repeat,
+    url(/images/bg/ail-silhouette.svg) center bottom/max(1100px,100%) auto no-repeat;
+}
+@media(max-width:639px){#ail-domus::before{opacity:.055;background-position:right -96px top 84px,center bottom}}
+@media print{#ail-domus::before{display:none}}
 #ail-domus ::selection{background:var(--dm-cyan);color:var(--dm-ink)}
 
 /* Header */

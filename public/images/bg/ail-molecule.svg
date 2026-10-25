@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" stroke="#1d1c1a" stroke-width="2.5" stroke-linejoin="round">
+  <!-- Faint molecule cluster for the top-right corner: a nod to formulation and lab work. -->
+  <path d="M120 60l35 20v40l-35 20-35-20V80z"/>
+  <path d="M155 120l35 20v40l-35 20-35-20v-40"/>
+  <path d="M190 140l35-20 35 20v40l-35 20-35-20"/>
+  <path d="M155 80l45-26M260 140l50-28M225 200v46M120 140l-46 26"/>
+  <g fill="#1d1c1a" stroke="none">
+    <circle cx="200" cy="54" r="7"/>
+    <circle cx="310" cy="112" r="9"/>
+    <circle cx="225" cy="246" r="7"/>
+    <circle cx="74" cy="166" r="6"/>
+  </g>
+  <circle cx="310" cy="112" r="16" stroke="#0aa7b5"/>
+  <circle cx="200" cy="54" r="13" stroke="#f07b4f"/>
+</svg>
