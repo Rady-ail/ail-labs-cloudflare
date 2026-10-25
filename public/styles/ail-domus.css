@@ -333,3 +333,183 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus #ail-promo-popup-root .ail-promo-cta{background:var(--dm-cyan)!important;border-color:var(--dm-cyan)!important;color:var(--dm-ink)!important;border-radius:999px!important;font-weight:700!important;box-shadow:0 10px 26px var(--dm-cyan-glow)!important}
 #ail-domus #ail-promo-popup-root .ail-promo-secondary{background:rgba(255,255,255,.08)!important;border-color:var(--dm-edge)!important;color:var(--dm-on-dark)!important;border-radius:999px!important}
 #ail-domus #ail-promo-popup-root .ail-promo-dialog:focus{outline:none!important;box-shadow:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08)!important}
+
+/* ───────── Widgets (islands/ail-islands.js + catalog card template) ───────── */
+
+/* Temperature range gauge inside the home "2–25°C" stat */
+#ail-domus #hero-following-stats .stat.has-gauge{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:12px;align-content:center}
+#ail-domus .stat.has-gauge>strong,#ail-domus .stat.has-gauge>span,#ail-domus .stat.has-gauge>.dm-gauge-legend{grid-column:1}
+#ail-domus .dm-gauge-slot{grid-column:2;grid-row:1/span 3;align-self:center;width:112px}
+#ail-domus .dm-gauge{display:block;width:100%;height:auto;overflow:visible}
+#ail-domus .dm-gauge path{fill:none;stroke-linecap:round}
+#ail-domus .dm-gauge__track{stroke:rgba(255,255,255,.12);stroke-width:7}
+#ail-domus .dm-gauge__track--inner{stroke:rgba(255,255,255,.08);stroke-width:3.5}
+#ail-domus .dm-gauge__band{stroke:var(--dm-cyan);stroke-width:7;stroke-dasharray:1 1;filter:drop-shadow(0 0 6px rgba(10,167,181,.45))}
+#ail-domus .dm-gauge__cold{stroke:var(--dm-orange);stroke-width:3.5;stroke-dasharray:1 1}
+#ail-domus .dm-gauge__tick{fill:var(--dm-on-dark-faint);font-size:9px;font-weight:600}
+#ail-domus .dm-gauge__unit{fill:var(--dm-on-dark-muted);font-size:10px;font-weight:600;letter-spacing:.04em}
+#ail-domus .dm-gauge-legend{display:inline-flex;align-items:center;gap:6px;margin-top:6px;color:var(--dm-on-dark-muted);font-size:10px;font-weight:600;letter-spacing:.04em}
+#ail-domus .dm-gauge-legend::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-orange)}
+/* Mobile: 500m² and 7+ share a row; the gauge tile takes the full row so its legend stays on one line */
+@media(max-width:639px){
+  #ail-domus #hero-following-stats .stat:first-child{grid-column:auto}
+  #ail-domus #hero-following-stats .stat[data-island="temp-gauge"]{grid-column:1/-1}
+  #ail-domus .dm-gauge-slot{width:96px}
+}
+
+/* Procurement stepper: cyan progress, orange numbering */
+#ail-domus .dm-stepper-wrap{margin-top:16px}
+#ail-domus .dm-stepper{position:relative;--dm-progress:0}
+#ail-domus .dm-stepper__list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(var(--dm-steps),minmax(0,1fr));gap:16px}
+#ail-domus .dm-stepper__track{position:absolute;top:17px;left:calc(100% / var(--dm-steps) / 2);right:calc(100% / var(--dm-steps) / 2);height:2px;border-radius:2px;background:rgba(255,255,255,.12);overflow:hidden}
+#ail-domus .dm-stepper__fill{position:absolute;inset:0;background:linear-gradient(90deg,var(--dm-cyan),var(--dm-cyan-bright));transform-origin:left center;transform:scaleX(var(--dm-progress))}
+#ail-domus .dm-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px}
+#ail-domus .dm-step__node{position:relative;z-index:1;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#1c1e1f;border:1.5px solid rgba(255,255,255,.22);color:var(--dm-orange-light);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums;transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+#ail-domus .dm-step.is-active .dm-step__node{background:var(--dm-orange);border-color:var(--dm-orange);color:var(--dm-ink);box-shadow:0 0 0 5px rgba(240,123,79,.16),0 8px 22px rgba(240,123,79,.28)}
+#ail-domus .dm-step__title{margin:14px 0 4px!important;font-size:15px!important;font-weight:600!important;line-height:1.3!important;letter-spacing:-.02em!important;color:var(--dm-on-dark)!important}
+#ail-domus .dm-step__desc{margin:0;font-size:12px;line-height:1.55;color:var(--dm-on-dark-muted)}
+@media(max-width:639px){
+  #ail-domus .dm-stepper__list{grid-template-columns:1fr;gap:18px}
+  #ail-domus .dm-stepper__track{top:18px;bottom:18px;left:17px;right:auto;width:2px;height:auto}
+  #ail-domus .dm-stepper__fill{background:linear-gradient(180deg,var(--dm-cyan),var(--dm-cyan-bright));transform-origin:center top;transform:scaleY(var(--dm-progress))}
+  #ail-domus .dm-step{display:grid;grid-template-columns:36px minmax(0,1fr);column-gap:14px;align-items:start;text-align:left;padding:0}
+  #ail-domus .dm-step__node{grid-row:1/span 2}
+  #ail-domus .dm-step__title{margin:7px 0 2px!important}
+}
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-step__node{transition:none}}
+
+/* Catalog product card: hierarchy, ingredient and packaging chips, studio tile */
+#ail-domus article[data-product] h3{font-size:16px!important;line-height:1.3!important;letter-spacing:-.02em!important;font-weight:600!important}
+#ail-domus .dm-product-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+#ail-domus .dm-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 10px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge);color:#d6d3cc;font-size:11px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ail-domus .dm-pack-icon{width:14px;height:14px;flex:none;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+#ail-domus .product-visual{box-shadow:inset 0 -22px 34px rgba(30,32,33,.08),inset 0 1px 0 rgba(255,255,255,.9)}
+/* Equal-height cards: the quote button sits on the card floor even when chips wrap */
+#ail-domus article[data-product]{display:flex;flex-direction:column}
+#ail-domus article[data-product] .quote-product-btn{min-height:44px;margin-top:auto!important}
+#ail-domus article[data-product] .dm-product-meta{margin-bottom:16px}
+
+/* Catalog loading skeleton (replaced by the catalog script on load or error) */
+#ail-domus .dm-skeleton{border-radius:10px;background:linear-gradient(90deg,rgba(255,255,255,.06) 0%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.06) 100%);background-size:200% 100%;animation:dmShimmer 1.4s ease-in-out infinite}
+#ail-domus .dm-skeleton--visual{aspect-ratio:5/4;border-radius:16px}
+#ail-domus .dm-skeleton--line{height:10px;margin-top:12px}
+#ail-domus .dm-skeleton--title{height:16px;width:80%}
+#ail-domus .dm-skeleton--heading{width:140px;height:18px;margin:0 0 20px}
+#ail-domus .dm-skeleton--btn{height:44px;margin-top:16px;border-radius:999px}
+#ail-domus .dm-skeleton-card{padding:16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge)}
+@keyframes dmShimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-skeleton{animation:none}}
+
+/* ───────── Stage 3: icons, static visuals, status, live data ───────── */
+
+/* Line-icon badge (top-right of a card or tile); one light source, same size everywhere */
+#ail-domus :has(>.dm-icon-badge){position:relative}
+#ail-domus .dm-icon-badge{position:absolute;top:16px;right:16px;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03));border:1px solid var(--dm-edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 6px 14px rgba(0,0,0,.18)}
+#ail-domus .dm-icon-badge svg{width:20px;height:20px;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+/* Keep the label and the line after it clear of the badge */
+#ail-domus .dm-icon-badge+*,#ail-domus .dm-icon-badge+*+*{padding-right:46px}
+#ail-domus .feature .dm-icon-badge{background:linear-gradient(160deg,rgba(255,255,255,.75),rgba(255,255,255,.35));border-color:var(--dm-edge-light);box-shadow:inset 0 1px 0 #fff,0 6px 14px rgba(30,32,33,.08)}
+#ail-domus .feature .dm-icon-badge svg{stroke:var(--dm-cyan-deep)}
+#ail-domus .feature strong{display:block;padding-right:46px}
+
+/* Home hero stats: static floor plan (500m²) and seven-plus ring (7+) */
+#ail-domus #hero-following-stats .stat.has-visual{display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-content:center}
+#ail-domus .stat.has-visual>strong,#ail-domus .stat.has-visual>span{grid-column:1}
+#ail-domus .dm-stat-visual{grid-column:2;grid-row:1/span 2;align-self:center;height:56px;width:auto;overflow:visible}
+#ail-domus .dm-floor__bay{fill:rgba(255,255,255,.06);stroke:rgba(255,255,255,.16);stroke-width:1}
+#ail-domus .dm-floor__bay.is-cold{fill:rgba(10,167,181,.32);stroke:var(--dm-cyan)}
+#ail-domus .dm-ring path{fill:none;stroke:var(--dm-cyan);stroke-width:6;stroke-linecap:round}
+#ail-domus .dm-ring path.is-plus{stroke:rgba(255,255,255,.4);stroke-dasharray:1.5 4.5}
+@media(max-width:639px){#ail-domus .dm-stat-visual{height:40px}}
+/* Narrow half-width tiles: the visual drops to its own row under the text */
+@media(max-width:480px){
+  #ail-domus #hero-following-stats .stat.has-visual{grid-template-columns:1fr}
+  #ail-domus .dm-stat-visual{grid-column:1;grid-row:auto;justify-self:start;height:30px;margin-top:10px}
+}
+
+/* Hero panel card: live catalog line */
+#ail-domus .dm-live{display:flex;align-items:center;gap:8px;margin:12px 0 0!important;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);color:var(--dm-on-dark-muted)!important;font-size:12px!important;font-weight:600;font-variant-numeric:tabular-nums}
+#ail-domus .dm-live i{width:7px;height:7px;border-radius:50%;background:var(--dm-cyan-bright);box-shadow:0 0 0 4px rgba(94,215,223,.16)}
+#ail-domus .dm-live.is-loading i{background:var(--dm-on-dark-faint);box-shadow:none;animation:dmPulse 1.2s ease-in-out infinite}
+@keyframes dmPulse{50%{opacity:.35}}
+
+/* Ready Supply card: per-category sparkline */
+#ail-domus .dm-spark-wrap{margin-top:18px;padding-top:14px;border-top:1px solid rgba(255,255,255,.1)}
+#ail-domus .dm-spark__caption{margin:0 0 10px!important;color:var(--dm-on-dark-muted)!important;font-size:12px!important;font-variant-numeric:tabular-nums}
+#ail-domus .dm-spark__caption b{color:var(--dm-on-dark)}
+#ail-domus .dm-spark{display:flex;align-items:flex-end;gap:4px;height:44px}
+#ail-domus .dm-spark.is-loading{background:linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,.12),rgba(255,255,255,.05));background-size:200% 100%;border-radius:8px;animation:dmShimmer 1.4s ease-in-out infinite;margin-top:18px}
+#ail-domus .dm-spark__bar{flex:1;min-width:4px;border-radius:3px 3px 1px 1px;background:rgba(10,167,181,.55);transform-origin:bottom}
+#ail-domus .dm-spark__bar.is-top{background:var(--dm-cyan-bright)}
+
+/* About aside: Sourcing → Support → Supply as connected nodes */
+#ail-domus .dm-chain{display:flex;align-items:center;gap:0;margin:24px 0 0;padding:0;list-style:none}
+#ail-domus .dm-chain li{position:relative;display:flex;align-items:center;gap:8px;color:var(--dm-cyan-bright);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+#ail-domus .dm-chain li::before{content:"";width:9px;height:9px;border-radius:50%;border:2px solid var(--dm-cyan-bright);background:var(--dm-black)}
+#ail-domus .dm-chain li+li{margin-left:12px}
+#ail-domus .dm-chain li+li::after{content:"";position:absolute;right:calc(100% + 2px);top:50%;width:12px;height:2px;background:linear-gradient(90deg,rgba(94,215,223,.2),var(--dm-cyan-bright))}
+
+/* Status pill: dot + word, never colour alone (cyan = in place, orange = in progress) */
+#ail-domus .dm-status{display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--dm-edge);color:var(--dm-on-dark)!important;font-size:10px;font-weight:700;letter-spacing:.05em;white-space:nowrap;vertical-align:1px}
+#ail-domus .dm-status::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--dm-cyan-bright)}
+#ail-domus .dm-status.is-progress::before{background:var(--dm-orange)}
+#ail-domus [data-status] .font-bold{display:flex;align-items:center;gap:8px}
+#ail-domus [data-status] .font-bold::before{content:"";flex:none;width:8px;height:8px;border-radius:50%;background:var(--dm-cyan-bright);box-shadow:0 0 0 4px rgba(94,215,223,.14)}
+#ail-domus [data-status="progress"] .font-bold::before{background:var(--dm-orange);box-shadow:0 0 0 4px rgba(240,123,79,.16)}
+
+/* Procurement: lead-time comparison on one day scale */
+#ail-domus .dm-leadtime{margin-top:12px}
+#ail-domus .dm-lead{padding:16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge)}
+#ail-domus .dm-lead__title{margin:0 0 12px!important;color:var(--dm-on-dark-faint)!important;font-size:10px!important;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+#ail-domus .dm-lead__rows{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+#ail-domus .dm-lead__row{display:grid;grid-template-columns:52px minmax(0,1fr) 72px;align-items:center;gap:10px}
+#ail-domus .dm-lead__label{color:var(--dm-on-dark);font-size:12px;font-weight:600}
+#ail-domus .dm-lead__value{color:var(--dm-cyan-bright);font-size:12px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+#ail-domus .dm-lead__track{position:relative;height:8px;border-radius:999px;background:rgba(255,255,255,.1)}
+#ail-domus .dm-lead__seg{position:absolute;top:0;bottom:0;border-radius:999px;background:var(--dm-cyan-bright);transform-origin:left center}
+#ail-domus .dm-lead__row.is-bulk .dm-lead__seg{background:var(--dm-cyan)}
+#ail-domus .dm-lead__axis{display:flex;justify-content:space-between;margin:8px 82px 0 62px;color:var(--dm-on-dark-faint);font-size:10px;font-variant-numeric:tabular-nums}
+
+/* Private label: lead line from artwork approval */
+#ail-domus .dm-leadline{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:12px;padding:16px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid var(--dm-edge);color:var(--dm-on-dark-muted);font-size:11px;font-weight:600}
+#ail-domus .dm-leadline__start::before{content:"";display:inline-block;width:8px;height:8px;margin-right:8px;border-radius:50%;background:var(--dm-orange);vertical-align:0}
+#ail-domus .dm-leadline__bar{position:relative;display:grid;place-items:center;height:26px;border-radius:999px;background:linear-gradient(90deg,rgba(240,123,79,.35),rgba(10,167,181,.45));border:1px solid var(--dm-edge)}
+#ail-domus .dm-leadline__bar b{color:var(--dm-on-dark);font-size:12px;font-weight:700}
+@media(max-width:480px){#ail-domus .dm-leadline{grid-template-columns:1fr;text-align:left}}
+
+/* About: focus checklist */
+#ail-domus .dm-checklist li{position:relative;padding-left:28px}
+#ail-domus .dm-checklist li::before{content:"";position:absolute;left:0;top:3px;width:18px;height:18px;border-radius:50%;background:rgba(10,167,181,.18);border:1px solid rgba(94,215,223,.45)}
+#ail-domus .dm-checklist li::after{content:"";position:absolute;left:6px;top:8px;width:6px;height:3.5px;border-left:2px solid var(--dm-cyan-bright);border-bottom:2px solid var(--dm-cyan-bright);transform:rotate(-45deg)}
+
+/* Working-hours status (home CTA, contact) */
+#ail-domus .dm-hours{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 0!important;color:var(--dm-on-dark-muted)!important;font-size:12px!important;font-weight:600}
+#ail-domus .dm-hours:empty{display:none}
+#ail-domus .dm-hours__status{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:11px;font-weight:700}
+#ail-domus .dm-hours__status i{width:7px;height:7px;border-radius:50%;background:var(--dm-orange)}
+#ail-domus .dm-hours__status.is-open i{background:var(--dm-cyan-bright);box-shadow:0 0 0 4px rgba(94,215,223,.16)}
+
+/* Contact: copy buttons */
+#ail-domus .dm-copy-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+#ail-domus .dm-copy{position:relative;display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font:600 11px/1 var(--font-sf,inherit);cursor:pointer;transition:background-color .2s ease,border-color .2s ease}
+#ail-domus .dm-copy::after{content:"";position:absolute;inset:-7px}
+#ail-domus .dm-copy:hover{background:rgba(255,255,255,.14)}
+#ail-domus .dm-copy.is-done{border-color:var(--dm-cyan-bright);color:var(--dm-cyan-bright)}
+
+/* Catalog: per-category count in the filter pills */
+#ail-domus .dm-pill-count{display:inline-grid;place-items:center;min-width:20px;height:18px;margin-left:7px;padding:0 6px;border-radius:999px;background:rgba(255,255,255,.12);font-size:10px;font-variant-numeric:tabular-nums}
+#ail-domus .dm-pill-count{color:var(--dm-on-dark)}
+#ail-domus .bg-ail-teal .dm-pill-count{background:rgba(255,255,255,.3);color:var(--dm-ink)}
+
+/* Contact form: inline validation once the visitor has interacted */
+#ail-domus main :is(input,select,textarea):user-invalid{border-color:#ff8f8f!important;box-shadow:0 0 0 3px rgba(255,143,143,.16)}
+
+/* Generic gauge tile (procurement Facility) */
+#ail-domus .has-gauge:not(.stat){display:grid!important;grid-template-columns:minmax(0,1fr) auto;column-gap:12px;align-items:center}
+#ail-domus .has-gauge:not(.stat)>*:not(.dm-gauge-slot){grid-column:1}
+#ail-domus .has-gauge:not(.stat)>.dm-gauge-slot{grid-row:1/span 4;width:84px}
+
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-live.is-loading i,#ail-domus .dm-spark.is-loading{animation:none}}
+
+/* An island that replaces its host hides the original markup; author display rules must not win over [hidden] */
+#ail-domus [data-island][hidden]{display:none!important}
