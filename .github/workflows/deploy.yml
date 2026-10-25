@@ -57,7 +57,6 @@ jobs:
                     : undefined;
                   console.log(`success=${response.success === true}`);
                   console.log(`zone_status=${zone?.status || "not-found-in-account"}`);
-                  console.log(`account_name=${zone?.account?.name || "not-found-in-account"}`);
                   if (response.success !== true || !zone || zone.status !== "active") process.exitCode = 1;
                 } catch {
                   console.log("success=false");
@@ -95,7 +94,7 @@ jobs:
           printf 'CLOUDFLARE_ACCOUNT_ID format valid: %s\n' "$account_id_format"
           printf 'CLOUDFLARE_API_TOKEN length: %s\n' "${#CLOUDFLARE_API_TOKEN}"
 
-          echo 'Cloudflare account names accessible to this token:'
+          echo 'Checking whether the configured Cloudflare account is accessible to this token:'
           if ! curl --silent --show-error --fail \
             -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
             https://api.cloudflare.com/client/v4/accounts \
@@ -108,7 +107,7 @@ jobs:
                   const response = JSON.parse(input);
                   if (!response.success || !Array.isArray(response.result)) throw new Error();
                   for (const account of response.result) {
-                    if (typeof account.name === "string") console.log(account.name);
+                    if (typeof account.id === "string" && account.id === process.env.CLOUDFLARE_ACCOUNT_ID) console.log("configured account is accessible to this token");
                   }
                 } catch {
                   console.error("Could not read account names from Cloudflare API.");
@@ -116,7 +115,7 @@ jobs:
                 }
               });
             '; then
-            echo 'Could not retrieve Cloudflare account names.'
+            echo 'Could not verify Cloudflare account access.'
           fi
 
       - name: Set runtime secrets

@@ -5,9 +5,18 @@ const loginAttempts = new Map();
 const LOGIN_WINDOW_MS = 10 * 60 * 1000;
 const LOGIN_MAX_ATTEMPTS = 8;
 
+const crypto = require('crypto');
+const { clientIp } = require('../utils/clientIp');
+
 function getClientIp(req) {
-  const forwarded = req.headers['x-forwarded-for'];
-  return String(forwarded || req.ip || req.socket?.remoteAddress || 'unknown').split(',')[0].trim();
+  return clientIp(req);
+}
+
+// Bandingkan lewat hash supaya panjang input tidak bocor lewat waktu respons.
+function safeEqual(a, b) {
+  const ha = crypto.createHash('sha256').update(String(a == null ? '' : a)).digest();
+  const hb = crypto.createHash('sha256').update(String(b == null ? '' : b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
 }
 
 function loginRateLimit(req, res, next) {
@@ -42,7 +51,9 @@ router.post('/login', loginRateLimit, (req, res) => {
     return res.status(503).json({ error: 'Login admin belum dikonfigurasi.' });
   }
 
-  if (username === validUser && password === validPass) {
+  const userOk = safeEqual(username, validUser);
+  const passOk = safeEqual(password, validPass);
+  if (userOk && passOk) {
     req.session.isAdmin = true;
     req.session.username = username;
     loginAttempts.delete(getClientIp(req));

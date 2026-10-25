@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { transporter } = require('../db/mailer');
+const { rateLimit } = require('../utils/rateLimit');
+const limitConfirm = rateLimit({ windowMs: 10 * 60 * 1000, max: 10 });
 
 const PAYMENT_EMAIL = 'info@ail-aesthetic-labs.my.id';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,7 +23,7 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-router.post('/confirm', async (req, res) => {
+router.post('/confirm', limitConfirm, async (req, res) => {
   const body = req.body || {};
   const customerName = cleanText(body.customer_name || 'Pelanggan AIL LABS', 120);
   const customerEmail = cleanText(body.customer_email, 160);

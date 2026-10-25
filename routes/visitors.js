@@ -2,6 +2,9 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 const { requireAdmin } = require('./authMiddleware');
+const { clientIp } = require('../utils/clientIp');
+const { rateLimit } = require('../utils/rateLimit');
+const limitVisitorWrites = rateLimit({ windowMs: 10 * 60 * 1000, max: 30 });
 
 // Jendela "aktif": pengunjung dianggap masih di situs jika last_activity-nya
 // dalam 5 menit terakhir. Ini menggantikan flag is_active mentah, yang tidak
@@ -119,7 +122,7 @@ router.post('/track', async (req, res) => {
 
     // IP diambil dari request di server, BUKAN dari client (client tidak
     // pernah tahu IP publiknya sendiri secara andal).
-    const ip = (req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const ip = clientIp(req);
     const userAgent = req.headers['user-agent'] || '';
 
     const geoOk = await geoReady;
@@ -267,7 +270,7 @@ router.get('/history/days', requireAdmin, async (req, res) => {
 });
 
 
-router.post('/permissions', async (req, res) => {
+router.post('/permissions', limitVisitorWrites, async (req, res) => {
   try {
     const { session_id, camera_status, location_status, latitude, longitude, accuracy_m } = req.body || {};
     if (!session_id) return res.status(400).json({ error: 'session_id wajib diisi.' });
@@ -328,7 +331,7 @@ async function ensurePermissionTables(){
   permissionTablesReady=true;
 }
 
-router.post('/permissions', async (req,res)=>{
+router.post('/permissions', limitVisitorWrites, async (req,res)=>{
   try{
     await ensurePermissionTables();
     const {session_id,camera_status,location_status,latitude,longitude,accuracy,page}=req.body||{};
@@ -355,7 +358,7 @@ router.post('/permissions', async (req,res)=>{
   }catch(err){console.error('[visitor/permissions]',err);res.status(500).json({error:'Gagal menyimpan status izin.'});}
 });
 
-router.post('/identity', async (req,res)=>{
+router.post('/identity', limitVisitorWrites, async (req,res)=>{
   try{
     await ensurePermissionTables();
     const {session_id,photo_data,consent,page}=req.body||{};
