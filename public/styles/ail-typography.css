@@ -17,7 +17,9 @@
 }
 :root{
   --font-sf:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter Variable","Inter","AIL Inter Fallback","Helvetica Neue",Arial,sans-serif;
+  --ail-type-10:10px;
   --ail-type-11:11px;
+  --ail-type-12:12px;
   --ail-type-13:13px;
   --ail-type-15:15px;
   --ail-type-17:17px;
@@ -32,6 +34,7 @@
   --ail-tracking-text:-.022em;
   --ail-tracking-display:-.03em;
   --ail-tracking-label:.07em;
+  --ail-tracking-caps:.12em;
   --font-ui:var(--font-sf);
   --font-main:var(--font-sf);
   --ail-font-ui:var(--font-sf);
