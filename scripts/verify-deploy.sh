@@ -106,6 +106,10 @@ fi
 
 check_2xx 'categories' '/api/categories'
 
+# Informational: whether the B2B OTP gate is switched on (needs both email and WhatsApp OTP secrets).
+request '/api/leads/verification-status'
+printf 'INFO %-24s %s %s\n' 'otp-gate' "$status" "$(head -c 200 "$response_file")"
+
 request '/api/customer/auth/me'
 if [[ "$status" == 200 || "$status" == 401 ]]; then
   printf 'PASS %-24s %s\n' 'customer-auth-me' "$status"

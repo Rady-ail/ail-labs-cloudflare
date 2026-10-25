@@ -1,4 +1,5 @@
-(() => {\n  if (location.pathname === '/compliance.html') return;
+(() => {
+  if (location.pathname === '/compliance.html') return;
   const KEY='ail_verified_lead_token_v1', SESSION_KEY='ail_session_id';
   const getSessionId=()=>localStorage.getItem(SESSION_KEY)||'', token=()=>localStorage.getItem(KEY)||'';
   const style=document.createElement('style'); style.textContent=`
@@ -11,7 +12,7 @@
   #ailLeadGate button:disabled{opacity:.55;cursor:not-allowed} #ailLeadGate .ail-note{margin-top:13px;font-size:10px;color:#78908e}
   #ailLeadGate .ail-check{display:flex;gap:9px;align-items:flex-start;margin-top:13px;font-size:10px;line-height:1.5;color:#607474}
   #ailLeadGate .ail-check input{width:17px;height:17px;margin:0;flex:0 0 auto} #ailLeadGate .ail-error{min-height:18px;margin-top:10px;color:#b42318;font-size:11px;font-weight:700}
-  #ailLeadGate .ail-step{display:none}.ail-step.active{display:block} body.ail-lead-locked{overflow:hidden}`; document.head.appendChild(style);
+  #ailLeadGate .ail-step{display:none}#ailLeadGate .ail-step.active{display:block} body.ail-lead-locked{overflow:hidden}`; document.head.appendChild(style);
   function build(){
     if(document.getElementById('ailLeadGate'))return;
     const wrap=document.createElement('div'); wrap.id='ailLeadGate';
@@ -43,7 +44,7 @@
     $('ailVerify').onclick=async()=>{
       const name=$('ailName').value.trim(),company=$('ailCompany').value.trim(),businessType=$('ailBusiness').value,email=$('ailEmail').value.trim().toLowerCase(),phone=$('ailPhone').value.trim(),otp=$('ailOtp').value.trim(),waOtp=$('ailWaOtp').value.trim();
       $('ailVerify').disabled=true;err('ailError2','Memverifikasi…');
-      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,otp,wa_otp:waOtp,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||'direct',utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{$('ailVerify').disabled=false}
+      try{const r=await fetch('/api/leads/verify-otp',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,company,business_type:businessType,email,phone,otp,wa_otp:waOtp,session_id:getSessionId(),landing_page:location.pathname+location.search,lead_source:new URLSearchParams(location.search).get('utm_source')||'direct',utm_source:new URLSearchParams(location.search).get('utm_source')||'',utm_medium:new URLSearchParams(location.search).get('utm_medium')||'',utm_campaign:new URLSearchParams(location.search).get('utm_campaign')||'',consent:$('ailConsent').checked,marketing_consent:$('ailMarketing').checked})});const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.token)throw new Error(d.error||'Verifikasi gagal.');localStorage.setItem(KEY,d.token);wrap.remove();document.body.classList.remove('ail-lead-locked')}catch(e){err('ailError2',e.message||'Verifikasi gagal.')}finally{const b=$('ailVerify');if(b)b.disabled=false}
     };
     $('ailBack').onclick=()=>{err('ailError2','');show(0)};
   }
