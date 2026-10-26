@@ -35,7 +35,7 @@ router.post('/', requireAdmin, async (req, res) => {
       `🌿 *Promo Baru dari AIL Labs!*\n\n` +
       `${title}\n${description}\n` +
       (discount ? `Diskon: ${discount}\n\n` : '\n') +
-      `Chat admin untuk info lebih lanjut: https://wa.me/628781739521`;
+      `Chat admin untuk info lebih lanjut: https://wa.me/62818184445`;
 
     const results = await broadcastInChunks(targets, message, imageUrl || null);
 
