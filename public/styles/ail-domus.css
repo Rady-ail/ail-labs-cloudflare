@@ -64,7 +64,7 @@
   --dm-shadow-modal:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
   --dm-blur-chip:blur(12px);
   --dm-blur-backdrop:blur(16px) saturate(120%);
-  /* Motion (--dm-ease mirrors EASE in ail-islands.js) */
+  /* Motion (ail-islands.js reads --dm-ease for its Motion animations) */
   --dm-ease:cubic-bezier(.2,.75,.2,1);
   --dm-dur-fast:.2s;
   --dm-dur-base:.3s;
@@ -423,7 +423,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-stepper__track{position:absolute;top:17px;left:calc(100% / var(--dm-steps) / 2);right:calc(100% / var(--dm-steps) / 2);height:2px;border-radius:2px;background:var(--dm-fill-3);overflow:hidden}
 #ail-domus .dm-stepper__fill{position:absolute;inset:0;background:linear-gradient(90deg,var(--dm-cyan),var(--dm-cyan-bright));transform-origin:left center;transform:scaleX(var(--dm-progress))}
 #ail-domus .dm-step{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 4px}
-#ail-domus .dm-step__node{position:relative;z-index:1;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--dm-node);border:1.5px solid rgba(255,255,255,.22);color:var(--dm-orange-light);font-size:var(--ail-type-12);font-weight:700;font-variant-numeric:tabular-nums;transition:background-color .3s ease,border-color .3s ease,color .3s ease,box-shadow .3s ease}
+#ail-domus .dm-step__node{position:relative;z-index:1;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--dm-node);border:1.5px solid rgba(255,255,255,.22);color:var(--dm-orange-light);font-size:var(--ail-type-12);font-weight:700;font-variant-numeric:tabular-nums;transition:background-color var(--dm-dur-base) ease,border-color var(--dm-dur-base) ease,color var(--dm-dur-base) ease,box-shadow var(--dm-dur-base) ease}
 #ail-domus .dm-step.is-active .dm-step__node{background:var(--dm-orange);border-color:var(--dm-orange);color:var(--dm-ink);box-shadow:0 0 0 5px rgba(240,123,79,.16),0 8px 22px rgba(240,123,79,.28)}
 #ail-domus .dm-step__title{margin:14px 0 4px!important;font-size:15px!important;font-weight:600!important;line-height:1.3!important;letter-spacing:-.02em!important;color:var(--dm-on-dark)!important}
 #ail-domus .dm-step__desc{margin:0;font-size:var(--ail-type-12);line-height:1.55;color:var(--dm-on-dark-muted)}
