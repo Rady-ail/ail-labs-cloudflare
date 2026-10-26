@@ -1,21 +1,21 @@
-/* AIL LABS — "Domus" skin: greige ground, smoked-glass panels, brand cyan + orange accents.
+/* AIL LABS — "Domus" skin: cool ice-white ground, smoked-glass panels, brand cyan + orange accents.
    Presentation only. Scoped to <body id="ail-domus"> so it outranks the page's inline glass rules.
    Colour rules: pure cyan/orange are fills, dots, rings and rules; on the light ground, normal-size text accents use
-   --dm-cyan-ink (AA 4.8:1 on ground-2) and --dm-cyan-deep is kept for large text and icons; on smoke and black, text accents use --dm-cyan-bright and --dm-orange-light. */
+   --dm-cyan-ink (AA 6.3:1 on ground-2) and --dm-cyan-deep is kept for large text and icons; on smoke and black, text accents use --dm-cyan-bright and --dm-orange-light. */
 
 :root{
-  --dm-ground-1:#e6e4df;
-  --dm-ground-2:#d2cec7;
-  --dm-ink:#1d1c1a;
-  --dm-ink-soft:#4a4740;
-  --dm-ink-faint:#5a5650;
-  --dm-smoke:rgba(28,30,31,.86);
-  --dm-black:#0f1112;
+  --dm-ground-1:#f5f9fb;
+  --dm-ground-2:#e2edf1;
+  --dm-ink:#132530;
+  --dm-ink-soft:#3a5260;
+  --dm-ink-faint:#4a606c;
+  --dm-smoke:rgba(22,44,54,.86);
+  --dm-black:#0d1f27;
   --dm-edge:rgba(255,255,255,.14);
-  --dm-edge-light:rgba(255,255,255,.6);
-  --dm-on-dark:#f3f1ec;
-  --dm-on-dark-muted:#bdbab3;
-  --dm-on-dark-faint:#b3b0a9;
+  --dm-edge-light:rgba(255,255,255,.7);
+  --dm-on-dark:#f1f7f9;
+  --dm-on-dark-muted:#b6cbd2;
+  --dm-on-dark-faint:#a9bfc6;
   --dm-cyan:#0aa7b5;
   --dm-cyan-bright:#5ed7df;
   --dm-cyan-deep:#087079;
@@ -24,22 +24,22 @@
   --dm-orange:#f07b4f;
   --dm-orange-light:#ff9b74;
   --dm-orange-glow:rgba(240,123,79,.26);
-  --dm-chip:rgba(255,255,255,.42);
+  --dm-chip:rgba(255,255,255,.55);
   --dm-radius-xl:30px;
   --dm-radius-lg:24px;
   --dm-radius-md:18px;
-  --dm-shadow:0 30px 70px rgba(30,32,33,.24),0 8px 20px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.10);
+  --dm-shadow:0 30px 70px rgba(16,44,56,.24),0 8px 20px rgba(16,44,56,.10),inset 0 1px 0 rgba(255,255,255,.10);
   --dm-blur:blur(28px) saturate(140%);
   /* Stage 1 tokens (stage 2 rounded .05/.07 fills, the 9px gauge tick and the 28px button glow onto them). */
   /* Text */
-  --dm-on-dark-dim:#9b978f;
-  --dm-on-chip:#d6d3cc;
+  --dm-on-dark-dim:#8fa6ae;
+  --dm-on-chip:#cfdfe4;
   --dm-danger:#ff8f8f;
   /* Dark surfaces */
-  --dm-graphite:#121415;
-  --dm-node:#1c1e1f;
-  --dm-panel-deep:linear-gradient(160deg,#202325,#121415);
-  --dm-panel-modal:linear-gradient(160deg,#26292a,#161819);
+  --dm-graphite:#0e1f27;
+  --dm-node:#18303a;
+  --dm-panel-deep:linear-gradient(160deg,#1c3742,#0e1f27);
+  --dm-panel-modal:linear-gradient(160deg,#21404c,#12272f);
   /* White fill ladder on dark */
   --dm-fill-1:rgba(255,255,255,.06);
   --dm-fill-2:rgba(255,255,255,.08);
@@ -57,8 +57,8 @@
   --dm-radius-lg-sm:20px;
   --dm-radius-pill:999px;
   /* Shadow and blur */
-  --dm-shadow-light:0 18px 40px rgba(30,32,33,.10),inset 0 1px 0 rgba(255,255,255,.6);
-  --dm-shadow-btn:0 10px 24px rgba(29,28,26,.22);
+  --dm-shadow-light:0 18px 40px rgba(16,44,56,.10),inset 0 1px 0 rgba(255,255,255,.6);
+  --dm-shadow-btn:0 10px 24px rgba(19,37,48,.22);
   --dm-shadow-cyan:0 10px 26px var(--dm-cyan-glow);
   --dm-shadow-orange:0 10px 26px var(--dm-orange-glow);
   --dm-shadow-modal:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
@@ -76,7 +76,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
   color:var(--dm-ink)!important;
   background:
     radial-gradient(900px 600px at 82% 6%,rgba(10,167,181,.10),transparent 62%),
-    radial-gradient(800px 560px at 6% 92%,rgba(240,123,79,.08),transparent 64%),
+    radial-gradient(800px 560px at 6% 92%,rgba(110,214,190,.12),transparent 64%),
     linear-gradient(170deg,var(--dm-ground-1) 0%,var(--dm-ground-2) 100%) fixed!important;
 }
 /* Silhouette backdrop: supply skyline along the bottom, molecule cluster top-right.
@@ -102,15 +102,15 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:var(--ail-type-11);font-weight:700;line-height:1.3;white-space:nowrap}
 
 /* Header */
-#ail-domus .site-header{background:rgba(234,232,227,.66)!important;border-bottom:1px solid rgba(29,28,26,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
+#ail-domus .site-header{background:rgba(245,249,251,.66)!important;border-bottom:1px solid rgba(19,37,48,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
 #ail-domus .brand-name{color:var(--dm-ink)!important}
 #ail-domus .brand-sub{color:var(--dm-ink-faint)!important}
 #ail-domus .nav a:not(.button){color:var(--dm-ink-soft)!important;border-radius:var(--dm-radius-pill)}
 #ail-domus .nav a:not(.button):hover,#ail-domus .nav a[aria-current="page"]{background:var(--dm-chip)!important;color:var(--dm-ink)!important}
 #ail-domus .nav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--dm-cyan)}
 #ail-domus .menu-btn{background:var(--dm-chip)!important;border-color:var(--dm-edge-light)!important;color:var(--dm-ink)!important;border-radius:var(--dm-radius-pill)!important}
-#ail-domus .mobile-menu{border-top-color:rgba(29,28,26,.08)!important}
-#ail-domus .mobile-menu a{color:var(--dm-ink)!important;border-bottom-color:rgba(29,28,26,.08)!important}
+#ail-domus .mobile-menu{border-top-color:rgba(19,37,48,.08)!important}
+#ail-domus .mobile-menu a{color:var(--dm-ink)!important;border-bottom-color:rgba(19,37,48,.08)!important}
 
 /* Type */
 #ail-domus :is(h1,h2,h3){color:inherit}
@@ -128,10 +128,10 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 }
 #ail-domus .eyebrow::before{content:"";width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-cyan);box-shadow:0 0 10px var(--dm-cyan-glow)}
 
-/* Buttons: ink primary, glass secondary, brand fills carry ink labels (cyan 5.8:1, orange 6.2:1) */
+/* Buttons: ink primary, glass secondary, brand fills carry ink labels (cyan 5.4:1, orange 5.7:1) */
 #ail-domus .button{border-radius:var(--dm-radius-pill)!important}
 #ail-domus .button-primary{background:var(--dm-ink)!important;color:var(--dm-on-dark)!important;box-shadow:var(--dm-shadow-btn)}
-#ail-domus .button-primary:hover{background:#2c2b29!important}
+#ail-domus .button-primary:hover{background:#24404c!important}
 #ail-domus .button-light{background:var(--dm-chip)!important;color:var(--dm-ink)!important;border-color:var(--dm-edge-light)!important;backdrop-filter:var(--dm-blur-chip);-webkit-backdrop-filter:var(--dm-blur-chip)}
 #ail-domus .button-orange{background:var(--dm-orange)!important;color:var(--dm-ink)!important;box-shadow:var(--dm-shadow-orange)}
 #ail-domus .button-cyan{background:var(--dm-cyan)!important;color:var(--dm-ink)!important;box-shadow:var(--dm-shadow-cyan)}
@@ -147,7 +147,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 }
 #ail-domus .hero>.container{position:relative;z-index:1}
 #ail-domus .hero-panel[data-hero-3d]::before{
-  background:linear-gradient(150deg,rgba(48,51,52,.90),rgba(18,20,21,.94))!important;
+  background:linear-gradient(150deg,rgba(38,66,78,.90),rgba(13,31,39,.94))!important;
   border-color:var(--dm-edge)!important;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.10)!important;
 }
@@ -176,7 +176,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.feature,.about-aside,.panel-card)::before{background:none!important;animation:none!important}
 #ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.feature,.about-aside,.panel-card)::after{display:none!important}
 @media(hover:hover) and (pointer:fine){
-  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:var(--dm-edge-hover)!important;box-shadow:0 34px 80px rgba(30,32,33,.30),0 0 0 1px rgba(94,215,223,.10) inset!important}
+  #ail-domus :is(.category,.compliance-card,.step,.feature):hover{border-color:var(--dm-edge-hover)!important;box-shadow:0 34px 80px rgba(16,44,56,.30),0 0 0 1px rgba(94,215,223,.10) inset!important}
 }
 #ail-domus :is(.category,.step) p,#ail-domus .compliance-list li{color:var(--dm-on-dark-muted)!important}
 #ail-domus :is(.category .number,.step-num){color:var(--dm-orange-light)!important}
@@ -208,7 +208,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .feature p{color:var(--dm-ink-soft)!important}
 
 /* Process: deep graphite band */
-#ail-domus .process{background:radial-gradient(700px 360px at 90% 0%,rgba(10,167,181,.14),transparent 70%),linear-gradient(170deg,#202325,#121415)!important;color:var(--dm-on-dark)!important}
+#ail-domus .process{background:radial-gradient(700px 360px at 90% 0%,rgba(10,167,181,.14),transparent 70%),var(--dm-panel-deep)!important;color:var(--dm-on-dark)!important}
 #ail-domus .process .eyebrow{background:var(--dm-fill-2);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
 #ail-domus .process .section-intro{color:var(--dm-on-dark-muted)!important}
 #ail-domus .step{background:var(--dm-fill-1)!important;background-color:var(--dm-fill-1)!important}
@@ -222,14 +222,14 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .cta{background:
   radial-gradient(520px 260px at 92% 20%,rgba(240,123,79,.20),transparent 70%),
   radial-gradient(520px 260px at 8% 100%,rgba(10,167,181,.22),transparent 70%),
-  linear-gradient(150deg,rgba(40,43,44,.94),rgba(16,18,19,.96))!important}
+  linear-gradient(150deg,rgba(34,60,71,.94),rgba(12,29,36,.96))!important}
 #ail-domus .cta h2{color:var(--dm-on-dark)}
 #ail-domus .cta .section-intro{color:var(--dm-on-dark-muted)!important}
 #ail-domus .cta .eyebrow{background:var(--dm-fill-2);border-color:var(--dm-edge);color:var(--dm-on-dark-muted)!important}
 #ail-domus .cta .button-primary{background:var(--dm-on-dark)!important;color:var(--dm-ink)!important}
 
 /* Contact */
-#ail-domus .contact-line{border-bottom-color:rgba(29,28,26,.12)!important}
+#ail-domus .contact-line{border-bottom-color:rgba(19,37,48,.12)!important}
 #ail-domus .contact-line small{color:var(--dm-ink-faint)!important}
 #ail-domus .contact-line :is(a,span){color:var(--dm-ink)!important}
 #ail-domus .contact-line a:hover{color:var(--dm-cyan-ink)!important}
@@ -239,7 +239,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .site-footer .brand-name{color:var(--dm-on-dark)!important}
 #ail-domus .site-footer p{color:var(--dm-on-dark-muted)!important}
 #ail-domus .footer-title{color:var(--dm-cyan-bright)!important}
-#ail-domus .footer-links{color:#dad7d0!important}
+#ail-domus .footer-links{color:#d3e2e7!important}
 #ail-domus .copyright{color:var(--dm-on-dark-dim)!important;border-top-color:var(--dm-divider)!important}
 
 /* Focus: cyan-bright ring with a dark halo, visible on greige and on smoke */
@@ -261,7 +261,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .nav-cta{background:var(--dm-ink)!important;color:var(--dm-on-dark)!important;border-radius:var(--dm-radius-pill)!important;box-shadow:var(--dm-shadow-btn)!important}
 #ail-domus .nav-cta span{color:var(--dm-cyan-bright)!important}
 #ail-domus .mobile-menu-btn{background:var(--dm-chip)!important;border-color:var(--dm-edge-light)!important;color:var(--dm-ink)!important;border-radius:var(--dm-radius-pill)!important}
-#ail-domus .mobile-menu{background:rgba(234,232,227,.96)!important}
+#ail-domus .mobile-menu{background:rgba(245,249,251,.96)!important}
 #ail-domus .mobile-menu .mobile-cta{background:var(--dm-ink)!important;color:var(--dm-on-dark)!important;border-radius:var(--dm-radius-pill)!important}
 
 /* Kill the page-level glass sheen on Tailwind cards, like on the home page */
@@ -328,7 +328,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus main :is(input,select,textarea):focus{border-color:var(--dm-cyan-bright)!important;background:rgba(0,0,0,.32)!important}
 
 /* Catalog product visual: neutral studio light instead of mint */
-#ail-domus .product-visual{background:radial-gradient(circle at 50% 38%,#fff 0 24%,#ecebe7 58%,#dcd9d2 100%)!important}
+#ail-domus .product-visual{background:radial-gradient(circle at 50% 38%,#fff 0 24%,#e9f1f4 58%,#d6e4ea 100%)!important}
 #ail-domus .product-visual::before{background:radial-gradient(circle,rgba(10,167,181,.16),transparent 66%)!important}
 
 /* Footer */
@@ -346,7 +346,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 }
 
 /* ───────── B2B access gate (lead-gate.js) — logic untouched, look only ───────── */
-#ail-domus #ailLeadGate{background:rgba(18,20,21,.62)!important;backdrop-filter:var(--dm-blur-backdrop);-webkit-backdrop-filter:var(--dm-blur-backdrop);font-family:var(--font-sf,inherit)!important}
+#ail-domus #ailLeadGate{background:rgba(13,31,39,.55)!important;backdrop-filter:var(--dm-blur-backdrop);-webkit-backdrop-filter:var(--dm-blur-backdrop);font-family:var(--font-sf,inherit)!important}
 /* lead-gate.js ships `.ail-step.active{display:block}`, which loses to its own `#ailLeadGate .ail-step{display:none}`: show the active step */
 #ail-domus #ailLeadGate .ail-step.active{display:block!important}
 #ail-domus #ailLeadGate .ail-card{
@@ -373,7 +373,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus #ailLeadGate .ail-note{color:var(--dm-on-dark-faint)!important}
 
 /* ───────── Promo popup (promo-popup.js) — same smoke + cyan/orange language as the CTA band ───────── */
-#ail-domus #ail-promo-popup-root{background:rgba(18,20,21,.62)!important;backdrop-filter:blur(14px) saturate(120%)!important;-webkit-backdrop-filter:blur(14px) saturate(120%)!important}
+#ail-domus #ail-promo-popup-root{background:rgba(13,31,39,.55)!important;backdrop-filter:blur(14px) saturate(120%)!important;-webkit-backdrop-filter:blur(14px) saturate(120%)!important}
 #ail-domus #ail-promo-popup-root .ail-promo-dialog{
   background:radial-gradient(520px 260px at 100% 0%,rgba(240,123,79,.18),transparent 70%),radial-gradient(520px 260px at 0% 100%,rgba(10,167,181,.20),transparent 70%),var(--dm-panel-modal)!important;
   border:1px solid var(--dm-edge)!important;border-radius:var(--dm-radius-xl)!important;color:var(--dm-on-dark)!important;
@@ -442,7 +442,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-product-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 #ail-domus .dm-chip{max-width:100%;background:var(--dm-fill-1);color:var(--dm-on-chip);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 #ail-domus .dm-pack-icon{width:14px;height:14px;flex:none;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
-#ail-domus .product-visual{box-shadow:inset 0 -22px 34px rgba(30,32,33,.08),inset 0 1px 0 rgba(255,255,255,.9)}
+#ail-domus .product-visual{box-shadow:inset 0 -22px 34px rgba(16,44,56,.08),inset 0 1px 0 rgba(255,255,255,.9)}
 /* Equal-height cards: the quote button sits on the card floor even when chips wrap */
 #ail-domus article[data-product]{display:flex;flex-direction:column}
 #ail-domus article[data-product] .quote-product-btn{min-height:44px;margin-top:auto!important}
@@ -467,7 +467,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-icon-badge svg{width:20px;height:20px;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 /* Keep the label and the line after it clear of the badge */
 #ail-domus .dm-icon-badge+*,#ail-domus .dm-icon-badge+*+*{padding-right:46px}
-#ail-domus .feature .dm-icon-badge{background:linear-gradient(160deg,rgba(255,255,255,.75),rgba(255,255,255,.35));border-color:var(--dm-edge-light);box-shadow:inset 0 1px 0 #fff,0 6px 14px rgba(30,32,33,.08)}
+#ail-domus .feature .dm-icon-badge{background:linear-gradient(160deg,rgba(255,255,255,.75),rgba(255,255,255,.35));border-color:var(--dm-edge-light);box-shadow:inset 0 1px 0 #fff,0 6px 14px rgba(16,44,56,.08)}
 #ail-domus .feature .dm-icon-badge svg{stroke:var(--dm-cyan-deep)}
 #ail-domus .feature strong{display:block;padding-right:46px}
 
