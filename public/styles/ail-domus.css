@@ -64,6 +64,10 @@
   --dm-shadow-modal:0 40px 110px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
   --dm-blur-chip:blur(12px);
   --dm-blur-backdrop:blur(16px) saturate(120%);
+  /* Motion (--dm-ease mirrors EASE in ail-islands.js) */
+  --dm-ease:cubic-bezier(.2,.75,.2,1);
+  --dm-dur-fast:.2s;
+  --dm-dur-base:.3s;
 }
 
 /* Ground */
@@ -89,6 +93,13 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus ::selection{background:var(--dm-cyan);color:var(--dm-ink)}
 /* index and catalog set html{scroll-behavior:smooth} with no reduced-motion exception */
 @media(prefers-reduced-motion:reduce){html:has(#ail-domus){scroll-behavior:auto}}
+
+/* Shared components: status dot and pill (the widgets and pages below build on these) */
+#ail-domus .dm-dot{flex:none;display:inline-block;width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-cyan-bright)}
+#ail-domus .dm-dot--lg{width:var(--dm-dot-lg);height:var(--dm-dot-lg)}
+#ail-domus .dm-dot.is-progress{background:var(--dm-orange)}
+#ail-domus .dm-dot.is-live{box-shadow:var(--dm-halo-cyan)}
+#ail-domus .dm-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:var(--ail-type-11);font-weight:700;line-height:1.3;white-space:nowrap}
 
 /* Header */
 #ail-domus .site-header{background:rgba(234,232,227,.66)!important;border-bottom:1px solid rgba(29,28,26,.08)!important;backdrop-filter:var(--dm-blur);-webkit-backdrop-filter:var(--dm-blur)}
@@ -429,7 +440,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 /* Catalog product card: hierarchy, ingredient and packaging chips, studio tile */
 #ail-domus article[data-product] h3{font-size:16px!important;line-height:1.3!important;letter-spacing:-.02em!important;font-weight:600!important}
 #ail-domus .dm-product-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-#ail-domus .dm-chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 10px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-1);border:1px solid var(--dm-edge);color:var(--dm-on-chip);font-size:var(--ail-type-11);font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#ail-domus .dm-chip{max-width:100%;background:var(--dm-fill-1);color:var(--dm-on-chip);font-weight:600;overflow:hidden;text-overflow:ellipsis}
 #ail-domus .dm-pack-icon{width:14px;height:14px;flex:none;fill:none;stroke:var(--dm-cyan-bright);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
 #ail-domus .product-visual{box-shadow:inset 0 -22px 34px rgba(30,32,33,.08),inset 0 1px 0 rgba(255,255,255,.9)}
 /* Equal-height cards: the quote button sits on the card floor even when chips wrap */
@@ -477,8 +488,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 
 /* Hero panel card: live catalog line */
 #ail-domus .dm-live{display:flex;align-items:center;gap:8px;margin:12px 0 0!important;padding-top:12px;border-top:1px solid var(--dm-divider);color:var(--dm-on-dark-muted)!important;font-size:var(--ail-type-12)!important;font-weight:600;font-variant-numeric:tabular-nums}
-#ail-domus .dm-live i{width:7px;height:7px;border-radius:50%;background:var(--dm-cyan-bright);box-shadow:var(--dm-halo-cyan)}
-#ail-domus .dm-live.is-loading i{background:var(--dm-on-dark-faint);box-shadow:none;animation:dmPulse 1.2s ease-in-out infinite}
+#ail-domus .dm-live.is-loading .dm-dot{background:var(--dm-on-dark-faint);box-shadow:none;animation:dmPulse 1.2s ease-in-out infinite}
 @keyframes dmPulse{50%{opacity:.35}}
 
 /* Ready Supply card: per-category sparkline */
@@ -498,11 +508,11 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .dm-chain li+li::after{content:"";position:absolute;right:calc(100% + 2px);top:50%;width:12px;height:2px;background:linear-gradient(90deg,rgba(94,215,223,.2),var(--dm-cyan-bright))}
 
 /* Status pill: dot + word, never colour alone (cyan = in place, orange = in progress) */
-#ail-domus .dm-status{display:inline-flex;align-items:center;gap:6px;margin-left:6px;padding:3px 9px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark)!important;font-size:var(--ail-type-10);font-weight:700;letter-spacing:.05em;white-space:nowrap;vertical-align:1px}
-#ail-domus .dm-status::before{content:"";width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-cyan-bright)}
+#ail-domus .dm-status{margin-left:6px;color:var(--dm-on-dark)!important;letter-spacing:.05em;vertical-align:1px}
+#ail-domus .dm-status::before{content:"";flex:none;width:var(--dm-dot);height:var(--dm-dot);border-radius:50%;background:var(--dm-cyan-bright)}
 #ail-domus .dm-status.is-progress::before{background:var(--dm-orange)}
 #ail-domus [data-status] .font-bold{display:flex;align-items:center;gap:8px}
-#ail-domus [data-status] .font-bold::before{content:"";flex:none;width:var(--dm-dot-lg);height:var(--dm-dot-lg);border-radius:50%;background:var(--dm-cyan-bright);box-shadow:0 0 0 4px rgba(94,215,223,.14)}
+#ail-domus [data-status] .font-bold::before{content:"";flex:none;width:var(--dm-dot-lg);height:var(--dm-dot-lg);border-radius:50%;background:var(--dm-cyan-bright);box-shadow:var(--dm-halo-cyan)}
 #ail-domus [data-status="progress"] .font-bold::before{background:var(--dm-orange);box-shadow:var(--dm-halo-orange)}
 
 /* Procurement: lead-time comparison on one day scale */
@@ -533,13 +543,10 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 /* Working-hours status (home CTA, contact) */
 #ail-domus .dm-hours{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:14px 0 0!important;color:var(--dm-on-dark-muted)!important;font-size:var(--ail-type-12)!important;font-weight:600}
 #ail-domus .dm-hours:empty{display:none}
-#ail-domus .dm-hours__status{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font-size:var(--ail-type-11);font-weight:700}
-#ail-domus .dm-hours__status i{width:7px;height:7px;border-radius:50%;background:var(--dm-orange)}
-#ail-domus .dm-hours__status.is-open i{background:var(--dm-cyan-bright);box-shadow:var(--dm-halo-cyan)}
 
 /* Contact: copy buttons */
 #ail-domus .dm-copy-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
-#ail-domus .dm-copy{position:relative;display:inline-flex;align-items:center;min-height:30px;padding:0 12px;border-radius:var(--dm-radius-pill);background:var(--dm-fill-2);border:1px solid var(--dm-edge);color:var(--dm-on-dark);font:600 11px/1 var(--font-sf,inherit);cursor:pointer;transition:background-color .2s ease,border-color .2s ease}
+#ail-domus .dm-copy{position:relative;min-height:30px;padding:0 12px;font:600 var(--ail-type-11)/1 var(--font-sf,inherit);cursor:pointer;transition:background-color var(--dm-dur-fast) ease,border-color var(--dm-dur-fast) ease}
 #ail-domus .dm-copy::after{content:"";position:absolute;inset:-7px}
 #ail-domus .dm-copy:hover{background:rgba(255,255,255,.14)}
 #ail-domus .dm-copy.is-done{border-color:var(--dm-cyan-bright);color:var(--dm-cyan-bright)}
@@ -557,7 +564,7 @@ html:has(#ail-domus){background:var(--dm-ground-2)}
 #ail-domus .has-gauge:not(.stat)>*:not(.dm-gauge-slot){grid-column:1}
 #ail-domus .has-gauge:not(.stat)>.dm-gauge-slot{grid-row:1/span 4;width:84px}
 
-@media(prefers-reduced-motion:reduce){#ail-domus .dm-live.is-loading i,#ail-domus .dm-spark.is-loading{animation:none}}
+@media(prefers-reduced-motion:reduce){#ail-domus .dm-live.is-loading .dm-dot,#ail-domus .dm-spark.is-loading{animation:none}}
 
 /* An island that replaces its host hides the original markup; author display rules must not win over [hidden] */
 #ail-domus [data-island][hidden]{display:none!important}

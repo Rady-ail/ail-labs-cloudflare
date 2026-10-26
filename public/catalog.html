@@ -148,7 +148,7 @@ function card(i,c){
     '</div>'+
     '<p class="mt-4 text-[10px] font-bold uppercase tracking-widest text-ail-teal">'+esc(c)+'</p>'+
     '<h3 class="mt-1 font-bold">'+esc(n)+'</h3>'+
-    '<div class="dm-product-meta">'+(k?'<span class="dm-chip" title="Kandungan">'+esc(k)+'</span>':'')+(p?'<span class="dm-chip dm-chip--pack" title="Kemasan">'+packIcon(p)+esc(p)+'</span>':'')+'</div>'+
+    '<div class="dm-product-meta">'+(k?'<span class="dm-pill dm-chip" title="Kandungan">'+esc(k)+'</span>':'')+(p?'<span class="dm-pill dm-chip dm-chip--pack" title="Kemasan">'+packIcon(p)+esc(p)+'</span>':'')+'</div>'+
     '<button type="button" data-quote-product="'+esc(n)+'" class="quote-product-btn mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white">Request Bulk Quote</button>'+
   '</article>'
 }
