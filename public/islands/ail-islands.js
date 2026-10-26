@@ -9,7 +9,16 @@
   var RD = window.ReactDOM;
   var M = window.Motion;
   var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  var EASE = [0.2, 0.75, 0.2, 1];
+  // Easing comes from the --dm-ease token in ail-domus.css; the literal is the fallback if the sheet is missing.
+  var EASE = cssEase('--dm-ease', [0.2, 0.75, 0.2, 1]);
+
+  function cssEase(name, fallback) {
+    var v = window.getComputedStyle ? getComputedStyle(document.documentElement).getPropertyValue(name) : '';
+    var m = /cubic-bezier\(([^)]+)\)/.exec(v || '');
+    if (!m) return fallback;
+    var pts = m[1].split(',').map(parseFloat);
+    return pts.length === 4 && pts.every(isFinite) ? pts : fallback;
+  }
 
   function num(v, fallback) {
     var n = parseFloat(v);
