@@ -10,7 +10,7 @@ const DEFAULT_PROMO = {
   subtitle: 'Deskripsi singkat promo — ganti sesuai kebutuhan',
   discount: '30%-50%',
   note: 'S&K berlaku. Chat admin untuk info lebih lanjut.',
-  whatsapp_number: '6287817391521',
+  whatsapp_number: '628781739521',
   whatsapp_message: 'Halo Ail Labs, saya mau tanya soal promo',
   reappear_hours: 24,
 };
