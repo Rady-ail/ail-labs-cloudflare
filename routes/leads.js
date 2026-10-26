@@ -31,6 +31,10 @@ function sameOrigin(req) {
   const origin = clean(req.get('origin'), 300).replace(/\/$/, '');
   return !origin || allow.includes(origin);
 }
+// Region names injected by src/worker.js from request.cf (URI-encoded).
+function geoHeader(req, name, max) {
+  try { return clean(decodeURIComponent(String(req.get(name) || '')), max); } catch { return ''; }
+}
 function requestIp(req) {
   return clean((req.headers['x-forwarded-for'] || req.socket?.remoteAddress || '').split(',')[0], 100);
 }
@@ -242,8 +246,8 @@ router.post('/verify-otp', async (req, res) => {
     try {
       const token = crypto.randomBytes(32).toString('hex');
       const ip = requestIp(req);
-      const country = clean(req.get('cf-ipcountry'), 20), region = clean(req.get('cf-region'), 120);
-      const city = clean(req.get('cf-ipcity'), 120), userAgent = clean(req.get('user-agent'), 500);
+      const country = geoHeader(req, 'x-ail-geo-country', 20) || clean(req.get('cf-ipcountry'), 20), region = geoHeader(req, 'x-ail-geo-region', 120);
+      const city = geoHeader(req, 'x-ail-geo-city', 120), userAgent = clean(req.get('user-agent'), 500);
       const referrer = clean(req.get('referer'), 1000);
       const businessType = clean(body.business_type, 80), landingPage = clean(body.landing_page || body.first_page, 500), leadSource = clean(body.lead_source || 'direct', 120);
       const utmSource=clean(body.utm_source,120), utmMedium=clean(body.utm_medium,120), utmCampaign=clean(body.utm_campaign,160);

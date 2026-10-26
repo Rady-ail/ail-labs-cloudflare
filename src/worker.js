@@ -65,9 +65,16 @@ async function renderCatalogPage(request, env, context) {
 // diteruskan ke Express lewat header internal. Header dari klien dengan nama
 // yang sama selalu dibuang dulu supaya tidak bisa dipalsukan. Tidak ada
 // koordinat atau GPS yang dipakai; hanya nama wilayah.
+//
+// Di depan Worker, Cloudflare tidak mengisi X-Forwarded-For, jadi Express hanya
+// melihat header yang dikirim klien (bisa dipalsukan) atau tidak ada sama
+// sekali. Akibatnya semua pengunjung berbagi satu "IP" dan rate limit OTP
+// mengunci semua orang. Isi ulang dari CF-Connecting-IP, IP asli pengunjung.
 function withGeoHeaders(request) {
   const headers = new Headers(request.headers);
-  for (const name of ['x-ail-geo-country', 'x-ail-geo-region', 'x-ail-geo-city']) headers.delete(name);
+  for (const name of ['x-ail-geo-country', 'x-ail-geo-region', 'x-ail-geo-city', 'x-forwarded-for']) headers.delete(name);
+  const clientIp = request.headers.get('cf-connecting-ip');
+  if (clientIp) headers.set('x-forwarded-for', clientIp);
   const cf = request.cf || {};
   const set = (name, value) => {
     if (value) headers.set(name, encodeURIComponent(String(value).slice(0, 120)));
