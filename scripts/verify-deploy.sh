@@ -110,6 +110,30 @@ check_2xx 'categories' '/api/categories'
 request '/api/leads/verification-status'
 printf 'INFO %-24s %s %s\n' 'otp-gate' "$status" "$(head -c 200 "$response_file")"
 
+# OTP gate backend reaches the database without side effects: an unknown token
+# is reported as unverified, and a code for an address that never requested
+# one is rejected with 400 (a 500 here means visitors cannot get past the gate).
+request_with_body() {
+  status=$(curl --compressed --connect-timeout 3 --max-time 30 --silent --show-error \
+    -o "$response_file" -w '%{http_code}' -H 'Content-Type: application/json' \
+    "${@:2}" "$base_url$1" 2>/dev/null) || status=000
+}
+request_with_body '/api/leads/status' -H 'X-Lead-Token: deploy-check-unknown-token'
+if [[ "$status" == 200 ]] && grep -qF '"verified":false' "$response_file"; then
+  printf 'PASS %-24s %s\n' 'otp-status' "$status"
+else
+  printf 'FAIL %-24s %s %s\n' 'otp-status' "$status" "$(head -c 200 "$response_file")"
+  failures=$((failures + 1))
+fi
+request_with_body '/api/leads/verify-otp' -X POST \
+  --data '{"name":"Deploy check","company":"Deploy check","email":"deploy-check@example.invalid","phone":"+628000000000","otp":"000000","wa_otp":"000000","consent":true}'
+if [[ "$status" == 400 || "$status" == 503 ]]; then
+  printf 'PASS %-24s %s %s\n' 'otp-verify-path' "$status" "$(head -c 120 "$response_file")"
+else
+  printf 'FAIL %-24s %s %s\n' 'otp-verify-path' "$status" "$(head -c 200 "$response_file")"
+  failures=$((failures + 1))
+fi
+
 request '/api/customer/auth/me'
 if [[ "$status" == 200 || "$status" == 401 ]]; then
   printf 'PASS %-24s %s\n' 'customer-auth-me' "$status"
