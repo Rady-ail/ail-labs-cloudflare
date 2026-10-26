@@ -221,31 +221,52 @@ router.post('/verify-otp', async (req, res) => {
         return res.status(400).json({ ok: false, error: 'Kode WhatsApp salah.' });
       }
     }
-    await pool.query('UPDATE lead_email_otps SET consumed_at = now() WHERE id = $1', [challenge.id]);
-    if (waChallenge) await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = now() WHERE id = $1', [waChallenge.id]);
-
-    const token = crypto.randomBytes(32).toString('hex');
-    const ip = requestIp(req);
-    const country = clean(req.get('cf-ipcountry'), 20), region = clean(req.get('cf-region'), 120);
-    const city = clean(req.get('cf-ipcity'), 120), userAgent = clean(req.get('user-agent'), 500);
-    const referrer = clean(req.get('referer'), 1000);
-    const businessType = clean(body.business_type, 80), landingPage = clean(body.landing_page || body.first_page, 500), leadSource = clean(body.lead_source || 'direct', 120);
-    const utmSource=clean(body.utm_source,120), utmMedium=clean(body.utm_medium,120), utmCampaign=clean(body.utm_campaign,160);
-    let firstPage = '/';
-    if (sessionId) {
-      const session = await pool.query('SELECT page_visited FROM visitors WHERE session_id = $1 LIMIT 1', [sessionId]);
-      if (session.rows[0]) firstPage = clean(session.rows[0].page_visited || '/', 500);
+    // Claim the code atomically so two parallel submits cannot both use it.
+    const claimed = await pool.query('UPDATE lead_email_otps SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL RETURNING id', [challenge.id]);
+    if (!claimed.rows[0]) return res.status(400).json({ ok: false, error: 'Kode sudah digunakan. Minta kode baru.' });
+    if (waChallenge) {
+      const waClaimed = await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = now() WHERE id = $1 AND consumed_at IS NULL RETURNING id', [waChallenge.id]);
+      if (!waClaimed.rows[0]) {
+        await pool.query('UPDATE lead_email_otps SET consumed_at = NULL WHERE id = $1', [challenge.id]);
+        return res.status(400).json({ ok: false, error: 'Kode WhatsApp sudah digunakan. Minta kode baru.' });
+      }
     }
-
-    const eventRows = sessionId ? (await pool.query('SELECT event_type,event_data FROM user_events WHERE session_id=$1 ORDER BY timestamp DESC LIMIT 100',[sessionId])).rows : [];
-    const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
-    const result = await pool.query(
-      `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,phone_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
-       VALUES ($1,$2,$3,$4,$5,now(),CASE WHEN $23::boolean THEN now() END,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
-       RETURNING id,name,company,email,phone,phone_verified_at,city,region,country,interest_category,lead_score,status`,
-      [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score,Boolean(waChallenge)]
-    );
-    res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
+    // If saving the lead fails, give the codes back so the visitor can retry
+    // with the same code instead of being stuck with a consumed one.
+    const releaseCodes = async () => {
+      try {
+        await pool.query('UPDATE lead_email_otps SET consumed_at = NULL WHERE id = $1', [challenge.id]);
+        if (waChallenge) await pool.query('UPDATE lead_whatsapp_otps SET consumed_at = NULL WHERE id = $1', [waChallenge.id]);
+      } catch (releaseErr) { console.error('[lead/verify-otp] release', releaseErr); }
+    };
+    try {
+      const token = crypto.randomBytes(32).toString('hex');
+      const ip = requestIp(req);
+      const country = clean(req.get('cf-ipcountry'), 20), region = clean(req.get('cf-region'), 120);
+      const city = clean(req.get('cf-ipcity'), 120), userAgent = clean(req.get('user-agent'), 500);
+      const referrer = clean(req.get('referer'), 1000);
+      const businessType = clean(body.business_type, 80), landingPage = clean(body.landing_page || body.first_page, 500), leadSource = clean(body.lead_source || 'direct', 120);
+      const utmSource=clean(body.utm_source,120), utmMedium=clean(body.utm_medium,120), utmCampaign=clean(body.utm_campaign,160);
+      let firstPage = '/';
+      // Visit history only enriches the lead score; a lookup failure must not block access.
+      let eventRows = [];
+      if (sessionId) {
+        const session = await pool.query('SELECT page_visited FROM visitors WHERE session_id = $1 LIMIT 1', [sessionId]).catch(() => ({ rows: [] }));
+        if (session.rows[0]) firstPage = clean(session.rows[0].page_visited || '/', 500);
+        eventRows = (await pool.query('SELECT event_type,event_data FROM user_events WHERE session_id=$1 ORDER BY timestamp DESC LIMIT 100',[sessionId]).catch(() => ({ rows: [] }))).rows;
+      }
+      const interest=inferInterest(landingPage || firstPage,eventRows), score=scoreLead({company,phone,marketingConsent,interest,repeatVisit:eventRows.length>3});
+      const result = await pool.query(
+        `INSERT INTO lead_captures (session_id,name,company,phone,email,email_verified_at,phone_verified_at,consent_at,marketing_consent,lead_token_hash,ip_address,country,region,city,user_agent,first_page,referrer,business_type,interest_category,lead_source,landing_page,utm_source,utm_medium,utm_campaign,lead_score,status,last_activity_at)
+         VALUES ($1,$2,$3,$4,$5,now(),CASE WHEN $23::boolean THEN now() END,now(),$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,'New',now())
+         RETURNING id,name,company,email,phone,phone_verified_at,city,region,country,interest_category,lead_score,status`,
+        [sessionId||null,name,company,phone,email,marketingConsent,hash(token),ip,country||null,region||null,city||null,userAgent,firstPage,referrer||null,businessType||null,interest,leadSource,landingPage||firstPage,utmSource||null,utmMedium||null,utmCampaign||null,score,Boolean(waChallenge)]
+      );
+      res.status(201).json({ ok: true, verified: true, token, lead: result.rows[0] });
+    } catch (err) {
+      await releaseCodes();
+      throw err;
+    }
   } catch (err) {
     console.error('[lead/verify-otp]', err);
     res.status(500).json({ ok: false, error: 'Verifikasi belum dapat diselesaikan.' });
