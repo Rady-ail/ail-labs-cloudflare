@@ -48,3 +48,9 @@ There is no database password-reset flow. To rotate the admin password, update t
 
 ## Credential exposure warning
 If a credential was ever committed to the repository, treat it as compromised even after the file is edited. Rotate the credential in the real provider first, then remove the exposed value from the repository.
+
+Catalog AI agent (WhatsApp)
+- File: lib/catalog-agent.js, dipanggil dari routes/whatsapp-webhook.js.
+- Secret wajib: ANTHROPIC_API_KEY (Cloudflare secret). Opsional var: CATALOG_AGENT_MODEL (default claude-sonnet-5-5).
+- Tanpa ANTHROPIC_API_KEY, bot otomatis memakai pencarian kata kunci lama.
+- Harga hanya diberikan ke model untuk customer berstatus approved.

@@ -8,6 +8,7 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 const { sendWhatsApp } = require('../lib/whatsapp');
+const { answerWithAgent } = require('../lib/catalog-agent');
 const { requireAdmin } = require('./authMiddleware');
 
 const MAX_HASIL = 5;
@@ -84,6 +85,14 @@ router.post('/webhook', async (req, res) => {
     );
     const statusCustomer = customerRows[0]?.status || null;
     const bolehLihatHarga = statusCustomer === 'approved';
+
+    // Agent AI katalog (Claude): jawab cerdas hanya seputar produk katalog.
+    // Kalau ANTHROPIC_API_KEY belum diset / API gagal -> jatuh ke pencarian kata kunci di bawah.
+    const jawabanAgent = await answerWithAgent({ teks, nomor: nomorWA, priceVisible: bolehLihatHarga });
+    if (jawabanAgent) {
+      await sendWhatsApp(nomorWA, jawabanAgent);
+      return;
+    }
 
     // Cari produk yang cocok
     const { rows: produk } = await pool.query(
