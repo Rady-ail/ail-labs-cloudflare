@@ -126,6 +126,10 @@ router.post('/request-otp', async (req, res) => {
 
     const channels = otpChannels();
     if (!channels.email) return res.status(503).json({ ok: false, error: 'Verifikasi email sedang dikonfigurasi. Silakan coba lagi nanti.' });
+    // MAIL_FROM may be a display-name address such as "AIL LABS <info@domain>".
+    const from = clean(process.env.MAIL_FROM || process.env.RESEND_FROM, 254);
+    const fromAddress = (from.match(/<([^<>]+)>\s*$/) || [, from])[1].trim();
+    if (!from || !EMAIL_RE.test(fromAddress)) return res.status(503).json({ ok: false, error: 'Email verifikasi sedang dikonfigurasi.' });
     const otp = String(crypto.randomInt(100000, 1000000));
     const waOtp = String(crypto.randomInt(100000, 1000000));
     const waTemplate = clean(process.env.WHATSAPP_OTP_TEMPLATE_NAME, 120);
@@ -149,9 +153,6 @@ router.post('/request-otp', async (req, res) => {
         [phone, hash(waOtp), ip]
       );
     }
-
-    const from = clean(process.env.MAIL_FROM || process.env.RESEND_FROM, 254);
-    if (!from || !EMAIL_RE.test(from)) return res.status(503).json({ ok: false, error: 'Email verifikasi sedang dikonfigurasi.' });
 
     await transporter.sendMail({
       from, to: email, subject: 'Kode verifikasi AIL LABS',

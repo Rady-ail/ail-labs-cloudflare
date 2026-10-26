@@ -18,12 +18,48 @@ export default {
     if (pathname === '/api/webhooks/resend/inbound' && request.method === 'POST') {
       return handleResendInbound(request, env);
     }
+    if ((pathname === '/catalog' || pathname === '/catalog.html') && request.method === 'GET') {
+      return renderCatalogPage(request, env, context);
+    }
     if (!pathname.startsWith('/api/')) {
       return env.ASSETS.fetch(request);
     }
     return handleNodeRequest.fetch(withGeoHeaders(request), env, context);
   },
 };
+
+// Katalog dirender dulu di server (nama, kandungan, kemasan — tanpa harga)
+// supaya isinya terbaca mesin pencari. Script di halaman tetap mengganti
+// isi #productGroups dengan versi interaktif seperti biasa. Kalau API gagal,
+// halaman statis asli dikirim apa adanya.
+async function renderCatalogPage(request, env, context) {
+  const page = await env.ASSETS.fetch(request);
+  if (!page.ok || !(page.headers.get('content-type') || '').includes('text/html')) return page;
+  let groups;
+  try {
+    const apiUrl = new URL('/api/products', request.url);
+    const apiRes = await handleNodeRequest.fetch(new Request(apiUrl, { headers: { Accept: 'application/json' } }), env, context);
+    groups = apiRes.ok ? await apiRes.json() : null;
+  } catch {
+    groups = null;
+  }
+  if (!Array.isArray(groups) || !groups.length) return page;
+  const esc = (v) => String(v ?? '').replace(/[&<>"]/g, (m) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+  const html = groups
+    .filter((g) => g && typeof g.cat === 'string' && Array.isArray(g.items))
+    .map((g) => '<section class="rounded-2xl border border-slate-200 bg-white p-5 card sm:p-6 lg:p-7"><h3 class="mb-4 font-black">' + esc(g.cat) + '</h3><ul class="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2 lg:grid-cols-3">'
+      + g.items.map((i) => '<li class="rounded-xl bg-ail-clinical px-4 py-3"><strong class="block text-ail-teal">' + esc(i[0]) + '</strong>'
+        + (i[1] ? '<span class="block text-xs text-slate-500">' + esc(i[1]) + '</span>' : '')
+        + (i[2] ? '<span class="block text-xs text-slate-400">' + esc(i[2]) + '</span>' : '') + '</li>').join('')
+      + '</ul></section>')
+    .join('');
+  const out = new HTMLRewriter()
+    .on('#productGroups', { element(el) { el.setInnerContent(html, { html: true }); } })
+    .transform(page);
+  const headers = new Headers(out.headers);
+  headers.set('Cache-Control', 'public, max-age=0, s-maxage=300');
+  return new Response(out.body, { status: out.status, headers });
+}
 
 // Lokasi pengunjung level negara/provinsi/kota dari Cloudflare (request.cf),
 // diteruskan ke Express lewat header internal. Header dari klien dengan nama
