@@ -136,6 +136,8 @@ jobs:
           WHATSAPP_VERIFY_TOKEN: ${{ secrets.WHATSAPP_VERIFY_TOKEN }}
           WHATSAPP_APP_SECRET: ${{ secrets.WHATSAPP_APP_SECRET }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
         run: |
           set -euo pipefail
           node -e '
@@ -146,7 +148,7 @@ jobs:
             const resendKey = process.env.RESEND_API_KEY;
             if (resendKey) secrets.RESEND_API_KEY = resendKey;
             // Optional B2B OTP gate (WhatsApp channel). Names only are logged, never values.
-            const otpNames = ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_OTP_TEMPLATE_NAME", "WHATSAPP_OTP_TEMPLATE_LANGUAGE", "WHATSAPP_VERIFY_TOKEN", "WHATSAPP_APP_SECRET", "ANTHROPIC_API_KEY"];
+            const otpNames = ["WHATSAPP_TOKEN", "WHATSAPP_PHONE_NUMBER_ID", "WHATSAPP_OTP_TEMPLATE_NAME", "WHATSAPP_OTP_TEMPLATE_LANGUAGE", "WHATSAPP_VERIFY_TOKEN", "WHATSAPP_APP_SECRET", "ANTHROPIC_API_KEY", "ADMIN_EMAIL", "MAIL_FROM"];
             for (const name of otpNames) if (process.env[name]) secrets[name] = process.env[name];
             console.error("Optional OTP secrets provided by GitHub: " + (["RESEND_API_KEY", ...otpNames].filter(n => process.env[n]).join(", ") || "none"));
             const googleId = process.env.GOOGLE_CLIENT_ID;
