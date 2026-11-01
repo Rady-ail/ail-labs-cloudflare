@@ -74,17 +74,34 @@
     var groups = root.querySelectorAll('.section-head,.category-grid>*,.feature,.step,.compliance-card,.about-copy,.about-aside,.cta,.contact-grid>*,.stat');
     var io = new IntersectionObserver(function (entries) {
       entries.forEach(function (en) {
-        if (en.isIntersecting) { en.target.classList.add('is-in'); io.unobserve(en.target); }
+        /* also reveal blocks already scrolled past (anchor jumps, restored scroll position) */
+        if (en.isIntersecting || en.boundingClientRect.top < 0) { en.target.classList.add('is-in'); io.unobserve(en.target); }
       });
     }, { rootMargin: '0px 0px -8% 0px', threshold: 0.08 });
-    var vh = window.innerHeight;
+    var vh = window.innerHeight, pending = [];
     Array.prototype.forEach.call(groups, function (el) {
       if (el.closest('[hidden]') || el.getBoundingClientRect().top < vh * 0.92) return;
       var sib = el.parentElement ? Array.prototype.indexOf.call(el.parentElement.children, el) : 0;
       el.style.setProperty('--mg-i', Math.min(sib, 6));
       el.classList.add('mg-reveal');
       io.observe(el);
+      pending.push(el);
     });
+    /* Safety net: IntersectionObserver only fires on edge crossings, so a jump past blocks
+       (anchor link, restored scroll) would leave them hidden. Reveal anything already scrolled past. */
+    var sweepQueued = false;
+    var sweep = function () {
+      sweepQueued = false;
+      pending = pending.filter(function (el) {
+        if (el.classList.contains('is-in')) return false;
+        if (el.getBoundingClientRect().bottom < 0) { el.classList.add('is-in'); io.unobserve(el); return false; }
+        return true;
+      });
+    };
+    window.addEventListener('scroll', function () {
+      if (!sweepQueued && pending.length) { sweepQueued = true; requestAnimationFrame(sweep); }
+    }, { passive: true });
+    setTimeout(sweep, 700);
   }
 
   /* 5. AI neural mesh behind the hero: drifting nodes, links that light up near the pointer */
