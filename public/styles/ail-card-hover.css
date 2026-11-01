@@ -1,0 +1,23 @@
+/* AIL LABS catalog card hover: lift, soft cyan glow, image zoom, light sheen. Pointer devices only. */
+@media (hover:hover) and (pointer:fine){
+  article[data-product]{transition:transform .38s cubic-bezier(.2,.7,.2,1),box-shadow .38s ease,border-color .3s ease;will-change:transform}
+  article[data-product]:hover,article[data-product]:focus-within{
+    transform:translateY(-6px);
+    border-color:rgba(10,167,181,.45)!important;
+    box-shadow:0 26px 54px rgba(8,47,50,.12),0 0 0 1px rgba(10,167,181,.18),0 10px 30px rgba(10,167,181,.12)
+  }
+  article[data-product] .product-real{transition:transform .5s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
+  article[data-product]:hover .product-real{transform:scale(1.07) translateY(-3px) rotate(-1.2deg)}
+  article[data-product] .product-visual::after{
+    content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+    background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.55) 50%,transparent 65%);
+    transform:translateX(-120%);opacity:0
+  }
+  article[data-product]:hover .product-visual::after{opacity:1;transform:translateX(120%);transition:transform .9s ease,opacity .2s ease}
+  article[data-product] .product-badge{transition:transform .3s ease}
+  article[data-product]:hover .product-badge{transform:translateY(-2px)}
+}
+@media (prefers-reduced-motion:reduce){
+  article[data-product],article[data-product] .product-real,article[data-product] .product-visual::after,article[data-product] .product-badge{transition:none!important;transform:none!important}
+  article[data-product] .product-visual::after{display:none}
+}
