@@ -10,7 +10,8 @@
     "build": "node scripts/copy-inter-font.js && node scripts/validate-build.js",
     "deploy": "npx wrangler deploy",
     "seed": "node scripts/seed.js",
-    "postinstall": "node scripts/patch-workers-express.js"
+    "postinstall": "node scripts/patch-workers-express.js",
+    "build:css": "npx --yes tailwindcss@3.4.17 -c scripts/tailwind/tailwind.config.js -i scripts/tailwind/input.css -o public/styles/tailwind.css --minify"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
