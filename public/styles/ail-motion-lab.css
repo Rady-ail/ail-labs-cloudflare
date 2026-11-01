@@ -1,0 +1,33 @@
+/* AIL LABS motion lab (scoped: #ml-skin, #ml-route) */
+#ml-skin{height:320vh;position:relative}
+#ml-skin .ml-stick{position:sticky;top:72px;min-height:calc(100vh - 72px);display:grid;align-content:center;gap:20px;padding:20px 0}
+#ml-skin .ml-grid{display:grid;gap:20px;align-items:center}
+#ml-skin svg{width:100%;height:auto;max-height:62vh;display:block;border-radius:22px;background:linear-gradient(160deg,#eaf8f7,#fff 60%,#fff2ec);border:1px solid rgba(8,47,50,.12)}
+#ml-skin h2{margin:10px 0 14px;font-size:clamp(28px,5vw,44px);line-height:1.03;letter-spacing:-.055em}
+#ml-skin .ml-steps{display:grid;gap:10px}
+#ml-skin .ml-step{padding:14px 16px;border:1px solid rgba(8,47,50,.12);border-radius:14px;background:#fff;opacity:.45;transition:opacity .35s,border-color .35s,transform .35s}
+#ml-skin .ml-step b{display:block;font-size:15px}
+#ml-skin .ml-step span{display:block;margin-top:4px;color:#4f6b6a;font-size:12.5px;line-height:1.55}
+#ml-skin .ml-step.on{opacity:1;border-color:#0aa7b5;transform:translateX(6px)}
+#ml-skin .ml-progress{height:3px;margin-top:14px;border-radius:3px;background:rgba(8,47,50,.12);overflow:hidden}
+#ml-skin .ml-progress i{display:block;height:100%;width:0;background:linear-gradient(90deg,#0aa7b5,#f07b4f)}
+#ml-skin .ml-note,#ml-route .ml-note{margin:12px 0 0;font-size:11px;color:#78908e}
+#ml-needle{will-change:transform}
+#ml-route{background:#082f32;color:#fff;padding:72px 0}
+#ml-route .eyebrow{color:#9fe8ee!important;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);box-shadow:none}
+#ml-route h2{margin:10px 0 12px;font-size:clamp(28px,5vw,44px);line-height:1.03;letter-spacing:-.055em}
+#ml-route .ml-lead{margin:0;max-width:620px;color:#b4cdcb;font-size:15px;line-height:1.75}
+#ml-route svg{width:100%;height:auto;display:block;margin-top:24px;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12)}
+#ml-route .rpath{fill:none;stroke:#5ed7df;stroke-width:1.6;stroke-linecap:round;opacity:.85}
+#ml-route .rdot{fill:#f07b4f}
+#ml-route .node circle.core{fill:#0aa7b5}
+#ml-route .node circle.pulse{fill:none;stroke:#0aa7b5;stroke-width:1.2}
+#ml-route .node text{fill:#d5e5e3;font-size:20px;font-weight:700;letter-spacing:.04em}
+#ml-route .node.dest circle.core{fill:#f07b4f}
+#ml-route .node.dest circle.pulse{stroke:#f07b4f}
+#ml-route .node.dest text{fill:#fff;font-size:24px;font-weight:900}
+#ml-route .ml-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+#ml-route .ml-chips span{padding:7px 12px;border:1px solid rgba(255,255,255,.18);border-radius:99px;font-size:11.5px;font-weight:700;color:#d5e5e3}
+#ml-route .ml-note{color:#8eacab}
+@media(min-width:900px){#ml-route .node text{font-size:15px}#ml-route .node.dest text{font-size:20px}#ml-skin .ml-grid{grid-template-columns:1.15fr .85fr;gap:48px}}
+@media(prefers-reduced-motion:reduce){#ml-skin{height:auto}#ml-skin .ml-stick{position:static;min-height:0}#ml-skin .ml-step{opacity:1;transform:none;transition:none}}
