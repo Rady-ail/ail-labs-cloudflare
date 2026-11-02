@@ -65,3 +65,18 @@
   #ail-domus .mg-lit{translate:none}
 }
 @media print{#ail-domus .mg-aurora,#ail-domus .mg-neural,#ail-domus .mg-glare{display:none}}
+
+/* ---------- Navbar liquid squash ---------- */
+#ail-domus .site-header nav.nl-on{position:relative}
+#ail-domus .site-header nav.nl-on>a{position:relative;z-index:1}
+#ail-domus .site-header nav.nl-on a:not(.button):not(.nav-cta),
+#ail-domus .site-header nav.nl-on a:not(.button):not(.nav-cta):hover,
+#ail-domus .site-header nav.nl-on a:not(.button):not(.nav-cta)[aria-current="page"]{background:transparent!important;box-shadow:none!important}
+.nl-blob{position:absolute;left:0;top:0;z-index:0;pointer-events:none;opacity:0;
+  transition:transform .46s cubic-bezier(.3,1.35,.5,1),width .46s cubic-bezier(.3,1.35,.5,1),height .46s cubic-bezier(.3,1.35,.5,1),opacity .2s}
+.nl-blob.nl-show{opacity:1}
+.nl-blob b{display:block;width:100%;height:100%;border-radius:999px;transform-origin:50% 60%;
+  background:var(--dm-chip,rgba(10,167,181,.12));box-shadow:inset 0 -2px 0 var(--dm-cyan,#0aa7b5),0 6px 16px -8px rgba(10,167,181,.55)}
+@keyframes nl-press{0%{transform:scale(1,1)}25%{transform:scale(1.14,.82)}55%{transform:scale(.93,1.1)}80%{transform:scale(1.03,.98)}100%{transform:scale(1,1)}}
+#ail-domus .site-header a.nl-press{animation:nl-press .5s cubic-bezier(.3,1.2,.5,1);transform-origin:50% 60%}
+@media(prefers-reduced-motion:reduce){.nl-blob,#ail-domus .site-header a.nl-press{animation:none;transition:none}}

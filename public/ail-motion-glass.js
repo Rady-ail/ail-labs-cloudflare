@@ -104,6 +104,69 @@
     setTimeout(sweep, 700);
   }
 
+  /* 4b. Navbar liquid squash: a gooey pill slides between links (stretch while moving, squash on landing);
+         every nav click squashes the link, then navigates after a short beat so the motion is seen. */
+  (function () {
+    var nav = root.querySelector('.site-header nav');
+    var links = root.querySelectorAll('.site-header nav a, .site-header .mobile-menu a');
+    if (!links.length) return;
+    var blob = null, cur = null;
+    if (nav && !reduce) {
+      var items = Array.prototype.slice.call(nav.querySelectorAll('a:not(.button):not(.nav-cta)'));
+      blob = document.createElement('i');
+      blob.className = 'nl-blob';
+      blob.setAttribute('aria-hidden', 'true');
+      nav.insertBefore(blob, nav.firstChild);
+      nav.classList.add('nl-on');
+      var home = function () { return nav.querySelector('a[aria-current="page"]:not(.button):not(.nav-cta)'); };
+      var place = function (el, animate) {
+        if (!el) { blob.classList.remove('nl-show'); return; }
+        var from = blob.getBoundingClientRect(), moved = blob.classList.contains('nl-show');
+        blob.style.width = el.offsetWidth + 'px';
+        blob.style.height = el.offsetHeight + 'px';
+        blob.style.transform = 'translate(' + el.offsetLeft + 'px,' + el.offsetTop + 'px)';
+        blob.classList.add('nl-show');
+        if (animate && moved && blob.animate) {
+          var dist = Math.abs(from.left - (nav.getBoundingClientRect().left + el.offsetLeft));
+          var s = Math.min(0.28, 0.06 + dist / 1400);
+          blob.firstChild.animate([
+            { transform: 'scale(1,1)' },
+            { transform: 'scale(' + (1 + s) + ',' + (1 - s * 0.7) + ')', offset: 0.35 },
+            { transform: 'scale(' + (1 - s * 0.35) + ',' + (1 + s * 0.45) + ')', offset: 0.7 },
+            { transform: 'scale(1,1)' }
+          ], { duration: 520, easing: 'cubic-bezier(.3,1.4,.5,1)' });
+        }
+      };
+      blob.innerHTML = '<b></b>';
+      cur = home();
+      place(cur, false);
+      items.forEach(function (a) {
+        a.addEventListener('pointerenter', function () { place(a, true); });
+        a.addEventListener('focus', function () { place(a, true); });
+      });
+      nav.addEventListener('pointerleave', function () { place(cur, true); });
+      nav.addEventListener('focusout', function (e) { if (!nav.contains(e.relatedTarget)) place(cur, true); });
+      window.addEventListener('resize', function () { place(cur, false); }, { passive: true });
+      nav._nlSet = function (a) { cur = a; place(a, true); };
+    }
+    Array.prototype.forEach.call(links, function (a) {
+      a.addEventListener('click', function (e) {
+        if (reduce) return;
+        var inNav = nav && nav.contains(a) && !a.classList.contains('button') && !a.classList.contains('nav-cta');
+        if (inNav && nav._nlSet) nav._nlSet(a);
+        a.classList.remove('nl-press'); void a.offsetWidth; a.classList.add('nl-press');
+        setTimeout(function () { a.classList.remove('nl-press'); }, 520);
+        var href = a.getAttribute('href') || '';
+        var same = a.origin === location.origin && a.pathname === location.pathname;
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey ||
+            a.target === '_blank' || a.hasAttribute('download') || a.origin !== location.origin ||
+            href.charAt(0) === '#' || same) return;
+        e.preventDefault();
+        setTimeout(function () { location.href = a.href; }, 280);
+      });
+    });
+  })();
+
   /* 5. AI neural mesh behind the hero: drifting nodes, links that light up near the pointer */
   var hero = root.querySelector('.hero');
   if (!hero) return;
