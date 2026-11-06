@@ -9,9 +9,11 @@
     {href:"/compliance.html",label:"Compliance",match:["/compliance.html"],svg:'<path d="M12 3.6 5 6.3v5.4c0 4.2 2.8 7.2 7 8.7 4.2-1.5 7-4.5 7-8.7V6.3z"/><path d="m8.9 12 2.3 2.3 4-4.3"/>'},
     {href:"/contact.html",label:"Kontak",match:["/contact.html"],svg:'<path d="M20 11.6c0 3.9-3.6 7-8 7-1 0-2-.15-2.9-.45L4.6 19.6l1.2-3.5A6.6 6.6 0 0 1 4 11.6c0-3.9 3.6-7 8-7s8 3.1 8 7z"/>'}
   ];
-  var path=location.pathname.replace(/\/+$/,"")||"/";
+  /* Cloudflare serves /catalog (no .html) — compare paths without the extension */
+  function norm(p){p=p.replace(/\/+$/,"").replace(/\.html$/,"");return p===""||p==="/index"?"/":p}
+  var path=norm(location.pathname);
   var active=0;
-  items.forEach(function(it,i){if(it.match.indexOf(path)>-1)active=i});
+  items.forEach(function(it,i){if(it.match.some(function(m){return norm(m)===path}))active=i});
   var nav=document.createElement("nav");
   nav.className="lg-dock";nav.setAttribute("aria-label","Navigasi utama");
   nav.style.setProperty("--lg-i",active);
