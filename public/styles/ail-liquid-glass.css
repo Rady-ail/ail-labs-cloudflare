@@ -1,0 +1,129 @@
+/* AIL LABS — Liquid Glass material + floating glass dock.
+   Presentation only. Loaded last so it wins over ail-domus / ail-motion-glass.
+   One material, two tints: light (white glass) and dark (smoked teal glass), same rim + specular recipe.
+   Palette: ink #082f32, cyan #0aa7b5, orange #f07b4f. Font: Inter (inherited). */
+
+body#ail-domus{
+  --lg-ink:8,47,50;--lg-cyan:10,167,181;--lg-orange:240,123,79;
+  --lg-ease:cubic-bezier(.2,.75,.2,1);--lg-spring:cubic-bezier(.34,1.45,.5,1);
+  --lg-blur:blur(22px) saturate(185%) brightness(1.04);
+}
+
+/* ---------- Light glass: white, refractive, readable ---------- */
+body#ail-domus :is(.feature,.card,article[data-product],.menu-btn){
+  background:
+    radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.88),transparent 46%),
+    linear-gradient(135deg,rgba(255,255,255,.60),rgba(255,255,255,.26) 58%,rgba(255,255,255,.46))!important;
+  border:1px solid rgba(255,255,255,.72)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 1px 0 0 rgba(255,255,255,.55),
+    inset 0 -1px 0 rgba(var(--lg-ink),.10),
+    inset 0 0 22px rgba(255,255,255,.32),
+    0 18px 44px rgba(var(--lg-ink),.13)!important;
+  -webkit-backdrop-filter:var(--lg-blur)!important;backdrop-filter:var(--lg-blur)!important;
+}
+/* keep the brand accent rules on top of feature cards */
+body#ail-domus .feature{border-top:2px solid rgba(var(--lg-cyan),.9)!important}
+body#ail-domus .feature:nth-child(2){border-top-color:rgba(var(--lg-orange),.9)!important}
+
+/* ---------- Dark glass: smoked teal, same rim + specular ---------- */
+body#ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.about-aside,.hero-panel .panel-card),
+body#ail-domus main :is(section.card,section .card,.bg-ail-ink,.bg-\[\#FBF7EF\]){
+  background:
+    radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.20),transparent 42%),
+    linear-gradient(135deg,rgba(14,58,64,.88),rgba(8,34,38,.80) 58%,rgba(14,58,64,.86))!important;
+  border:1px solid rgba(255,255,255,.22)!important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.38),
+    inset 1px 0 0 rgba(255,255,255,.14),
+    inset 0 -1px 0 rgba(0,0,0,.28),
+    inset 0 0 26px rgba(255,255,255,.05),
+    0 22px 52px rgba(var(--lg-ink),.28)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(170%)!important;backdrop-filter:blur(22px) saturate(170%)!important;
+}
+body#ail-domus .cta{
+  background:
+    radial-gradient(90% 120% at 100% 0%,rgba(var(--lg-cyan),.30),transparent 60%),
+    radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.20),transparent 42%),
+    linear-gradient(135deg,rgba(14,58,64,.88),rgba(8,34,38,.80))!important;
+}
+body#ail-domus #hero-following-stats .stat:first-child{
+  background:
+    radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.16),transparent 42%),
+    linear-gradient(135deg,rgba(6,28,32,.92),rgba(8,36,40,.86))!important;
+}
+/* category trio keeps its cyan / cyan+orange / orange rule */
+body#ail-domus .category{border-top:2px solid rgba(var(--lg-cyan),.95)!important}
+body#ail-domus .category:nth-child(3){border-top-color:rgba(var(--lg-orange),.95)!important}
+
+
+/* Cards nested in a dark panel (product cards, form, tiles) step up one glass level: pale inner glass, no extra blur */
+body#ail-domus main :is(section.card,section .card,.bg-ail-ink,.bg-\[\#FBF7EF\]) :is(.card,.bg-white,.bg-ail-clinical,.bg-white\/5,.bg-slate-50),
+body#ail-domus main :is(section.card,section .card,.bg-ail-ink,.bg-\[\#FBF7EF\]) article[data-product]{
+  background:
+    radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.16),transparent 44%),
+    linear-gradient(135deg,rgba(255,255,255,.11),rgba(255,255,255,.05) 60%,rgba(255,255,255,.09))!important;
+  border:1px solid rgba(255,255,255,.20)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.30),inset 1px 0 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(0,0,0,.22),0 10px 26px rgba(0,0,0,.18)!important;
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important;
+}
+
+/* Hover: glass lifts, rim brightens (pointer devices only) */
+@media(hover:hover) and (pointer:fine){
+  body#ail-domus :is(.feature,.card,article[data-product],.category,.compliance-card,.step){
+    transition:translate .45s var(--lg-ease),box-shadow .45s ease,border-color .3s ease}
+  body#ail-domus .feature:hover{
+    box-shadow:inset 0 1px 0 #fff,inset 1px 0 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(var(--lg-ink),.12),
+      inset 0 0 26px rgba(255,255,255,.45),0 28px 60px rgba(var(--lg-ink),.20),0 0 0 1px rgba(var(--lg-cyan),.28)!important}
+}
+
+/* ---------- Floating glass dock (mobile) ---------- */
+.lg-dock{display:none}
+@media(max-width:820px){
+  body#ail-domus{padding-bottom:calc(98px + env(safe-area-inset-bottom))}
+  .lg-dock{
+    --lg-n:5;--lg-i:0;
+    display:block;position:fixed;z-index:90;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));
+    width:min(calc(100vw - 28px),400px);height:66px;translate:-50% 0;border-radius:999px;padding:6px;
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,.14) 46%,rgba(255,255,255,.30)),
+      linear-gradient(100deg,rgba(var(--lg-cyan),.10),rgba(255,255,255,.18) 48%,rgba(var(--lg-orange),.10));
+    border:1px solid rgba(255,255,255,.62);
+    box-shadow:
+      inset 0 1.5px 0 rgba(255,255,255,.95),
+      inset 0 -1.5px 0 rgba(var(--lg-ink),.14),
+      inset 0 0 22px rgba(255,255,255,.34),
+      0 14px 38px rgba(var(--lg-ink),.24),0 2px 8px rgba(var(--lg-ink),.10);
+    -webkit-backdrop-filter:blur(26px) saturate(200%) brightness(1.05);backdrop-filter:blur(26px) saturate(200%) brightness(1.05);
+    animation:lg-dock-in .7s var(--lg-spring) both}
+  /* thin specular streak across the top edge, like a lens */
+  .lg-dock::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:linear-gradient(105deg,transparent 12%,rgba(255,255,255,.55) 30%,transparent 46%) no-repeat;
+    background-size:200% 100%;background-position:0 0;mix-blend-mode:soft-light}
+  .lg-dock ul{list-style:none;margin:0;padding:0;height:100%;position:relative;display:grid;grid-template-columns:repeat(var(--lg-n),1fr)}
+  /* active capsule: slides under the selected icon */
+  .lg-dock .lg-pill{position:absolute;top:0;bottom:0;left:0;width:calc(100%/var(--lg-n));border-radius:999px;pointer-events:none;
+    translate:calc(var(--lg-i)*100%) 0;
+    background:linear-gradient(180deg,rgba(var(--lg-ink),.13),rgba(var(--lg-ink),.07));
+    border:1px solid rgba(255,255,255,.55);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(var(--lg-ink),.10),0 2px 10px rgba(var(--lg-ink),.12);
+    transition:translate .5s var(--lg-spring),scale .25s ease}
+  .lg-dock.is-press .lg-pill{scale:.94 .9}
+  .lg-dock a{position:relative;z-index:1;display:grid;place-items:center;height:100%;color:rgb(var(--lg-ink));
+    -webkit-tap-highlight-color:transparent;text-decoration:none;border-radius:999px;outline-offset:-3px}
+  .lg-dock a svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.1;stroke-linecap:round;stroke-linejoin:round;
+    transition:scale .3s var(--lg-spring)}
+  .lg-dock a[aria-current="page"] svg{scale:1.08}
+  .lg-dock a:active svg{scale:.9}
+  .lg-dock .lg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@keyframes lg-dock-in{from{opacity:0;translate:-50% 28px;scale:.94}to{opacity:1;translate:-50% 0;scale:1}}
+
+/* Browsers without backdrop-filter: fall back to a solid, still-legible surface */
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  body#ail-domus :is(.feature,.card,article[data-product]){background:rgba(255,255,255,.92)!important}
+  body#ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.about-aside,.hero-panel .panel-card){background:rgba(10,42,46,.94)!important}
+  .lg-dock{background:rgba(255,255,255,.92)}
+}
+@media(prefers-reduced-motion:reduce){.lg-dock,.lg-dock .lg-pill,.lg-dock a svg{animation:none!important;transition:none!important}}
