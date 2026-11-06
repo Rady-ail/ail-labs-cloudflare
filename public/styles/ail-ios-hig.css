@@ -104,3 +104,56 @@ body#ail-domus :is(.menu-btn,.mobile-menu-btn)[aria-expanded="true"]::after{tran
   .lg-dock .lg-pill{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.12));border-color:rgba(255,255,255,.28);
     box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.25),0 2px 10px rgba(0,0,0,.35)}
 }
+
+/* ====================================================================
+   v2 — audit hardening (Apple HIG / WWDC accessibility & adaptivity)
+   Additive. Sources: HIG Accessibility, Dark Mode, Layout (safe areas),
+   Typography (min 11pt), Motion; WWDC "Build accessible apps" principles.
+   ==================================================================== */
+
+/* Skip link — first focusable element, visible on focus (keyboard / VoiceOver users) */
+.skip-link{position:fixed;left:max(12px,env(safe-area-inset-left));top:-64px;z-index:1000;padding:12px 18px;min-height:44px;display:inline-flex;align-items:center;
+  border-radius:12px;background:#082f32;color:#fff;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 10px 28px rgba(0,0,0,.28);transition:top .2s ease}
+.skip-link:focus,.skip-link:focus-visible{top:max(12px,env(safe-area-inset-top));outline:3px solid #5ed7df;outline-offset:2px}
+:target,main:focus{scroll-margin-top:88px}
+main:focus{outline:none}
+html{scroll-padding-top:88px}
+
+/* Safe areas: notch / Dynamic Island / rounded corners in landscape */
+body#ail-domus .container,body#ail-domus main{padding-left:max(0px,env(safe-area-inset-left));padding-right:max(0px,env(safe-area-inset-right))}
+body#ail-domus .site-header{padding-top:env(safe-area-inset-top)}
+body#ail-domus .site-footer{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+
+/* Typography floor: nothing below 11pt (HIG minimum); form text 16px so iOS Safari never auto-zooms */
+body#ail-domus :is([class*="text-[9px]"],[class*="text-[10px]"]){font-size:11px!important}
+body#ail-domus :is(.panel-label,small,.dm-gauge-legend,.ail-access-btn){font-size:11px!important}
+body#ail-domus :is(input,select,textarea){font-size:max(16px,1em)}
+
+/* Tap feedback: no grey flash, keep hover effects to devices that really hover */
+body#ail-domus :is(a,button,[role=button],summary){-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+@media(hover:none){body#ail-domus :is(.button,.feature,.category,.card):hover{transform:none}}
+
+/* Touch targets: extend the 44pt rule to the whole interactive set, not only coarse pointers' named classes */
+@media(pointer:coarse){
+  body#ail-domus :is(button,[role=button],.lg-dock a,.footer-links a,.contact-line a,.mobile-menu a,summary){min-height:44px}
+  body#ail-domus .footer-links a,body#ail-domus .contact-line a{display:inline-flex;align-items:center}
+}
+
+/* Accessibility settings (Settings > Accessibility on iOS / macOS) */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+}
+@media(prefers-reduced-transparency:reduce){
+  body#ail-domus *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  body#ail-domus :is(.site-header,.mobile-menu,.card,.feature,.category,.compliance-card,.stat,.cta,.lg-dock){background-color:var(--dm-chip-solid,#ffffff)!important}
+}
+@media(prefers-contrast:more){
+  body#ail-domus :is(.card,.feature,.category,.compliance-card,.stat,.cta,.step,.button,input,select,textarea){border:1.5px solid currentColor!important}
+  body#ail-domus :is(a,button,input,select,textarea):focus-visible{outline-width:4px;outline-color:currentColor}
+  body#ail-domus :is(.text-slate-400,.text-slate-500,.text-slate-600,.hero-lead,.section-intro,.stat span){color:var(--dm-ink,#082f32)!important}
+}
+@media(forced-colors:active){
+  body#ail-domus :is(.button,.card,.feature,.category,.stat,.cta,input,select,textarea){border:1px solid CanvasText}
+  body#ail-domus :is(a,button,input,select,textarea):focus-visible{outline:3px solid Highlight}
+}
+@media(prefers-color-scheme:dark){.skip-link{background:#5ed7df;color:#031c20}}
