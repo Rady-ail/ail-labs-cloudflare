@@ -12,35 +12,6 @@
   --ail-spatial-edge: rgba(255,255,255,.105);
   --ail-spatial-ease: cubic-bezier(.2,.75,.2,1);
 }
-body#ail-domus .site-header {
-  color: var(--ail-spatial-white);
-  background: rgba(11,15,23,.86) !important;
-  border-bottom: 1px solid rgba(255,255,255,.09) !important;
-  box-shadow: 0 8px 28px rgba(0,0,0,.12);
-  -webkit-backdrop-filter: blur(24px) saturate(155%);
-  backdrop-filter: blur(24px) saturate(155%);
-}
-body#ail-domus .site-header .brand-name { color: #F7FAFC; }
-body#ail-domus .site-header .brand-sub { color: #93A2B4; }
-body#ail-domus .site-header .nav a { color: #C1CBD7; }
-body#ail-domus .site-header .nav a:hover,
-body#ail-domus .site-header .nav a:focus-visible {
-  color: #fff;
-  background: rgba(255,255,255,.08);
-}
-body#ail-domus .site-header .menu-btn {
-  color: #F7FAFC;
-  background: rgba(255,255,255,.055);
-  border-color: rgba(255,255,255,.16);
-}
-body#ail-domus .site-header .mobile-menu {
-  background: rgba(11,15,23,.97);
-  border-top-color: rgba(255,255,255,.09);
-}
-body#ail-domus .site-header .mobile-menu a {
-  color: #E5ECF3;
-  border-bottom-color: rgba(255,255,255,.08);
-}
 body#ail-domus .ail-spatial-hero {
   position: relative;
   isolation: isolate;
