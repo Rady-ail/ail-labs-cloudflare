@@ -157,3 +157,20 @@ body#ail-domus :is(a,button,[role=button],summary){-webkit-tap-highlight-color:t
   body#ail-domus :is(a,button,input,select,textarea):focus-visible{outline:3px solid Highlight}
 }
 @media(prefers-color-scheme:dark){.skip-link{background:#5ed7df;color:#031c20}}
+
+/* ====================================================================
+   v3 — "feel" layer (pairs with /ail-feel.js; works without it)
+   Spring press response + metallic sheen for primary actions.
+   ==================================================================== */
+body#ail-domus :is(.button,.mobile-cta,.menu-btn,.mobile-menu-btn,.lg-dock a){
+  transition:transform var(--spring-ms,420ms) var(--spring,cubic-bezier(.2,.75,.2,1)),filter .2s ease,background-color .2s ease}
+body#ail-domus :is(.button,.mobile-cta,.menu-btn,.mobile-menu-btn):active{transform:scale(.96);filter:brightness(.97);transition-duration:.12s;transition-timing-function:ease-out}
+.btn-metal{position:relative;isolation:isolate;overflow:hidden;color:#031c20;
+  background:linear-gradient(180deg,#7ee3ea,#0aa7b5 55%,#087f8a);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7),inset 0 -1px 0 rgba(0,0,0,.25),0 10px 24px rgba(10,167,181,.28)}
+.btn-metal::before{content:"";position:absolute;inset:-40%;z-index:-1;pointer-events:none;mix-blend-mode:soft-light;opacity:.9;
+  background:conic-gradient(from var(--a,0deg) at var(--x,50%) var(--y,50%),transparent 0 20%,rgba(255,255,255,var(--sheen,.4)) 30%,transparent 42% 70%,rgba(255,255,255,calc(var(--sheen,.4) * .7)) 80%,transparent)}
+body#ail-domus .btn-metal:not(.cta .btn-metal){color:#031c20!important}
+@media(prefers-color-scheme:dark){.btn-metal{--sheen:.22}}
+@media(prefers-reduced-motion:reduce){body#ail-domus :is(.button,.mobile-cta,.menu-btn,.mobile-menu-btn,.lg-dock a):active{transform:none}.btn-metal::before{display:none}}
+@media(prefers-contrast:more){.btn-metal{background:#082f32;color:#fff;box-shadow:none}.btn-metal::before{display:none}}
