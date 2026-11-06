@@ -1,0 +1,106 @@
+/* AIL LABS — iOS HIG refinement layer.
+   Presentation only, additive, loaded last (after ail-liquid-glass.css). Safe to remove: pages fall back to the previous look.
+   Covers: SF-style type roles, 44pt touch targets, visible focus, continuous-curvature corners, thin-stroke menu icon,
+   and an automatic dark appearance (prefers-color-scheme) built on the existing --dm-* tokens. */
+
+/* ---------- Type roles (HIG): bold headers, crisp readable body ---------- */
+body#ail-domus{font-family:var(--font-sf);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;font-synthesis:none}
+body#ail-domus :is(h1,h2,h3){font-weight:700;letter-spacing:-.03em;text-wrap:balance}
+body#ail-domus .hero h1{font-weight:700!important;line-height:1.06;font-size:clamp(34px,9vw,60px)}
+body#ail-domus .hero h1 span{font-weight:600!important}
+body#ail-domus main :is(p,li){line-height:1.5;text-wrap:pretty}
+body#ail-domus :is(.eyebrow,.panel-label,[class*="uppercase"]){font-weight:600}
+
+/* ---------- 8pt rhythm for stacked cards ---------- */
+body#ail-domus :is(.category-grid,.feature-grid,.stats){gap:16px}
+
+/* ---------- Touch targets >= 44pt on touch screens ---------- */
+@media(pointer:coarse){
+  body#ail-domus :is(.button,.button-primary,.button-light,.button-orange,.mobile-cta,.mobile-menu a,.menu-btn,.nav a,.mobile-menu-btn,select,input:not([type=checkbox]):not([type=radio]),.quote-product-btn){min-height:44px}
+  body#ail-domus :is(.menu-btn,.mobile-menu-btn){min-width:44px}
+}
+
+/* ---------- Focus: clear, never removed ---------- */
+body#ail-domus :is(a,button,input,select,textarea,[tabindex]):focus-visible{outline:3px solid rgba(10,167,181,.55);outline-offset:3px;border-radius:inherit}
+
+/* ---------- Continuous curvature (squircle) where the browser supports it ---------- */
+@supports (corner-shape:squircle){
+  body#ail-domus :is(.feature,.card,.category,.compliance-card,.stat,.step,.cta,.about-aside,.hero-panel,.panel-card,article[data-product],.button,.mobile-cta,.menu-btn,.mobile-menu-btn,input,select,textarea,.mobile-menu){corner-shape:squircle}
+}
+
+/* ---------- Thin-stroke menu icon (replaces the heavy ☰ glyph; JS text is hidden, state read from aria-expanded) ---------- */
+body#ail-domus :is(.menu-btn,.mobile-menu-btn){position:relative;font-size:0!important;color:var(--dm-ink)}
+body#ail-domus :is(.menu-btn,.mobile-menu-btn)::before,body#ail-domus :is(.menu-btn,.mobile-menu-btn)::after{
+  content:"";position:absolute;left:50%;top:50%;width:18px;height:0;border-top:1.6px solid currentColor;border-radius:2px;
+  translate:-50% -50%;transition:transform .35s cubic-bezier(.2,.75,.2,1)}
+body#ail-domus :is(.menu-btn,.mobile-menu-btn)::before{transform:translateY(-3.5px)}
+body#ail-domus :is(.menu-btn,.mobile-menu-btn)::after{transform:translateY(3.5px)}
+body#ail-domus :is(.menu-btn,.mobile-menu-btn)[aria-expanded="true"]::before{transform:rotate(45deg)}
+body#ail-domus :is(.menu-btn,.mobile-menu-btn)[aria-expanded="true"]::after{transform:rotate(-45deg)}
+
+/* ====================================================================
+   Dark appearance — follows the device setting, tokens only.
+   ==================================================================== */
+@media(prefers-color-scheme:dark){
+  :root{
+    color-scheme:dark;
+    --dm-ground-1:#091418;--dm-ground-2:#0e1e25;
+    --dm-ink:#eef6f8;--dm-ink-soft:#b9cdd4;--dm-ink-faint:#9bb2ba;
+    --dm-chip:rgba(255,255,255,.08);--dm-edge-light:rgba(255,255,255,.14);
+    --dm-black:#050d11;--dm-smoke:rgba(14,32,40,.88);
+    --dm-cyan-ink:#5ed7df;--dm-cyan-deep:#5ed7df;
+    --dm-shadow-light:0 18px 40px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.08);
+    --dm-shadow-btn:0 10px 24px rgba(0,0,0,.45);
+  }
+  body#ail-domus{
+    background:
+      radial-gradient(900px 600px at 82% 6%,rgba(10,167,181,.16),transparent 62%),
+      radial-gradient(800px 560px at 6% 92%,rgba(110,214,190,.08),transparent 64%),
+      linear-gradient(170deg,var(--dm-ground-1) 0%,var(--dm-ground-2) 100%) fixed!important;
+  }
+  body#ail-domus .site-header,body#ail-domus .site-header.mg-scrolled{background:rgba(9,20,24,.72)!important;border-bottom-color:rgba(255,255,255,.08)!important;box-shadow:none}
+  body#ail-domus .mobile-menu{background:rgba(9,20,24,.94)!important}
+  body#ail-domus .mobile-menu a{border-bottom-color:rgba(255,255,255,.08)!important}
+  body#ail-domus .mg-orb{opacity:.32}
+  body#ail-domus .hero::before{color:rgba(255,255,255,.05)!important}
+  body#ail-domus main :is(.bg-white,.bg-slate-50){background:rgba(255,255,255,.07)!important;border-color:rgba(255,255,255,.16)!important;color:var(--dm-ink-soft)}
+  body#ail-domus main :is(.bg-white,.bg-slate-50) :is(.text-slate-500,.text-slate-600,.text-slate-700){color:var(--dm-ink-soft)!important}
+  body#ail-domus main :is(.bg-white,.bg-slate-50) .text-ail-teal{color:var(--dm-cyan-bright)!important}
+
+  /* light glass becomes dark glass (same rim + specular recipe) */
+  body#ail-domus :is(.feature,.card,article[data-product],.menu-btn,.mobile-menu-btn){
+    background:
+      radial-gradient(120% 90% at 10% 0%,rgba(255,255,255,.14),transparent 46%),
+      linear-gradient(135deg,rgba(255,255,255,.10),rgba(255,255,255,.04) 58%,rgba(255,255,255,.08))!important;
+    border:1px solid rgba(255,255,255,.16)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 1px 0 0 rgba(255,255,255,.10),inset 0 -1px 0 rgba(0,0,0,.30),0 18px 44px rgba(0,0,0,.38)!important;
+  }
+  body#ail-domus .feature p,body#ail-domus .feature h3{color:var(--dm-ink)!important}
+  body#ail-domus .feature p{color:var(--dm-ink-soft)!important}
+  body#ail-domus .feature:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(0,0,0,.3),0 28px 60px rgba(0,0,0,.5),0 0 0 1px rgba(94,215,223,.35)!important}
+  body#ail-domus .product-visual{filter:brightness(.92)}
+
+  /* dark panels go a touch deeper so they separate from the dark ground */
+  body#ail-domus :is(.category,.compliance-card,.stat,.step,.cta,.about-aside,.hero-panel .panel-card),
+  body#ail-domus main :is(section.card,section .card,.bg-ail-ink,.bg-\[\#FBF7EF\]){
+    border-color:rgba(255,255,255,.14)!important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.30),inset 0 -1px 0 rgba(0,0,0,.40),0 22px 52px rgba(0,0,0,.45)!important;
+  }
+
+  /* primary action: tinted fill, readable on dark */
+  body#ail-domus .button-primary{background:var(--dm-cyan)!important;color:#031c20!important}
+  body#ail-domus .button-primary:hover{background:var(--dm-cyan-bright)!important}
+  body#ail-domus .cta .button-primary{background:var(--dm-on-dark)!important;color:#082f32!important}
+  body#ail-domus .button:not(.button-primary):not(.button-orange){border-color:rgba(255,255,255,.18)}
+
+  /* glass dock on dark */
+  .lg-dock{
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.20),rgba(255,255,255,.05) 46%,rgba(255,255,255,.10)),
+      linear-gradient(100deg,rgba(10,167,181,.14),rgba(255,255,255,.04) 48%,rgba(240,123,79,.12));
+    border-color:rgba(255,255,255,.22);
+    box-shadow:inset 0 1.5px 0 rgba(255,255,255,.35),inset 0 -1.5px 0 rgba(0,0,0,.40),inset 0 0 22px rgba(255,255,255,.06),0 14px 38px rgba(0,0,0,.55)}
+  .lg-dock a{color:#eef6f8}
+  .lg-dock .lg-pill{background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.12));border-color:rgba(255,255,255,.28);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.45),inset 0 -1px 0 rgba(0,0,0,.25),0 2px 10px rgba(0,0,0,.35)}
+}
