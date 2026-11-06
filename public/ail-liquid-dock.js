@@ -1,4 +1,4 @@
-/* AIL LABS — floating glass dock (mobile). Injects a 5-item nav; styles live in styles/ail-liquid-glass.css.
+/* AIL LABS — floating glass dock (mobile bottom, desktop top). Injects a 5-item nav; styles live in styles/ail-liquid-glass.css.
    Presentation only: plain links, no tracking, safe if JS fails (the header menu still works). */
 (function(){
   if(document.querySelector(".lg-dock"))return;
@@ -13,7 +13,7 @@
   var active=0;
   items.forEach(function(it,i){if(it.match.indexOf(path)>-1)active=i});
   var nav=document.createElement("nav");
-  nav.className="lg-dock";nav.setAttribute("aria-label","Navigasi bawah");
+  nav.className="lg-dock";nav.setAttribute("aria-label","Navigasi utama");
   nav.style.setProperty("--lg-i",active);
   var html='<ul><li class="lg-pill" aria-hidden="true"></li>';
   items.forEach(function(it,i){
