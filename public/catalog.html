@@ -90,6 +90,7 @@ button,a,input,select,textarea{-webkit-tap-highlight-color:transparent}
 <link rel="stylesheet" href="/styles/ail-typography.css">
 <link rel="stylesheet" href="/styles/ail-domus.css">
 <link rel="stylesheet" href="/styles/ail-motion-glass.css?v=3"><link rel="stylesheet" href="/styles/ail-liquid-glass.css?v=1"><link rel="stylesheet" href="/styles/ail-ios-hig.css?v=3">
+<link rel="stylesheet" href="/styles/ail-island.css?v=1">
 <noscript><style>#productGroups .dm-skeleton-group{display:none}</style></noscript>
 <link rel="stylesheet" href="/styles/tailwind.css?v=1">
 <link rel="stylesheet" href="/styles/ail-card-hover.css"></head><body id="ail-domus">
@@ -155,6 +156,7 @@ function card(i,c){
     '<h3 class="mt-1 font-bold">'+esc(n)+'</h3>'+
     '<div class="dm-product-meta">'+(k?'<span class="dm-pill dm-chip" title="Kandungan">'+esc(k)+'</span>':'')+(p?'<span class="dm-pill dm-chip dm-chip--pack" title="Kemasan">'+packIcon(p)+esc(p)+'</span>':'')+'</div>'+
     '<button type="button" data-quote-product="'+esc(n)+'" class="quote-product-btn mt-4 w-full rounded-xl bg-ail-teal py-3 text-xs font-bold text-white">Request Bulk Quote</button>'+
+    '<button type="button" data-rfq-add="'+esc(n)+'" class="rfq-add-btn">Tambah ke RFQ</button>'+
   '</article>'
 }
 function apply(){
@@ -190,7 +192,7 @@ async function load(){
   }
 }
 document.getElementById("categoryPills")?.addEventListener("click",e=>{const b=e.target.closest("button[data-cat]");if(!b)return;filterGroup(b.dataset.cat);});
-document.getElementById("productGroups")?.addEventListener("click",e=>{const b=e.target.closest("button[data-quote-product]");if(!b)return;selectProductForQuote(b.dataset.quoteProduct);});
+document.getElementById("productGroups")?.addEventListener("click",e=>{const a=e.target.closest("button[data-rfq-add]");if(a){dispatchEvent(new CustomEvent("ail:rfq-add",{detail:{id:a.dataset.rfqAdd,name:a.dataset.rfqAdd}}));return}const b=e.target.closest("button[data-quote-product]");if(!b)return;selectProductForQuote(b.dataset.quoteProduct);});
 document.getElementById("catalogSearch")?.addEventListener("input",apply);
 document.getElementById("catalogSort")?.addEventListener("change",apply);
 const mobileMenu=document.getElementById("mobileMenu"),mobileMenuBtn=document.getElementById("mobileMenuBtn");
@@ -204,4 +206,6 @@ load();
 <script src="/islands/ail-islands.js" defer></script>
 <script src="/ail-motion-glass.js?v=5" defer></script><script src="/ail-liquid-dock.js?v=1" defer></script>
 <script src="/ail-feel.js" defer></script>
+<script src="/ail-island.js" defer></script>
+<ail-island></ail-island>
 </body></html>
