@@ -462,6 +462,12 @@ body#ail-domus #hero-following-stats .dm-stat-visual { opacity: .55; }
   body#ail-domus .ail-spatial-stage { min-height: 405px; }
   body#ail-domus .ail-spatial-float { padding: 7px 8px; font-size: 7px; }
 }
+
+@media (hover: none), (pointer: coarse) {
+  body#ail-domus .ail-spatial-stage { transform: none !important; transition: none !important; }
+  body#ail-domus .ail-spatial-vessel { transform: none !important; transition: none !important; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   body#ail-domus .ail-spatial-copy,
   body#ail-domus .ail-spatial-stage { animation: none !important; }
