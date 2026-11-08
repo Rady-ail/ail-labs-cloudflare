@@ -27,6 +27,9 @@ jobs:
       - name: Remove unused Nodemailer dependency
         run: npm uninstall nodemailer
 
+      - name: Pin patched qs release
+        run: npm pkg set 'overrides.qs=6.16.1'
+
       - name: Apply semver-compatible security fixes
         run: npm audit fix
 
