@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix/visitor-permissions-handler-2026-11-08
+      - repair/visitor-permission-storage-and-ci-2026-11-08
   pull_request:
     branches:
       - main
@@ -46,4 +47,26 @@ jobs:
               process.exit(1);
             }
             console.log("PASS: exactly one POST /permissions route");
+          '
+
+      - name: Validate permission INSERT parameter mapping
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const source = fs.readFileSync("routes/visitors.js", "utf8");
+            const start = source.indexOf("INSERT INTO visitor_permissions");
+            const end = source.indexOf("RETURNING id, session_id", start);
+            const sql = source.slice(start, end);
+            const q = String.fromCharCode(39);
+            const checks = [
+              ["latitude must be gated and use $5", "CASE WHEN $3 = " + q + "granted" + q + " AND $4::boolean THEN $5 ELSE NULL END"],
+              ["longitude must be gated and use $6", "CASE WHEN $3 = " + q + "granted" + q + " AND $4::boolean THEN $6 ELSE NULL END"],
+              ["accuracy must be gated and use $7", "CASE WHEN $3 = " + q + "granted" + q + " AND $4::boolean THEN $7 ELSE NULL END"],
+              ["page must use $8", "$8,\n"],
+              ["conflict update must preserve $8 page", "page = COALESCE($8, visitor_permissions.page)"]
+            ];
+            for (const [label, expected] of checks) {
+              if (!sql.includes(expected)) { console.error("FAIL: " + label); process.exit(1); }
+            }
+            console.log("PASS: visitor permission INSERT parameter mapping");
           '

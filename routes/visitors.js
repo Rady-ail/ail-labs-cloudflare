@@ -314,7 +314,11 @@ router.post('/permissions', async (req, res) => {
       `INSERT INTO visitor_permissions
         (session_id, camera_status, location_status, latitude, longitude, accuracy, page, consent_at, updated_at)
        VALUES
-        ($1, COALESCE($2, 'not-requested'), COALESCE($3, 'not-requested'), $4, $5, $6, $7,
+        ($1, COALESCE($2, 'not-requested'), COALESCE($3, 'not-requested'),
+         CASE WHEN $3 = 'granted' AND $4::boolean THEN $5 ELSE NULL END,
+         CASE WHEN $3 = 'granted' AND $4::boolean THEN $6 ELSE NULL END,
+         CASE WHEN $3 = 'granted' AND $4::boolean THEN $7 ELSE NULL END,
+         $8,
          CASE WHEN $2 = 'granted' OR $3 = 'granted' THEN now() ELSE NULL END, now())
        ON CONFLICT (session_id) DO UPDATE SET
          camera_status = COALESCE($2, visitor_permissions.camera_status),
