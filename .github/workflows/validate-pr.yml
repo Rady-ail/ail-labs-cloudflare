@@ -1,6 +1,9 @@
 name: Validate Pull Request
 
 on:
+  push:
+    branches:
+      - fix/visitor-permissions-handler-2026-11-08
   pull_request:
     branches:
       - main
