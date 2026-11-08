@@ -47,3 +47,24 @@ jobs:
             }
             console.log("PASS: exactly one POST /permissions route");
           '
+
+      - name: Validate permission INSERT parameter mapping
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const source = fs.readFileSync("routes/visitors.js", "utf8");
+            const start = source.indexOf("INSERT INTO visitor_permissions");
+            const end = source.indexOf("RETURNING id, session_id", start);
+            const sql = source.slice(start, end);
+            const checks = [
+              ["latitude must be gated and use $5", /CASE WHEN \\$3 = \'granted\' AND \\$4::boolean THEN \\$5 ELSE NULL END/],
+              ["longitude must be gated and use $6", /CASE WHEN \\$3 = \'granted\' AND \\$4::boolean THEN \\$6 ELSE NULL END/],
+              ["accuracy must be gated and use $7", /CASE WHEN \\$3 = \'granted\' AND \\$4::boolean THEN \\$7 ELSE NULL END/],
+              ["page must use $8", /\\n\\s*\\$8,\\n/],
+              ["conflict update must preserve $8 page", /page = COALESCE\\(\\$8, visitor_permissions\\.page\\)/]
+            ];
+            for (const [label, pattern] of checks) {
+              if (!pattern.test(sql)) { console.error("FAIL: " + label); process.exit(1); }
+            }
+            console.log("PASS: visitor permission INSERT parameter mapping");
+          '
