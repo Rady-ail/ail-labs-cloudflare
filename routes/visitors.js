@@ -8,8 +8,7 @@ const { requireAdmin } = require('./authMiddleware');
 // pernah kadaluarsa kalau browser ditutup paksa (endSession via sendBeacon
 // tidak selalu terkirim, mis. koneksi mati / app di-kill di HP).
 const ACTIVE_WINDOW = "last_activity > now() - interval '5 minutes'";
-let permissionColumnsReady = false;
-(async () => {
+const permissionColumnsMigration = (async () => {
   try {
     await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS camera_permission TEXT');
     await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS camera_permission_at TIMESTAMPTZ');
@@ -18,8 +17,11 @@ let permissionColumnsReady = false;
     await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS latitude DOUBLE PRECISION');
     await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS longitude DOUBLE PRECISION');
     await pool.query('ALTER TABLE visitors ADD COLUMN IF NOT EXISTS location_accuracy_m DOUBLE PRECISION');
-    permissionColumnsReady = true;
-  } catch (err) { console.error('Visitor permission migration failed:', err.message); }
+    return true;
+  } catch (err) {
+    console.error('Visitor permission migration failed:', err.message);
+    return false;
+  }
 })();
 
 // Lokasi level wilayah (negara/provinsi/kota) untuk laporan peminat per daerah.
@@ -269,15 +271,32 @@ router.get('/history/days', requireAdmin, async (req, res) => {
 
 router.post('/permissions', async (req, res) => {
   try {
-    const { session_id, camera_status, location_status, latitude, longitude, accuracy_m } = req.body || {};
+    const migrationReady = await permissionColumnsMigration;
+    if (!migrationReady) return res.status(503).json({ error: 'Permission storage belum siap.' });
+    await ensurePermissionTables();
+
+    const { session_id, camera_status, location_status, latitude, longitude, accuracy, accuracy_m, page } = req.body || {};
     if (!session_id) return res.status(400).json({ error: 'session_id wajib diisi.' });
-    if (!permissionColumnsReady) return res.status(503).json({ error: 'Permission storage belum siap.' });
-    const allowed = new Set(['granted','denied','unsupported']);
+
+    const allowed = new Set(['granted', 'denied', 'prompt', 'not-requested', 'not-available', 'unsupported']);
     if (camera_status && !allowed.has(camera_status)) return res.status(400).json({ error: 'camera_status tidak valid.' });
     if (location_status && !allowed.has(location_status)) return res.status(400).json({ error: 'location_status tidak valid.' });
-    const lat = Number(latitude), lon = Number(longitude), acc = Number(accuracy_m);
-    const hasLocation = location_status === 'granted' && Number.isFinite(lat) && Number.isFinite(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-    const result = await pool.query(
+
+    const session = await pool.query('SELECT session_id FROM visitors WHERE session_id = $1', [session_id]);
+    if (!session.rows[0]) return res.status(404).json({ error: 'Session pengunjung belum tercatat.' });
+
+    const lat = Number(latitude);
+    const lon = Number(longitude);
+    const rawAccuracy = Number(accuracy ?? accuracy_m);
+    const hasLocation = location_status === 'granted'
+      && Number.isFinite(lat) && Number.isFinite(lon)
+      && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+    const safeAccuracy = hasLocation && Number.isFinite(rawAccuracy)
+      ? Math.min(Math.max(rawAccuracy, 0), 100000)
+      : null;
+
+    // Keep the legacy visitor summary in sync with the consent-based monitor.
+    await pool.query(
       `UPDATE visitors SET
         camera_permission = COALESCE($2, camera_permission),
         camera_permission_at = CASE WHEN $2 IS NOT NULL THEN now() ELSE camera_permission_at END,
@@ -287,14 +306,34 @@ router.post('/permissions', async (req, res) => {
         longitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $6 ELSE longitude END,
         location_accuracy_m = CASE WHEN $3 = 'granted' AND $4::boolean THEN $7 ELSE location_accuracy_m END,
         last_activity = now()
-       WHERE session_id = $1
-       RETURNING session_id, camera_permission, camera_permission_at, location_permission, location_permission_at, latitude, longitude, location_accuracy_m`,
-      [session_id, camera_status || null, location_status || null, hasLocation, hasLocation ? lat : null, hasLocation ? lon : null, hasLocation && Number.isFinite(acc) ? acc : null]
+       WHERE session_id = $1`,
+      [session_id, camera_status || null, location_status || null, hasLocation, hasLocation ? lat : null, hasLocation ? lon : null, safeAccuracy]
     );
-    if (!result.rows[0]) return res.status(404).json({ error: 'Session tidak ditemukan.' });
-    res.json(result.rows[0]);
+
+    const result = await pool.query(
+      `INSERT INTO visitor_permissions
+        (session_id, camera_status, location_status, latitude, longitude, accuracy, page, consent_at, updated_at)
+       VALUES
+        ($1, COALESCE($2, 'not-requested'), COALESCE($3, 'not-requested'), $4, $5, $6, $7,
+         CASE WHEN $2 = 'granted' OR $3 = 'granted' THEN now() ELSE NULL END, now())
+       ON CONFLICT (session_id) DO UPDATE SET
+         camera_status = COALESCE($2, visitor_permissions.camera_status),
+         location_status = COALESCE($3, visitor_permissions.location_status),
+         latitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $5 ELSE visitor_permissions.latitude END,
+         longitude = CASE WHEN $3 = 'granted' AND $4::boolean THEN $6 ELSE visitor_permissions.longitude END,
+         accuracy = CASE WHEN $3 = 'granted' AND $4::boolean THEN $7 ELSE visitor_permissions.accuracy END,
+         page = COALESCE($8, visitor_permissions.page),
+         updated_at = now(),
+         consent_at = CASE WHEN $2 = 'granted' OR $3 = 'granted'
+           THEN COALESCE(visitor_permissions.consent_at, now())
+           ELSE visitor_permissions.consent_at END
+       RETURNING id, session_id, camera_status, location_status, latitude, longitude, accuracy, page, consent_at, updated_at`,
+      [session_id, camera_status || null, location_status || null, hasLocation, hasLocation ? lat : null, hasLocation ? lon : null, safeAccuracy, String(page || '').slice(0, 500) || null]
+    );
+
+    res.json({ ok: true, permission: result.rows[0] });
   } catch (err) {
-    console.error(err);
+    console.error('[visitor/permissions]', err);
     res.status(500).json({ error: 'Gagal menyimpan status izin.' });
   }
 });
@@ -327,33 +366,6 @@ async function ensurePermissionTables(){
   await pool.query('CREATE INDEX IF NOT EXISTS idx_visitor_permissions_updated ON visitor_permissions(updated_at DESC)');
   permissionTablesReady=true;
 }
-
-router.post('/permissions', async (req,res)=>{
-  try{
-    await ensurePermissionTables();
-    const {session_id,camera_status,location_status,latitude,longitude,accuracy,page}=req.body||{};
-    if(!session_id) return res.status(400).json({error:'session_id wajib diisi.'});
-    const session=await pool.query('SELECT session_id FROM visitors WHERE session_id=$1',[session_id]);
-    if(!session.rows[0]) return res.status(404).json({error:'Session pengunjung belum tercatat.'});
-    const cam=['granted','denied','prompt','not-requested','not-available','unsupported'].includes(camera_status)?camera_status:'not-requested';
-    const loc=['granted','denied','prompt','not-requested','not-available','unsupported'].includes(location_status)?location_status:'not-requested';
-    const lat=loc==='granted'&&Number.isFinite(Number(latitude))?Number(latitude):null;
-    const lon=loc==='granted'&&Number.isFinite(Number(longitude))?Number(longitude):null;
-    const acc=loc==='granted'&&Number.isFinite(Number(accuracy))?Math.min(Math.max(Number(accuracy),0),100000):null;
-    const result=await pool.query(`INSERT INTO visitor_permissions(session_id,camera_status,location_status,latitude,longitude,accuracy,page,consent_at,updated_at)
-      VALUES($1,$2,$3,$4,$5,$6,$7,CASE WHEN $2='granted' OR $3='granted' THEN now() ELSE NULL END,now())
-      ON CONFLICT(session_id) DO UPDATE SET
-        camera_status=$2,location_status=$3,
-        latitude=CASE WHEN $3='granted' THEN $4 ELSE visitor_permissions.latitude END,
-        longitude=CASE WHEN $3='granted' THEN $5 ELSE visitor_permissions.longitude END,
-        accuracy=CASE WHEN $3='granted' THEN $6 ELSE visitor_permissions.accuracy END,
-        page=COALESCE($7,visitor_permissions.page),updated_at=now(),
-        consent_at=CASE WHEN $2='granted' OR $3='granted' THEN COALESCE(visitor_permissions.consent_at,now()) ELSE visitor_permissions.consent_at END
-      RETURNING id,session_id,camera_status,location_status,latitude,longitude,accuracy,page,consent_at,updated_at`,
-      [session_id,cam,loc,lat,lon,acc,String(page||'').slice(0,500)||null]);
-    res.json({ok:true,permission:result.rows[0]});
-  }catch(err){console.error('[visitor/permissions]',err);res.status(500).json({error:'Gagal menyimpan status izin.'});}
-});
 
 router.post('/identity', async (req,res)=>{
   try{
