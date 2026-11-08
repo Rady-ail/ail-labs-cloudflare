@@ -36,7 +36,7 @@ jobs:
           node -e '
             const fs = require("node:fs");
             const source = fs.readFileSync("routes/visitors.js", "utf8");
-            const count = (source.match(/router\\.post\\(["\\x27]\\/permissions["\\x27]/g) || []).length;
+            const count = source.split("router.post('/permissions'").length - 1;
             if (count !== 1) {
               console.error("Expected exactly one POST /permissions route; found " + count);
               process.exit(1);
