@@ -1,0 +1,62 @@
+name: Safe Dependency Patch
+
+on:
+  push:
+    branches:
+      - security/patch-dependencies-2026-11-08
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Apply semver-compatible security fixes
+        run: npm audit fix
+
+      - name: Ensure package manifest remains unchanged
+        run: git diff --exit-code -- package.json
+
+      - name: Clean install and build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Require a clean dependency audit
+        run: |
+          npm audit --json > npm-audit.json || true
+          node -e '
+            const fs = require("node:fs");
+            const report = JSON.parse(fs.readFileSync("npm-audit.json", "utf8"));
+            const counts = report.metadata?.vulnerabilities || {};
+            console.log(JSON.stringify(counts, null, 2));
+            if ((counts.total || 0) !== 0) {
+              console.error("Dependency vulnerabilities remain; refusing to commit the patch.");
+              process.exit(1);
+            }
+          '
+
+      - name: Commit patched lockfile
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "No lockfile changes were needed."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "fix: patch vulnerable npm dependencies"
+          git push origin HEAD
