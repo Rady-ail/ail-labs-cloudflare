@@ -1,0 +1,45 @@
+name: Validate Pull Request
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and static integrity audit
+        run: npm run build
+
+      - name: Check visitor route syntax
+        run: node --check routes/visitors.js
+
+      - name: Ensure visitor permissions route is registered once
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const source = fs.readFileSync("routes/visitors.js", "utf8");
+            const count = (source.match(/router\\.post\\(["\\x27]\\/permissions["\\x27]/g) || []).length;
+            if (count !== 1) {
+              console.error("Expected exactly one POST /permissions route; found " + count);
+              process.exit(1);
+            }
+            console.log("PASS: exactly one POST /permissions route");
+          '
