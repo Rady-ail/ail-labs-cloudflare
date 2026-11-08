@@ -24,11 +24,11 @@ jobs:
           node-version: 20
           cache: npm
 
+      - name: Remove unused Nodemailer dependency
+        run: npm uninstall nodemailer
+
       - name: Apply semver-compatible security fixes
         run: npm audit fix
-
-      - name: Ensure package manifest remains unchanged
-        run: git diff --exit-code -- package.json
 
       - name: Clean install and build
         run: |
@@ -57,6 +57,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package-lock.json
-          git commit -m "fix: patch vulnerable npm dependencies"
+          git add package.json package-lock.json
+          git commit -m "fix: remove unused Nodemailer and patch vulnerable dependencies"
           git push origin HEAD
