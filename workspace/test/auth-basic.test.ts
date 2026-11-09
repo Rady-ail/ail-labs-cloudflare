@@ -1,4 +1,4 @@
-import { test, expect } from "vitest";
+import { test, expect, vi } from "vitest";
 import { app } from "../src/index";
 
 const env: any = { API_TOKEN: "s3cret-token", DATABASE_URL: "postgres://x:y@127.0.0.1:1/db", EMAIL_SEND_MODE: "dry-run",
@@ -38,4 +38,35 @@ test("body > 256KB -> 413", async () => {
 test("health: DB tak terjangkau -> 503 tanpa bocor", async () => {
   const r = await req("/api/health", { headers: { Origin: allowedOrigin } }); const t = await r.text();
   expect(r.status).toBe(503); expect(t).not.toContain("postgres");
+});
+
+test("GET tanpa Origin dengan JWT Access valid -> 200; POST tanpa Origin tanpa Bearer -> 403", async () => {
+  const gen = () => crypto.subtle.generateKey(
+    { name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
+    true,
+    ["sign", "verify"],
+  ) as Promise<CryptoKeyPair>;
+  const kp = await gen();
+  const jwk = { ...(await crypto.subtle.exportKey("jwk", kp.publicKey)), kid: "k1", alg: "RS256" };
+  vi.stubGlobal("fetch", async () => new Response(JSON.stringify({ keys: [jwk] }), { status: 200 }));
+
+  const b64u = (value: string | ArrayBuffer) => {
+    const raw = typeof value === "string" ? btoa(value) : btoa(String.fromCharCode(...new Uint8Array(value)));
+    return raw.replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/, "");
+  };
+  const now = Math.floor(Date.now() / 1000);
+  const h = b64u(JSON.stringify({ alg: "RS256", kid: "k1" }));
+  const p = b64u(JSON.stringify({
+    iss: "https://ail.cloudflareaccess.com",
+    aud: ["aud123"],
+    exp: now + 600,
+    email: "rady@example.test",
+  }));
+  const signature = await crypto.subtle.sign("RSASSA-PKCS1-v1_5", kp.privateKey, new TextEncoder().encode(`${h}.${p}`));
+  const token = `${h}.${p}.${b64u(signature)}`;
+
+  const get = await req("/api/secure", { headers: { "Cf-Access-Jwt-Assertion": token } });
+  expect(get.status).toBe(200);
+  const post = await req("/api/echo", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+  expect(post.status).toBe(403);
 });
