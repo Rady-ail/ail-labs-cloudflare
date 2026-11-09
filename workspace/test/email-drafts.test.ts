@@ -1,12 +1,20 @@
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 import { neon } from "@neondatabase/serverless";
 import { app } from "../src/index";
 
 const runtime = (globalThis as any).process?.env ?? {};
 const databaseUrl = runtime.DATABASE_URL as string | undefined;
-if (!databaseUrl) throw new Error("DATABASE_URL wajib tersedia; tes email-drafts tidak boleh dilewati diam-diam");
-const sql = neon(databaseUrl);
-const integration = test;
+const databaseName = databaseUrl ? (() => {
+  try { return decodeURIComponent(new URL(databaseUrl).pathname.replace(/^\//, "")); }
+  catch { return ""; }
+})() : "";
+const integrationAllowed = Boolean(
+  databaseUrl && runtime.TEST_DATABASE_ALLOW_WRITE === "1" && /test/i.test(databaseName),
+);
+if (!integrationAllowed) {
+  console.warn("[integration tests skipped] Set DATABASE_URL to a dedicated database whose name contains 'test' and TEST_DATABASE_ALLOW_WRITE=1.");
+}
+const sql = databaseUrl ? neon(databaseUrl) : null;
 const env: any = {
   DATABASE_URL: databaseUrl ?? "postgres://unused:unused@127.0.0.1:1/unused",
   API_TOKEN: runtime.API_TOKEN ?? "email-test-token",
@@ -17,7 +25,8 @@ const env: any = {
 const headers = { Authorization: `Bearer ${env.API_TOKEN}`, "Content-Type": "application/json" };
 const request = (path: string, init: RequestInit = {}) => app.request(path, init, env);
 
-integration("draft -> approval -> idempotent schedule -> cancel, all events recorded", async () => {
+describe.skipIf(!integrationAllowed)("Postgres write integration", () => {
+test("draft -> approval -> idempotent schedule -> cancel, all events recorded", async () => {
   const marker = `email-draft-test-${crypto.randomUUID()}`;
   const threadRows = await sql!`INSERT INTO email_threads (subject, folder) VALUES (${marker}, 'inbox') RETURNING id::text AS id`;
   const threadId = String(threadRows[0].id);
@@ -111,6 +120,7 @@ integration("draft -> approval -> idempotent schedule -> cancel, all events reco
     if (draftId) await sql!`DELETE FROM email_drafts WHERE id = ${draftId}`;
     await sql!`DELETE FROM email_threads WHERE id = ${threadId}`;
   }
+});
 });
 
 test("draft validation returns 400 for unknown fields and 422 for invalid recipients", async () => {
