@@ -1,6 +1,6 @@
 # API security controls
 
-- Global response headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, empty `Permissions-Policy: ()`, `Referrer-Policy: no-referrer`, restrictive CSP, and HSTS only when the request URL is HTTPS. Headers are set before route handling so API errors also receive them.
+- Global response headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, deny-all `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, restrictive CSP, and HSTS only when the request URL is HTTPS. Headers are set before route handling so API errors also receive them.
 - Mutating API methods require the exact application origin `https://app.ail-aesthetic-labs.my.id`. HTTP localhost/127.0.0.1 origins are accepted only when runtime `DEV=1`. The Resend webhook is exempt from origin checks because it verifies the Svix signature.
 - Every non-CRM API request body is counted from the actual cloned request stream and rejected above 256 KiB; this does not trust `Content-Length`. CRM mutation handlers use `readJsonObject`, which independently counts actual streamed bytes and applies the same 256 KiB default. The Resend webhook independently reads/counts the raw body and rejects above 1 MiB.
 - API requests are limited to 120 requests per 60-second window per IP plus SHA-256 hash of the presented bearer token or Cloudflare Access JWT or Cloudflare Access JWT. The webhook is exempt.
