@@ -43,7 +43,7 @@ app.use("/api/*", async (c, next) => {
     return;
   }
 
-  await requireAuth(c, next);
+  return requireAuth(c, next);
 });
 
 app.get("/api/health", async (c) => {

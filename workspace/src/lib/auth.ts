@@ -20,7 +20,7 @@ const jwksCache = new Map<string, CachedJwks>();
 const JWKS_TTL_MS = 10 * 60 * 1000;
 const encoder = new TextEncoder();
 
-function base64UrlBytes(value: string): Uint8Array {
+function base64UrlBytes(value: string): Uint8Array<ArrayBuffer> {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
   const padded = normalized + "=".repeat((4 - (normalized.length % 4)) % 4);
   return Uint8Array.from(atob(padded), (character) => character.charCodeAt(0));
