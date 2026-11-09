@@ -24,6 +24,10 @@ export function assertQueryKeys(query: Record<string, string>, allowed: readonly
   if (unknown.length) badRequest("Parameter tidak dikenal", { fields: unknown });
 }
 
+export function assertNoQuery(c: Context<AppEnv>): void {
+  assertQueryKeys(c.req.query(), []);
+}
+
 export function parseBigintId(value: string, label = "ID"): string {
   if (!/^[1-9][0-9]{0,18}$/.test(value) || BigInt(value) > 9223372036854775807n) badRequest(`${label} tidak valid`);
   return value;
