@@ -35,7 +35,7 @@ function isCrmPath(c: Context<AppEnv>): boolean {
 
 function crmError(
   c: Context<AppEnv>,
-  status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 500 | 503,
+  status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 429 | 500 | 503,
   code: string,
   message: string,
   fields?: Record<string, string>,
@@ -48,7 +48,7 @@ function crmError(
 
 export function fail(
   c: Context<AppEnv>,
-  status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 500 | 503,
+  status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 429 | 500 | 503,
   code: string,
   message: string,
   details?: unknown,
