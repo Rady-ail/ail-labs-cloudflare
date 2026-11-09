@@ -4,7 +4,7 @@ import { ok, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
 import { readJsonObject } from "../../lib/body";
 import {
-  actor, assertAllowedKeys, assertQueryKeys, badRequest, decodeCursor, encodeCursor,
+  actor, assertAllowedKeys, assertQueryKeys, badRequest, invalid, decodeCursor, encodeCursor,
   escapeLike, iso, parseBigintId, readOptionalJsonObject,
 } from "./shared";
 
@@ -36,14 +36,18 @@ threadsRoutes.get("/threads", async (c) => {
   const [rows, totals] = await Promise.all([
     sql`SELECT t.id::text AS id, t.subject, COALESCE(t.snippet, '') AS snippet, t.folder,
         t.is_read AS "isRead", t.is_starred AS "isStarred", t.needs_approval AS "needsApproval",
-        COALESCE(t.last_message_at, t.created_at) AS "lastMessageAt",
+        t.last_message_at AS "lastMessageAt", COALESCE(t.last_message_at, t.created_at) AS "cursorAt",
         COALESCE((SELECT json_agg(json_build_object('id', l.id::text, 'name', l.name, 'color', l.color)
           ORDER BY l.name) FROM email_thread_labels tl JOIN email_labels l ON l.id = tl.label_id
           WHERE tl.thread_id = t.id), '[]'::json) AS labels
       FROM email_threads t
       WHERE (
           (${folder} = 'archive' AND (t.is_archived = true OR t.folder = 'archive'))
-          OR (${folder} <> 'archive' AND t.folder = ${folder} AND t.is_archived = false)
+          OR (${folder} = 'drafts' AND t.is_archived = false AND (
+            t.folder = 'drafts' OR EXISTS (SELECT 1 FROM email_drafts d
+              WHERE d.thread_id = t.id AND d.status IN ('draft', 'needs_ok'))
+          ))
+          OR (${folder} NOT IN ('archive', 'drafts') AND t.folder = ${folder} AND t.is_archived = false)
         )
         AND (${filter} = 'all'
           OR (${filter} = 'unread' AND t.is_read = false)
@@ -75,7 +79,11 @@ threadsRoutes.get("/threads", async (c) => {
       FROM email_threads t
       WHERE (
           (${folder} = 'archive' AND (t.is_archived = true OR t.folder = 'archive'))
-          OR (${folder} <> 'archive' AND t.folder = ${folder} AND t.is_archived = false)
+          OR (${folder} = 'drafts' AND t.is_archived = false AND (
+            t.folder = 'drafts' OR EXISTS (SELECT 1 FROM email_drafts d
+              WHERE d.thread_id = t.id AND d.status IN ('draft', 'needs_ok'))
+          ))
+          OR (${folder} NOT IN ('archive', 'drafts') AND t.folder = ${folder} AND t.is_archived = false)
         )
         AND (${filter} = 'all'
           OR (${filter} = 'unread' AND t.is_read = false)
@@ -105,7 +113,7 @@ threadsRoutes.get("/threads", async (c) => {
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
   const last = pageRows[pageRows.length - 1] as Record<string, unknown> | undefined;
   const nextCursor = hasMore && last
-    ? encodeCursor(new Date(String(last.lastMessageAt)).toISOString(), String(last.id))
+    ? encodeCursor(new Date(String(last.cursorAt)).toISOString(), String(last.id))
     : null;
   return ok(c, {
     items: pageRows.map((row: Record<string, any>) => ({
@@ -192,7 +200,7 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
   assertAllowedKeys(body, ["isRead", "isStarred"]);
   if (!Object.keys(body).length) badRequest("Minimal satu field harus diubah");
   for (const key of ["isRead", "isStarred"]) {
-    if (Object.hasOwn(body, key) && typeof body[key] !== "boolean") badRequest(`${key} harus boolean`);
+    if (Object.hasOwn(body, key) && typeof body[key] !== "boolean") invalid(`${key} harus boolean`, { field: key });
   }
   const hasRead = Object.hasOwn(body, "isRead");
   const hasStarred = Object.hasOwn(body, "isStarred");
