@@ -1,41 +1,23 @@
 {
-  "name": "ail-labs-catalog",
-  "version": "1.0.0",
-  "description": "Katalog B2B AIL LABS dengan database SQL (PostgreSQL) dan panel admin",
-  "main": "server.js",
-  "type": "commonjs",
+  "name": "ail-labs-workspace",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "npx wrangler dev",
-    "build": "node scripts/copy-inter-font.js && node scripts/validate-build.js",
-    "deploy": "npx wrangler deploy",
-    "seed": "node scripts/seed.js",
-    "postinstall": "node scripts/patch-workers-express.js",
-    "build:css": "npx --yes tailwindcss@3.4.17 -c scripts/tailwind/tailwind.config.js -i scripts/tailwind/input.css -o public/styles/tailwind.css --minify"
+    "dev": "wrangler dev --config wrangler.jsonc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "deploy:dry-run": "wrangler deploy --dry-run --config wrangler.jsonc",
+    "test:integration": "TEST_DATABASE_ALLOW_WRITE=1 vitest run test/email-drafts.test.ts test/email-threads.test.ts test/email-live.test.ts"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.2.8",
-    "@neondatabase/serverless": "^1.2.0",
-    "@paypal/checkout-server-sdk": "^1.0.3",
-    "axios": "^1.20.0",
-    "bcryptjs": "^2.4.3",
-    "compression": "^1.8.1",
-    "cookie-session": "^2.1.0",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "express-session": "^1.19.0",
-    "multer": "^2.3.0",
-    "node-cron": "^4.6.0",
-    "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0",
-    "passport-local": "^1.0.0",
-    "serverless-http": "^3.2.0"
+    "@neondatabase/serverless": "^1.0.2",
+    "hono": "^4.10.6",
+    "zod": "^3.25.76"
   },
-  "engines": {
-    "node": ">=18"
-  },
-  "overrides": {
-    "qs": "6.16.1"
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261109.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4",
+    "wrangler": "^4.44.0"
   }
 }
