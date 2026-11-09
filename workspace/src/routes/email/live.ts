@@ -20,7 +20,7 @@ liveRoutes.get("/live/new-count", async (c) => {
   const query = c.req.query();
   assertQueryKeys(query, ["since"]);
   const since = query.since;
-  if (!since || since.length > 50 || !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?(?:Z|[+-]\\d{2}:\\d{2})$/.test(since)
+  if (!since || since.length > 50 || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-]\d{2}:\d{2})$/.test(since)
     || Number.isNaN(Date.parse(since))) {
     badRequest("since wajib berupa timestamp ISO 8601 dengan zona waktu");
   }
