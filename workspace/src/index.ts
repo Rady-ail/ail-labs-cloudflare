@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import type { Env } from "./env";
 import type { AppEnv } from "./lib/http";
-import { errorHandler, notFound, newRequestId } from "./lib/http";
+import { errorHandler, notFound, newRequestId, fail } from "./lib/http";
+import { getSql } from "./lib/db";
+import { requireAuth } from "./lib/auth";
 
 const app = new Hono<AppEnv>();
 
@@ -14,7 +16,45 @@ app.use("*", async (c, next) => {
   await next();
 });
 
-app.get("/api/health", (c) => c.json({ ok: true, db: null }));
+app.use("/api/*", async (c, next) => {
+  const method = c.req.method.toUpperCase();
+  const path = c.req.path;
+
+  if (method === "POST" || method === "PATCH" || method === "PUT") {
+    const contentLengthHeader = c.req.header("Content-Length");
+    if (contentLengthHeader !== undefined) {
+      const contentLength = Number(contentLengthHeader);
+      const limit = path === "/api/email/webhook/resend" ? 1048576 : 262144;
+      if (Number.isFinite(contentLength) && contentLength > limit) {
+        return fail(c, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar");
+      }
+    }
+  }
+
+  if (method !== "GET" && method !== "HEAD" && method !== "OPTIONS") {
+    const origin = c.req.header("Origin");
+    if (origin !== undefined && origin !== "https://app.ail-aesthetic-labs.my.id") {
+      return fail(c, 403, "FORBIDDEN", "Origin tidak diizinkan");
+    }
+  }
+
+  if (path === "/api/health" || path === "/api/email/webhook/resend") {
+    await next();
+    return;
+  }
+
+  await requireAuth(c, next);
+});
+
+app.get("/api/health", async (c) => {
+  try {
+    const sql = getSql(c.env);
+    await sql`SELECT 1`;
+    return c.json({ ok: true, db: true, time: new Date().toISOString() }, 200);
+  } catch {
+    return c.json({ ok: false, db: false }, 503);
+  }
+});
 
 app.notFound(notFound);
 app.onError(errorHandler);

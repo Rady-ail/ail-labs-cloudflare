@@ -2,6 +2,7 @@ import type { Context, ErrorHandler, NotFoundHandler } from "hono";
 
 export interface AppVariables {
   requestId: string;
+  actor: string;
 }
 
 export type AppEnv = {
