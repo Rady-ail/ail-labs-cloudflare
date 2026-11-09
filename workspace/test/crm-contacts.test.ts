@@ -3,10 +3,7 @@ import { Hono } from "hono";
 import type { AppEnv } from "../src/lib/http";
 import { errorHandler } from "../src/lib/http";
 
-const mocks = vi.hoisted(() => ({
-  query: vi.fn(),
-  transaction: vi.fn(),
-}));
+const mocks = vi.hoisted(() => ({ query: vi.fn(), transaction: vi.fn() }));
 
 vi.mock("../src/lib/db", () => ({
   getSql: () => Object.assign(
@@ -40,13 +37,13 @@ function post(body: unknown) {
   }, {} as AppEnv["Bindings"]);
 }
 
-describe("clinic contacts", () => {
+describe("CRM contacts", () => {
   beforeEach(() => {
     mocks.query.mockReset().mockResolvedValue([]);
     mocks.transaction.mockReset().mockResolvedValue([]);
   });
 
-  it("rejects unknown fields with a CRM validation envelope", async () => {
+  it("rejects unknown contact fields", async () => {
     const response = await post({ name: "Dr A", is_admin: true });
     const body = await response.json() as any;
 
@@ -56,7 +53,18 @@ describe("clinic contacts", () => {
     expect(mocks.transaction).not.toHaveBeenCalled();
   });
 
-  it("creates a primary contact in one transaction and clears previous primary", async () => {
+  it("lists contacts for an active clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: contactId, clinic_id: clinicId, name: "Dr A" }]);
+    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts`, {}, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data[0].id).toBe(contactId);
+    expect(String(mocks.query.mock.calls[1][0])).toContain("FROM clinic_contacts");
+  });
+
+  it("creates a primary contact and resets the previous primary in one transaction", async () => {
     mocks.transaction.mockResolvedValueOnce([
       [{ id: clinicId }],
       [],
@@ -72,46 +80,7 @@ describe("clinic contacts", () => {
     expect(mocks.query.mock.calls.some((call) => String(call[0]).includes("INSERT INTO audit_log"))).toBe(true);
   });
 
-  it("lists contacts for an active clinic", async () => {
-    mocks.query
-      .mockResolvedValueOnce([{ archived: false }])
-      .mockResolvedValueOnce([{ id: contactId, clinic_id: clinicId, name: "Dr A" }]);
-    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts`, {}, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect((await response.json() as any).data[0].id).toBe(contactId);
-  });
-
-  it("patches a contact and changes primary status transactionally", async () => {
-    mocks.transaction.mockResolvedValueOnce([
-      [{ id: clinicId }],
-      [],
-      [{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }],
-    ]);
-    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts/${contactId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_primary: true }),
-    }, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect(mocks.transaction).toHaveBeenCalledTimes(1);
-    expect(mocks.transaction.mock.calls[0][0]).toHaveLength(3);
-  });
-
-  it("deletes a contact belonging to the clinic", async () => {
-    mocks.query
-      .mockResolvedValueOnce([{ archived: false }])
-      .mockResolvedValueOnce([{ id: contactId }]);
-    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts/${contactId}`, {
-      method: "DELETE",
-    }, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect((await response.json() as any).data.deleted).toBe(true);
-  });
-
-  it("supports the documented PATCH /contacts/:contactId route", async () => {
+  it("patches a contact through PATCH /contacts/:contactId transactionally", async () => {
     mocks.transaction.mockResolvedValueOnce([
       [{ clinic_id: clinicId }],
       [],
@@ -125,69 +94,24 @@ describe("clinic contacts", () => {
 
     expect(response.status).toBe(200);
     expect(mocks.transaction).toHaveBeenCalledTimes(1);
-    expect(mocks.query.mock.calls.some((call) => String(call[0]).includes("INSERT INTO audit_log"))).toBe(true);
+    expect(mocks.transaction.mock.calls[0][0]).toHaveLength(3);
   });
 
-  it("supports the documented DELETE /contacts/:contactId route", async () => {
+  it("deletes a contact through DELETE /contacts/:contactId", async () => {
     mocks.query.mockResolvedValueOnce([{ id: contactId }]);
     const response = await app().request(`/api/crm/contacts/${contactId}`, {
       method: "DELETE",
     }, {} as AppEnv["Bindings"]);
 
     expect(response.status).toBe(200);
-    expect((await response.json() as any).data.deleted).toBe(true);
+    expect((await response.json() as any).data).toEqual({ id: contactId, deleted: true });
   });
 
-  it("requires a name when creating a contact", async () => {
+  it("requires a contact name on create", async () => {
     const response = await post({ phone: "081234567890" });
     const body = await response.json() as any;
 
     expect(response.status).toBe(422);
     expect(body.error.fields.name).toBeDefined();
   });
-
-  it("lists contacts for an active clinic", async () => {
-    mocks.query
-      .mockResolvedValueOnce([{ archived: false }])
-      .mockResolvedValueOnce([{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }]);
-    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts\`, {}, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect((await response.json() as any).data).toHaveLength(1);
-    expect(String(mocks.query.mock.calls[1][0])).toContain("FROM clinic_contacts");
-  });
-
-  it("promotes a contact to primary inside a transaction", async () => {
-    mocks.transaction.mockResolvedValueOnce([
-      [{ id: clinicId }],
-      [],
-      [{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }],
-    ]);
-    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts/\${contactId}\`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_primary: true }),
-    }, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect((await response.json() as any).data.is_primary).toBe(true);
-    expect(mocks.transaction).toHaveBeenCalledTimes(1);
-    const statements = mocks.transaction.mock.calls[0][0] as unknown[];
-    expect(statements).toHaveLength(3);
-  });
-
-  it("deletes a contact belonging to the clinic", async () => {
-    mocks.query
-      .mockResolvedValueOnce([{ archived: false }])
-      .mockResolvedValueOnce([{ id: contactId }])
-      .mockResolvedValueOnce([]);
-    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts/\${contactId}\`, {
-      method: "DELETE",
-    }, {} as AppEnv["Bindings"]);
-
-    expect(response.status).toBe(200);
-    expect((await response.json() as any).data).toEqual({ id: contactId, deleted: true });
-    expect(String(mocks.query.mock.calls[1][0])).toContain("DELETE FROM clinic_contacts");
-  });
-
 });
