@@ -9,6 +9,7 @@ import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
 import { webhookRoutes } from "./routes/email/webhook";
+import { runScheduledEmailSender } from "./jobs/scheduled-email-sender";
 
 const app = new Hono<AppEnv>();
 
@@ -77,10 +78,10 @@ export default {
   fetch: app.fetch,
   async scheduled(
     _event: ScheduledController,
-    _env: Env,
+    env: Env,
     _context: ExecutionContext,
   ): Promise<void> {
-    return Promise.resolve();
+    await runScheduledEmailSender(env);
   },
 };
 
