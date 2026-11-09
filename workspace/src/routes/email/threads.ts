@@ -211,7 +211,7 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
   const hasStarred = Object.hasOwn(body, "isStarred");
   const sql = getSql(c.env);
   const rows = await sql`WITH before AS MATERIALIZED (
-      SELECT id, is_read, is_starred FROM email_threads WHERE id = ${threadId} FOR UPDATE
+      SELECT id, is_read, is_starred FROM email_threads WHERE id = ${threadId}::bigint FOR UPDATE
     ), updated AS (
       UPDATE email_threads t SET
         is_read = CASE WHEN ${hasRead} THEN ${hasRead ? body.isRead : null}::boolean ELSE t.is_read END,
@@ -223,11 +223,11 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
       INSERT INTO email_events (thread_id, event_type, actor, event_data)
       SELECT b.id, 'thread_marked_read', ${actor(c)}::text, jsonb_build_object('isRead', u.is_read)
       FROM before b JOIN updated u ON u.id::bigint = b.id
-      WHERE ${hasRead} AND b.is_read IS DISTINCT FROM u.is_read
+      WHERE ${hasRead}::boolean AND b.is_read IS DISTINCT FROM u.is_read
       UNION ALL
       SELECT b.id, 'thread_marked_starred', ${actor(c)}::text, jsonb_build_object('isStarred', u.is_starred)
       FROM before b JOIN updated u ON u.id::bigint = b.id
-      WHERE ${hasStarred} AND b.is_starred IS DISTINCT FROM u.is_starred
+      WHERE ${hasStarred}::boolean AND b.is_starred IS DISTINCT FROM u.is_starred
       RETURNING id
     )
     SELECT id, is_read AS "isRead", is_starred AS "isStarred" FROM updated`;
@@ -243,7 +243,7 @@ threadsRoutes.post("/threads/:threadId/archive", async (c) => {
   assertAllowedKeys(body, []);
   const sql = getSql(c.env);
   const rows = await sql`WITH before AS MATERIALIZED (
-      SELECT id, is_archived FROM email_threads WHERE id = ${threadId} FOR UPDATE
+      SELECT id, is_archived FROM email_threads WHERE id = ${threadId}::bigint FOR UPDATE
     ), updated AS (
       UPDATE email_threads t SET is_archived = true, folder = 'archive', updated_at = now()
       FROM before b WHERE t.id = b.id
