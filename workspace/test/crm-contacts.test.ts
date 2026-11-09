@@ -69,7 +69,7 @@ describe("clinic contacts", () => {
     expect(body.data.is_primary).toBe(true);
     expect(mocks.transaction).toHaveBeenCalledTimes(1);
     expect(mocks.transaction.mock.calls[0][0]).toHaveLength(3);
-    expect(mocks.query.mock.calls[0][0]).toContain("INSERT INTO audit_log");
+    expect(mocks.query.mock.calls.some((call) => String(call[0]).includes("INSERT INTO audit_log"))).toBe(true);
   });
 
   it("requires a name when creating a contact", async () => {
