@@ -1,6 +1,6 @@
-import type { neon } from "@neondatabase/serverless";
+import type { NeonQueryFunction } from "@neondatabase/serverless";
 
-type Sql = ReturnType<typeof neon>;
+type Sql = NeonQueryFunction<any, any>;
 
 export async function audit(
   sql: Sql,
