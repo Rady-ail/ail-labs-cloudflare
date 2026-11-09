@@ -214,8 +214,8 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
       SELECT id, is_read, is_starred FROM email_threads WHERE id = ${threadId}::bigint FOR UPDATE
     ), updated AS (
       UPDATE email_threads t SET
-        is_read = CASE WHEN ${hasRead} THEN ${hasRead ? body.isRead : null}::boolean ELSE t.is_read END,
-        is_starred = CASE WHEN ${hasStarred} THEN ${hasStarred ? body.isStarred : null}::boolean ELSE t.is_starred END,
+        is_read = CASE WHEN ${hasRead}::boolean THEN ${hasRead ? body.isRead : null}::boolean ELSE t.is_read END,
+        is_starred = CASE WHEN ${hasStarred}::boolean THEN ${hasStarred ? body.isStarred : null}::boolean ELSE t.is_starred END,
         updated_at = now()
       FROM before b WHERE t.id = b.id
       RETURNING t.id::text AS id, t.is_read, t.is_starred
