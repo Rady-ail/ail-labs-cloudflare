@@ -6,9 +6,4 @@ export interface Env {
   EMAIL_SEND_MODE: "dry-run" | "live";
   CF_ACCESS_TEAM_DOMAIN?: string;
   CF_ACCESS_AUD?: string;
-  ASSETS?: Fetcher;
-}
-
-export interface WorkerBindings extends Env {
-  ASSETS: Fetcher;
 }

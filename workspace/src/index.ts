@@ -1,29 +1,31 @@
 import { Hono } from "hono";
-import type { WorkerBindings } from "./env";
+import type { Env } from "./env";
 import type { AppEnv } from "./lib/http";
-import { authMiddleware } from "./lib/auth";
-import { bodyLimit, errorHandler, notFound, originGuard, requestId, securityHeaders } from "./lib/http";
-import health from "./routes/health";
-
-const api = new Hono<AppEnv>();
-api.route("/health", health);
+import { errorHandler, notFound, newRequestId } from "./lib/http";
 
 const app = new Hono<AppEnv>();
-app.use("*", requestId());
-app.use("*", securityHeaders());
-app.use("*", originGuard());
-app.use("/api/*", bodyLimit(256 * 1024));
-app.use("/api/*", async (c, next) => {
-  if (c.req.path === "/api/health" || c.req.path === "/api/email/webhook/resend") return next();
-  return authMiddleware(c, next);
+
+app.use("*", async (c, next) => {
+  c.set("requestId", newRequestId());
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Referrer-Policy", "no-referrer");
+  c.header("Content-Security-Policy", "default-src 'none'");
+  if (c.req.path.startsWith("/api/")) c.header("Cache-Control", "no-store");
+  await next();
 });
-app.route("/api", api);
+
+app.get("/api/health", (c) => c.json({ ok: true, db: null }));
+
 app.notFound(notFound);
 app.onError(errorHandler);
 
 export default {
   fetch: app.fetch,
-  async scheduled(_event: ScheduledController, _env: WorkerBindings, _context: ExecutionContext): Promise<void> {
+  async scheduled(
+    _event: ScheduledController,
+    _env: Env,
+    _context: ExecutionContext,
+  ): Promise<void> {
     return Promise.resolve();
   },
 };
