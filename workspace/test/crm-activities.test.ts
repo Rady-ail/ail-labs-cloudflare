@@ -91,7 +91,8 @@ describe("POST /api/crm/clinics/:id/activities", () => {
     const response = await send({ type: "note", summary: "Note", actor: "injected" });
     const body = await response.json() as any;
 
-    expect(response.status).toBe(422);
+    expect(response.status).toBe(400);
+    expect(body.error.code).toBe("BAD_REQUEST");
     expect(body.error.fields.actor).toBeDefined();
   });
 });
