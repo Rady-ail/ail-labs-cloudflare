@@ -65,7 +65,7 @@ describe("POST /api/crm/clinics/:id/stage", () => {
   });
 
   it("returns 404 when the clinic does not exist", async () => {
-    mocks.query.mockResolvedValueOnce([]).mockResolvedValueOnce([]);
+    mocks.query.mockResolvedValueOnce([]);
     const response = await request({ stage: "contacted" });
     const body = await response.json() as any;
 
@@ -74,7 +74,7 @@ describe("POST /api/crm/clinics/:id/stage", () => {
   });
 
   it("returns 409 when the clinic is archived", async () => {
-    mocks.query.mockResolvedValueOnce([]).mockResolvedValueOnce([{ archived: true }]);
+    mocks.query.mockResolvedValueOnce([{ archived: true }]);
     const response = await request({ stage: "contacted" });
     const body = await response.json() as any;
 
