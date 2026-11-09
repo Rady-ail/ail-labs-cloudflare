@@ -172,7 +172,7 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
     rows = await sql`WITH updated AS (
         UPDATE email_drafts SET status = 'scheduled', approved_by = ${actor(c)},
           approved_at = now(), scheduled_at = now() + interval '10 seconds',
-          idempotency_key = ${key}, metadata = metadata || jsonb_build_object('job_id', ${jobId}),
+          idempotency_key = ${key}, metadata = metadata || jsonb_build_object('job_id', ${jobId}::text),
           updated_at = now()
         WHERE id = ${draftId} AND status = 'needs_ok' AND idempotency_key IS NULL
         RETURNING id, thread_id, idempotency_key, metadata, scheduled_at
@@ -231,7 +231,7 @@ draftsRoutes.post("/drafts/:draftId/cancel", async (c) => {
   const sql = getSql(c.env);
   const rows = await sql`WITH updated AS (
       UPDATE email_drafts SET status = 'cancelled', cancelled_at = now(),
-        metadata = metadata || jsonb_build_object('cancel_reason', ${reason}),
+        metadata = metadata || jsonb_build_object('cancel_reason', ${reason}::text),
         updated_at = now()
       WHERE id = ${draftId} AND status = 'scheduled'
         AND COALESCE(metadata->>'processing_at', '') = ''
@@ -239,7 +239,7 @@ draftsRoutes.post("/drafts/:draftId/cancel", async (c) => {
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
       SELECT thread_id, id::bigint, 'send_job_cancelled', ${actor(c)},
-        jsonb_build_object('reason', ${reason}) FROM updated
+        jsonb_build_object('reason', ${reason}::text) FROM updated
       RETURNING id
     )
     SELECT * FROM updated`;
