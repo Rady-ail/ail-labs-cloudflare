@@ -229,8 +229,10 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
         ${cleanText(item.id ?? item.attachment_id, 300) || null})`;
   }
 
-  await sql`UPDATE email_threads SET last_message_at = ${receivedAt}::timestamptz,
-      snippet = ${bodyText.slice(0, 240)}, folder = 'inbox', updated_at = now()
+  await sql`UPDATE email_threads SET
+      snippet = CASE WHEN last_message_at <= ${receivedAt}::timestamptz THEN ${bodyText.slice(0, 240)} ELSE snippet END,
+      last_message_at = GREATEST(last_message_at, ${receivedAt}::timestamptz),
+      folder = 'inbox', updated_at = now()
     WHERE id = ${threadId}::bigint`;
   await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
     VALUES (${threadId}::bigint, 'message_received', 'resend_webhook',
@@ -310,4 +312,4 @@ webhookRoutes.post("/api/webhooks/resend", async (c) => {
   }
 });
 
-export { webhookRoutes };
+export { webhookRoutes, processReceived, resolveReceivedData };
