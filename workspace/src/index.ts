@@ -8,6 +8,8 @@ import { requireAuth } from "./lib/auth";
 import { crmRoutes } from "./routes/crm/clinics";
 import { supplierRoutes } from "./routes/supplier";
 import { katalogRoutes } from "./routes/katalog";
+import { kepatuhanRoutes } from "./routes/kepatuhan";
+import { aktivitasRoutes } from "./routes/aktivitas";
 import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
@@ -109,6 +111,8 @@ app.get("/api/health", async (c) => {
 app.route("/api/crm", crmRoutes);
 app.route("/api/supplier", supplierRoutes);
 app.route("/api/katalog", katalogRoutes);
+app.route("/api/aktivitas", aktivitasRoutes);
+app.route("/api/kepatuhan", kepatuhanRoutes);
 app.route("/api/email", threadsRoutes);
 app.route("/api/email", draftsRoutes);
 app.route("/api/email", liveRoutes);
