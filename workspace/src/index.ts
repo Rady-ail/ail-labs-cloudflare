@@ -48,10 +48,22 @@ app.use("/api/*", async (c, next) => {
   const isWebhook = path === "/api/webhooks/resend";
 
   if (!isWebhook && method !== "GET" && method !== "HEAD" && !path.startsWith("/api/crm/")) {
-    if (c.req.raw.body) {
-      const actualBytes = await c.req.raw.clone().arrayBuffer();
-      if (actualBytes.byteLength > 262144) {
-        return fail(c, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar");
+    const clonedBody = c.req.raw.clone().body;
+    if (clonedBody) {
+      const reader = clonedBody.getReader();
+      let totalBytes = 0;
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          totalBytes += value.byteLength;
+          if (totalBytes > 262144) {
+            await reader.cancel();
+            return fail(c, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar");
+          }
+        }
+      } finally {
+        reader.releaseLock();
       }
     }
   }
