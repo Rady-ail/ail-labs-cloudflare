@@ -32,7 +32,7 @@ app.use("*", async (c, next) => {
   c.set("requestId", newRequestId());
   c.header("X-Content-Type-Options", "nosniff");
   c.header("X-Frame-Options", "DENY");
-  c.header("Permissions-Policy", "");
+  c.header("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
   c.header("Referrer-Policy", "no-referrer");
   c.header("Content-Security-Policy", "default-src 'none'");
   if (new URL(c.req.url).protocol === "https:") {
