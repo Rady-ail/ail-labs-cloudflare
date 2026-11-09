@@ -60,7 +60,8 @@ app.use("/api/*", async (c, next) => {
   if (!isWebhook) {
     const origin = c.req.header("Origin");
     const hasBearer = /^Bearer\s+\S+$/i.test(c.req.header("Authorization") ?? "");
-    if (origin ? !isAllowedOrigin(origin, c.env.DEV === "1") : !hasBearer) {
+    const safe = method === "GET" || method === "HEAD";
+    if (origin ? !isAllowedOrigin(origin, c.env.DEV === "1") : !(hasBearer || safe)) {
       return fail(c, 403, "FORBIDDEN", "Origin tidak diizinkan");
     }
   }
