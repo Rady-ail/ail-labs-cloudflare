@@ -1,0 +1,8 @@
+# API security controls
+
+- Global response headers: `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`, `Referrer-Policy: no-referrer`, restrictive CSP, and HSTS only when the request URL is HTTPS.
+- Mutating API methods require the exact application origin `https://app.ail-aesthetic-labs.my.id`. HTTP localhost/127.0.0.1 origins are accepted only when runtime `DEV=1`. The Resend webhook is exempt from origin checks because it verifies the Svix signature.
+- Non-CRM API bodies are byte-counted from a cloned stream and rejected above 256 KiB; CRM routes are excluded. The Resend webhook independently reads/counts the raw body and rejects above 1 MiB.
+- API requests are limited to 120 requests per 60-second window per IP plus SHA-256 hash of the presented bearer token. The webhook is exempt.
+- The rate limiter is an in-memory Map scoped to a Worker isolate. It is best-effort, resets on isolate restart, and is not globally coordinated across concurrent isolates/locations. It is not a substitute for a Cloudflare Rate Limiting binding/WAF policy; no such binding is configured in this Worker. Worker Free plan limits/features may constrain available platform-level rate-limiting controls, so do not treat this Map as a hard abuse or billing boundary.
+- Application code contains no `console.log`/`console.error` statements. Error handling returns generic internal errors rather than stack traces or SQL details. Audit events store structured metadata (actor/action/resource type/id/request id/success), not message bodies, phone numbers, tokens, or secrets.
