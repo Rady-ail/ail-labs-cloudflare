@@ -1,11 +1,20 @@
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 import { neon } from "@neondatabase/serverless";
 import { app } from "../src/index";
 
 const runtime = (globalThis as any).process?.env ?? {};
 const databaseUrl = runtime.DATABASE_URL as string | undefined;
+const databaseName = databaseUrl ? (() => {
+  try { return decodeURIComponent(new URL(databaseUrl).pathname.replace(/^\//, "")); }
+  catch { return ""; }
+})() : "";
+const integrationAllowed = Boolean(
+  databaseUrl && runtime.TEST_DATABASE_ALLOW_WRITE === "1" && /test/i.test(databaseName),
+);
+if (!integrationAllowed) {
+  console.warn("[integration tests skipped] Set DATABASE_URL to a dedicated database whose name contains 'test' and TEST_DATABASE_ALLOW_WRITE=1.");
+}
 const sql = databaseUrl ? neon(databaseUrl) : null;
-const integration = test.skipIf(!sql);
 const env: any = {
   DATABASE_URL: databaseUrl ?? "postgres://unused:unused@127.0.0.1:1/unused",
   API_TOKEN: runtime.API_TOKEN ?? "email-test-token",
@@ -16,7 +25,8 @@ const env: any = {
 const headers = { Authorization: `Bearer ${env.API_TOKEN}` };
 const request = (path: string) => app.request(path, { headers }, env);
 
-integration("live status exposes no credentials and new-count returns inbound message IDs", async () => {
+describe.skipIf(!integrationAllowed)("Postgres write integration", () => {
+test("live status exposes no credentials and new-count returns inbound message IDs", async () => {
   const marker = `email-live-test-${crypto.randomUUID()}`;
   const since = new Date(Date.now() - 5000).toISOString();
   const threadRows = await sql!`INSERT INTO email_threads (subject, folder) VALUES (${marker}, 'inbox') RETURNING id::text AS id`;
@@ -42,6 +52,7 @@ integration("live status exposes no credentials and new-count returns inbound me
   } finally {
     await sql!`DELETE FROM email_threads WHERE id = ${threadId}`;
   }
+});
 });
 
 test("live new-count rejects missing or malformed since", async () => {
