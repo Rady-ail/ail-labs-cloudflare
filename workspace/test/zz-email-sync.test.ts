@@ -37,3 +37,21 @@ describe("email live sync", () => {
     expect((await app.request("/api/email/live/sync", { method: "POST", body: "{}" }, env)).status).toBeGreaterThanOrEqual(401);
   });
 });
+
+describe("unduh lampiran", () => {
+  test("mengalirkan berkas dari Resend; id salah ditolak", async () => {
+    const db = await getDb();
+    const m = (await db.query(`INSERT INTO email_threads (subject, folder) VALUES ('Lamp','inbox') RETURNING id`)).rows[0];
+    const msg = (await db.query(`INSERT INTO email_messages (thread_id, resend_email_id, direction, from_email, to_recipients, subject, body_text) VALUES (${m.id},'zz-att-1','inbound','a@b.com','[]'::jsonb,'Lamp','x') RETURNING id`)).rows[0];
+    const att = (await db.query(`INSERT INTO email_attachments (message_id, filename, content_type, byte_size, provider_attachment_id) VALUES (${msg.id},'a"b.pdf','application/pdf',5,'att-9') RETURNING id`)).rows[0];
+    vi.stubGlobal("fetch", vi.fn(async (u: string) => u.includes("/attachments/att-9")
+      ? new Response(JSON.stringify({ download_url: "https://files.example/x" }), { status: 200 })
+      : new Response("HELLO", { status: 200 })));
+    const r = await app.request(`/api/email/attachments/${att.id}/download`, { headers: H }, env);
+    expect(r.status).toBe(200);
+    expect(await r.text()).toBe("HELLO");
+    expect(r.headers.get("content-disposition")).toContain('a_b.pdf');
+    expect((await app.request("/api/email/attachments/abc/download", { headers: H }, env)).status).toBe(400);
+    expect((await app.request("/api/email/attachments/999999/download", { headers: H }, env)).status).toBe(404);
+  });
+});

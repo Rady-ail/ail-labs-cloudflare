@@ -70,4 +70,32 @@ liveRoutes.post("/live/sync", async (c) => {
   return ok(c, { seen: items.length, imported, has_more: Boolean(page.has_more), next_after: page.has_more ? last : null });
 });
 
+// Unduh lampiran email masuk (diambil langsung dari Resend, tidak disimpan di server).
+liveRoutes.get("/attachments/:id/download", async (c) => {
+  assertNoQuery(c);
+  const id = c.req.param("id");
+  if (!/^\d{1,18}$/.test(id)) badRequest("id tidak valid");
+  if (!c.env.RESEND_API_KEY) return fail(c, 503, "RESEND_UNAVAILABLE", "Kunci Resend belum diatur");
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT a.filename, a.content_type, a.byte_size, a.provider_attachment_id, m.resend_email_id
+    FROM email_attachments a JOIN email_messages m ON m.id = a.message_id
+    WHERE a.id = ${id}::bigint AND m.direction = 'inbound' LIMIT 1`;
+  const row = rows[0];
+  if (!row || !row.provider_attachment_id || !row.resend_email_id) return fail(c, 404, "NOT_FOUND", "Lampiran tidak ditemukan");
+  if (row.byte_size && Number(row.byte_size) > 25 * 1024 * 1024) return fail(c, 413, "TOO_LARGE", "Lampiran terlalu besar");
+  const meta = await fetch(`https://api.resend.com/emails/receiving/${encodeURIComponent(row.resend_email_id)}/attachments/${encodeURIComponent(row.provider_attachment_id)}`,
+    { headers: { Authorization: `Bearer ${c.env.RESEND_API_KEY}` } });
+  if (!meta.ok) return fail(c, 503, "RESEND_ERROR", "Lampiran tidak bisa diambil dari Resend");
+  const info = (await meta.json()) as Record<string, any>;
+  const url = typeof info.download_url === "string" ? info.download_url : "";
+  if (!/^https:\/\//.test(url)) return fail(c, 503, "RESEND_ERROR", "Tautan unduhan tidak tersedia");
+  const file = await fetch(url);
+  if (!file.ok || !file.body) return fail(c, 503, "RESEND_ERROR", "Lampiran tidak bisa diunduh");
+  const name = String(row.filename || "lampiran").replace(/[\r\n"\\]/g, "_").slice(0, 200);
+  return new Response(file.body, { status: 200, headers: {
+    "Content-Type": String(row.content_type || "application/octet-stream"),
+    "Content-Disposition": `attachment; filename="${name}"; filename*=UTF-8''${encodeURIComponent(name)}`,
+    "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" } });
+});
+
 export { liveRoutes };
