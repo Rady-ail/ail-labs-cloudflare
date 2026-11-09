@@ -127,6 +127,7 @@ threadsRoutes.get("/threads", async (c) => {
 
 threadsRoutes.get("/threads/:threadId", async (c) => {
   assertNoQuery(c);
+  assertNoQuery(c);
   const threadId = parseBigintId(c.req.param("threadId"), "threadId");
   const sql = getSql(c.env);
   const rows = await sql`SELECT id::text AS id, external_thread_id, subject, folder, contact_id::text AS contact_id,
@@ -197,6 +198,7 @@ threadsRoutes.get("/threads/:threadId", async (c) => {
 
 threadsRoutes.patch("/threads/:threadId", async (c) => {
   assertNoQuery(c);
+  assertNoQuery(c);
   const threadId = parseBigintId(c.req.param("threadId"), "threadId");
   const body = await readJsonObject(c);
   assertAllowedKeys(body, ["isRead", "isStarred"]);
@@ -234,6 +236,7 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
 });
 
 threadsRoutes.post("/threads/:threadId/archive", async (c) => {
+  assertNoQuery(c);
   assertNoQuery(c);
   const threadId = parseBigintId(c.req.param("threadId"), "threadId");
   const body = await readOptionalJsonObject(c);
