@@ -34,7 +34,8 @@ threadsRoutes.get("/threads", async (c) => {
   const sql = getSql(c.env);
 
   const [rows, totals] = await Promise.all([
-    sql`SELECT t.id::text AS id, t.subject, COALESCE(t.snippet, '') AS snippet,\n        CASE WHEN ${folder} = 'drafts' THEN 'drafts' WHEN ${folder} = 'archive' THEN 'archive' ELSE t.folder END AS folder,
+    sql`SELECT t.id::text AS id, t.subject, COALESCE(t.snippet, '') AS snippet,
+        CASE WHEN ${folder} = 'drafts' THEN 'drafts' WHEN ${folder} = 'archive' THEN 'archive' ELSE t.folder END AS folder,
         t.is_read AS "isRead", t.is_starred AS "isStarred", t.needs_approval AS "needsApproval",
         t.last_message_at AS "lastMessageAt", COALESCE(t.last_message_at, t.created_at) AS "cursorAt",
         COALESCE((SELECT json_agg(json_build_object('id', l.id::text, 'name', l.name, 'color', l.color)
