@@ -79,4 +79,49 @@ describe("clinic contacts", () => {
     expect(response.status).toBe(422);
     expect(body.error.fields.name).toBeDefined();
   });
+
+  it("lists contacts for an active clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }]);
+    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts\`, {}, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data).toHaveLength(1);
+    expect(String(mocks.query.mock.calls[1][0])).toContain("FROM clinic_contacts");
+  });
+
+  it("promotes a contact to primary inside a transaction", async () => {
+    mocks.transaction.mockResolvedValueOnce([
+      [{ id: clinicId }],
+      [],
+      [{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }],
+    ]);
+    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts/\${contactId}\`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_primary: true }),
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data.is_primary).toBe(true);
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    const statements = mocks.transaction.mock.calls[0][0] as unknown[];
+    expect(statements).toHaveLength(3);
+  });
+
+  it("deletes a contact belonging to the clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: contactId }])
+      .mockResolvedValueOnce([]);
+    const response = await app().request(\`/api/crm/clinics/\${clinicId}/contacts/\${contactId}\`, {
+      method: "DELETE",
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data).toEqual({ id: contactId, deleted: true });
+    expect(String(mocks.query.mock.calls[1][0])).toContain("DELETE FROM clinic_contacts");
+  });
+
 });
