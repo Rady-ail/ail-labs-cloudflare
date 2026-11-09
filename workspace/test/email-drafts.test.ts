@@ -22,7 +22,7 @@ const env: any = {
   RESEND_API_KEY: "",
   RESEND_WEBHOOK_SECRET: "",
 };
-const headers = { Authorization: `Bearer ${env.API_TOKEN}`, "Content-Type": "application/json" };
+const headers = { Authorization: `Bearer ${env.API_TOKEN}`, Origin: "https://app.ail-aesthetic-labs.my.id", "Content-Type": "application/json" };
 const request = (path: string, init: RequestInit = {}) => app.request(path, init, env);
 
 describe.skipIf(!integrationAllowed)("Postgres write integration", () => {
