@@ -68,6 +68,25 @@ describe("POST /api/crm/clinics/:id/activities", () => {
     expect(sql).toContain("INSERT INTO clinic_activities");
   });
 
+  it("lists recent activities for an active clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: "b3e1ac40-3f9b-4db6-a7b5-8b7f41c15b02", type: "call" }]);
+    const app = new Hono<AppEnv>();
+    app.use("*", async (c, next) => {
+      c.set("requestId", "request-test");
+      c.set("actor", "test-actor");
+      await next();
+    });
+    app.route("/api/crm", crmRoutes);
+    app.onError(errorHandler);
+    const response = await app.request(`/api/crm/clinics/${clinicId}/activities?limit=20`, {}, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data[0].type).toBe("call");
+    expect(String(mocks.query.mock.calls[1][0])).toContain("ORDER BY occurred_at DESC");
+  });
+
   it("rejects unknown activity fields", async () => {
     const response = await send({ type: "note", summary: "Note", actor: "injected" });
     const body = await response.json() as any;
