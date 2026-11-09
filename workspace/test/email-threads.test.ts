@@ -73,18 +73,31 @@ integration("thread list validates allowlists and returns BIGINT IDs as strings"
   const inserted = await sql!`INSERT INTO email_threads (subject, folder, snippet, last_message_at)
     VALUES (${marker}, 'inbox', 'find-me', now()) RETURNING id::text AS id`;
   const threadId = String(inserted[0].id);
+  const second = await sql!`INSERT INTO email_threads (subject, folder, snippet, last_message_at)
+    VALUES (${marker}, 'inbox', 'find-me too', now()) RETURNING id::text AS id`;
+  const secondId = String(second[0].id);
   try {
-    const response = await request(`/api/email/threads?folder=inbox&q=${encodeURIComponent(marker)}&limit=10`, { headers });
+    const response = await request(`/api/email/threads?folder=inbox&q=${encodeURIComponent(marker)}&limit=1`, { headers });
     expect(response.status).toBe(200);
     const body = await response.json() as any;
-    expect(body.data.items.some((item: any) => item.id === threadId)).toBe(true);
-    expect(typeof body.data.items.find((item: any) => item.id === threadId).id).toBe("string");
+    expect(body.data.total).toBe(2);
+    expect(body.data.items).toHaveLength(1);
+    expect(body.data.nextCursor).toBeTruthy();
+    expect([threadId, secondId]).toContain(body.data.items[0].id);
+    expect(typeof body.data.items[0].id).toBe("string");
     expect(body.meta.requestId).toBeTruthy();
+
+    const next = await request(`/api/email/threads?folder=inbox&q=${encodeURIComponent(marker)}&limit=1&cursor=${encodeURIComponent(body.data.nextCursor)}`, { headers });
+    expect(next.status).toBe(200);
+    const nextBody = await next.json() as any;
+    expect(nextBody.data.items).toHaveLength(1);
+    expect(nextBody.data.items[0].id).not.toBe(body.data.items[0].id);
 
     const badQuery = await request("/api/email/threads?unknown=x", { headers });
     expect(badQuery.status).toBe(400);
     expect((await badQuery.json() as any).error.code).toBe("BAD_REQUEST");
   } finally {
     await sql!`DELETE FROM email_threads WHERE id = ${threadId}`;
+    await sql!`DELETE FROM email_threads WHERE id = ${secondId}`;
   }
 });
