@@ -435,7 +435,8 @@ crmRoutes.post("/clinics/:id/contacts", async (c) => {
   const isPrimary = input.is_primary === true;
   const clinicLock = sql`SELECT id FROM clinics WHERE id = ${clinicId} AND archived = false FOR UPDATE`;
   const unsetPrimary = sql`UPDATE clinic_contacts SET is_primary = false
-    WHERE clinic_id = ${clinicId} AND is_primary = true`;
+    WHERE clinic_id = ${clinicId} AND is_primary = true
+      AND EXISTS (SELECT 1 FROM clinics WHERE id = ${clinicId} AND archived = false)`;
   const insert = sql`INSERT INTO clinic_contacts
       (clinic_id, name, role, phone, email, preferred_channel, is_primary)
     SELECT ${clinicId}, ${input.name}, ${input.role ?? null}, ${input.phone ?? null},
@@ -466,7 +467,9 @@ crmRoutes.patch("/clinics/:id/contacts/:contactId", async (c) => {
   const sql = getSql(c.env);
   const clinicLock = sql`SELECT id FROM clinics WHERE id = ${clinicId} AND archived = false FOR UPDATE`;
   const unsetPrimary = sql`UPDATE clinic_contacts SET is_primary = false
-    WHERE clinic_id = ${clinicId} AND id <> ${contactId} AND is_primary = true`;
+    WHERE clinic_id = ${clinicId} AND id <> ${contactId} AND is_primary = true
+      AND EXISTS (SELECT 1 FROM clinics WHERE id = ${clinicId} AND archived = false)
+      AND EXISTS (SELECT 1 FROM clinic_contacts WHERE id = ${contactId} AND clinic_id = ${clinicId})`;
   const update = sql`UPDATE clinic_contacts SET
       name = CASE WHEN ${Object.hasOwn(input, "name")} THEN ${input.name ?? null} ELSE name END,
       role = CASE WHEN ${Object.hasOwn(input, "role")} THEN ${input.role ?? null} ELSE role END,
