@@ -72,6 +72,45 @@ describe("clinic contacts", () => {
     expect(mocks.query.mock.calls.some((call) => String(call[0]).includes("INSERT INTO audit_log"))).toBe(true);
   });
 
+  it("lists contacts for an active clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: contactId, clinic_id: clinicId, name: "Dr A" }]);
+    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts`, {}, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data[0].id).toBe(contactId);
+  });
+
+  it("patches a contact and changes primary status transactionally", async () => {
+    mocks.transaction.mockResolvedValueOnce([
+      [{ id: clinicId }],
+      [],
+      [{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }],
+    ]);
+    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts/${contactId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_primary: true }),
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(mocks.transaction.mock.calls[0][0]).toHaveLength(3);
+  });
+
+  it("deletes a contact belonging to the clinic", async () => {
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{ id: contactId }]);
+    const response = await app().request(`/api/crm/clinics/${clinicId}/contacts/${contactId}`, {
+      method: "DELETE",
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data.deleted).toBe(true);
+  });
+
   it("requires a name when creating a contact", async () => {
     const response = await post({ phone: "081234567890" });
     const body = await response.json() as any;
