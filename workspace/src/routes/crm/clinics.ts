@@ -302,6 +302,8 @@ crmRoutes.post("/clinics/:id/stage", async (c) => {
   }
 
   const sql = getSql(c.env);
+  const clinicError = await requireActiveClinic(c, sql, id);
+  if (clinicError) return clinicError;
   const rows = await sql`WITH current_clinic AS (
       SELECT id, stage
       FROM clinics
@@ -324,12 +326,7 @@ crmRoutes.post("/clinics/:id/stage", async (c) => {
     SELECT id, previous_stage, stage FROM updated`;
 
   const updated = rows[0] as Record<string, unknown> | undefined;
-  if (!updated) {
-    const existing = await sql`SELECT archived FROM clinics WHERE id = ${id} LIMIT 1`;
-    if (!existing[0]) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
-    if (existing[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
-    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
-  }
+  if (!updated) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
 
   await audit(sql, {
     actor: c.get("actor"), action: "clinic.stage_change", resourceType: "clinic",
