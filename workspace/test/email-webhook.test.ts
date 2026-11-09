@@ -153,9 +153,9 @@ integration("delivery status is idempotent and bounce creates suppression", asyn
   try {
     for (const resendId of [deliveredId, bouncedId]) {
       await sql`INSERT INTO email_messages
-        (thread_id, resend_email_id, direction, from_email, to_recipients, subject, body_text, metadata)
+        (thread_id, resend_email_id, direction, from_email, to_recipients, subject, body_text, sent_at, metadata)
         VALUES (${threadId}::bigint, ${resendId}, 'outbound', 'alexa@ail-aesthetic-labs.my.id',
-          ${JSON.stringify([recipient])}::jsonb, 'Status test', 'body', '{}'::jsonb)`;
+          ${JSON.stringify([recipient])}::jsonb, 'Status test', 'body', now(), '{}'::jsonb)`;
     }
     const sendEvent = async (type: string, resendId: string) => {
       const body = JSON.stringify({ type, data: { email_id: resendId, to: [recipient] } });
@@ -196,9 +196,10 @@ integration("received event falls back to normalized subject and matching sender
   const threadId = String(threadRows[0].id);
   try {
     await sql`INSERT INTO email_messages
-      (thread_id, resend_email_id, direction, from_email, to_recipients, subject, body_text, metadata)
+      (thread_id, resend_email_id, direction, from_email, to_recipients, subject, body_text,
+       received_at, headers, metadata)
       VALUES (${threadId}::bigint, ${`seed-${resendId}`}, 'inbound', ${sender},
-        '[]'::jsonb, 'Quarterly Skin Update', 'previous', '{}'::jsonb)`;
+        '[]'::jsonb, 'Quarterly Skin Update', 'previous', now(), '{}'::jsonb, '{}'::jsonb)`;
     const body = JSON.stringify({
       type: "email.received",
       data: {
