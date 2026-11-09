@@ -52,7 +52,7 @@ test("GET tanpa Origin dengan JWT Access valid -> 200; POST tanpa Origin tanpa B
 
   const b64u = (value: string | ArrayBuffer) => {
     const raw = typeof value === "string" ? btoa(value) : btoa(String.fromCharCode(...new Uint8Array(value)));
-    return raw.replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/, "");
+    return raw.replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
   };
   const now = Math.floor(Date.now() / 1000);
   const h = b64u(JSON.stringify({ alg: "RS256", kid: "k1" }));
