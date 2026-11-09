@@ -99,7 +99,7 @@ describe("POST /api/crm/clinics/:id/stage", () => {
       previous_stage: "lead",
       stage: "contacted",
     });
-    const statement = mocks.query.mock.calls[0][0] as string;
+    const statement = mocks.query.mock.calls[1][0] as string;
     expect(statement).toContain("UPDATE clinics");
     expect(statement).toContain("INSERT INTO clinic_activities");
     expect(statement).toContain("'stage_change'");
