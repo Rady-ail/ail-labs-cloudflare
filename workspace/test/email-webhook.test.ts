@@ -96,7 +96,7 @@ integration("signed received event is deduplicated and stores sanitized attachme
       from: "Clinic Sender <clinic@example.test>",
       to: ["alexa@ail-aesthetic-labs.my.id"],
       subject: "Inbound test",
-      text: "Hello\\u0001 clinic",
+      text: "Hello\u0001 clinic",
       message_id: `<${crypto.randomUUID()}@example.test>`,
       attachments: [{ id: "att-test", filename: "brief.pdf", content_type: "application/pdf", size: 128 }],
     },
