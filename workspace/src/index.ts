@@ -57,7 +57,7 @@ app.use("/api/*", async (c, next) => {
     if (res) return res;
   }
 
-  if (!isWebhook && path !== "/api/health") {
+  if (!isWebhook) {
     const origin = c.req.header("Origin");
     const hasBearer = /^Bearer\s+\S+$/i.test(c.req.header("Authorization") ?? "");
     if (origin ? !isAllowedOrigin(origin, c.env.DEV === "1") : !hasBearer) {
