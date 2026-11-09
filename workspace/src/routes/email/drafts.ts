@@ -107,7 +107,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
   const sql = getSql(c.env);
   const rows = await sql`WITH updated AS (
       UPDATE email_drafts SET status = 'needs_ok', requested_by = ${actor(c)},
-        metadata = metadata || jsonb_build_object('requested_at', now()::text, 'approval_comment', ${comment}),
+        metadata = metadata || jsonb_build_object('requested_at', now()::text, 'approval_comment', ${comment}::text),
         updated_at = now()
       WHERE id = ${draftId} AND status = 'draft'
       RETURNING id, thread_id, subject, to_recipients, cc_recipients, bcc_recipients,
@@ -120,7 +120,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
       SELECT thread_id, id, 'approval_requested', ${actor(c)},
-        jsonb_build_object('comment', ${comment}) FROM updated
+        jsonb_build_object('comment', ${comment}::text) FROM updated
       RETURNING id
     )
     SELECT * FROM updated`;
