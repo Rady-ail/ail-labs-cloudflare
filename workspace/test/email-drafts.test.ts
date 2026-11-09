@@ -90,6 +90,14 @@ integration("draft -> approval -> idempotent schedule -> cancel, all events reco
     expect(cancelAgain.status).toBe(409);
     expect((await cancelAgain.json() as any).error.code).toBe("STATE_CONFLICT");
 
+    const approvalReplay = await request(`/api/email/drafts/${draftId}/approve`, {
+      method: "POST", headers, body: approvalBody,
+    });
+    expect(approvalReplay.status).toBe(200);
+    expect((await approvalReplay.json() as any).data).toMatchObject({
+      draftId, status: "scheduled", jobId: first.jobId,
+    });
+
     const events = await sql!`SELECT event_type FROM email_events
       WHERE draft_id = ${draftId} ORDER BY id`;
     const types = events.map((row: any) => row.event_type);
