@@ -576,7 +576,7 @@ function validateFollowUpInput(body: Record<string, unknown>, mode: "create" | "
   return result;
 }
 
-crmRoutes.post("/clinics/:id/follow-ups", async (c) => {
+crmRoutes.post("/clinics/:id/followups", async (c) => {
   const clinicId = c.req.param("id");
   if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
   const input = validateFollowUpInput(await readJsonObject(c), "create");
@@ -643,7 +643,7 @@ crmRoutes.post("/clinics/:id/follow-ups", async (c) => {
   return c.json({ data: followup }, 201);
 });
 
-crmRoutes.patch("/follow-ups/:id", async (c) => {
+crmRoutes.patch("/followups/:id", async (c) => {
   const followupId = c.req.param("id");
   if (!isUuid(followupId)) badRequest("ID follow-up tidak valid.");
   const input = validateFollowUpInput(await readJsonObject(c), "update");
@@ -690,7 +690,7 @@ crmRoutes.patch("/follow-ups/:id", async (c) => {
   return c.json({ data: followup }, 200);
 });
 
-crmRoutes.post("/follow-ups/:id/complete", async (c) => {
+crmRoutes.post("/followups/:id/complete", async (c) => {
   const followupId = c.req.param("id");
   if (!isUuid(followupId)) badRequest("ID follow-up tidak valid.");
   const sql = getSql(c.env);
