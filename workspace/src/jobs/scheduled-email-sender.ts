@@ -200,7 +200,7 @@ export async function runScheduledEmailSender(env: Env): Promise<void> {
         )
       ORDER BY scheduled_at ASC, id ASC
       FOR UPDATE SKIP LOCKED
-      LIMIT ${MAX_PER_RUN}
+      LIMIT ${MAX_PER_RUN}::int
     ), updated AS (
       UPDATE email_drafts d SET
         metadata = d.metadata || jsonb_build_object(
