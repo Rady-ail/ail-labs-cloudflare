@@ -58,4 +58,4 @@ Authorization: Bearer <API_TOKEN>
 
 Create/update bodies are validated against route-specific allowlists and clinic/contact/activity/follow-up model rules. Unknown query/body fields return `BAD_REQUEST` or `VALIDATION_ERROR`; invalid values return `INVALID_STAGE`, `INVALID_*`, or `VALIDATION_ERROR` (422); missing resources return `CLINIC_NOT_FOUND`, `CONTACT_NOT_FOUND`, or `FOLLOWUP_NOT_FOUND` (404); archived-resource conflicts return `ARCHIVED_CLINIC` (409). Other common statuses are 401 `UNAUTHORIZED`, 403 `FORBIDDEN`, 413 `PAYLOAD_TOO_LARGE`, and 500 `INTERNAL_ERROR`.
 
-CRM errors use `fields` and `request_id` (snake case), unlike the email API envelope. CRM routes are currently excluded from the generic 256 KiB request-body middleware; each CRM route validates its own input.
+CRM errors use `fields` and `request_id` (snake case), unlike the email API envelope. CRM routes are excluded from the generic non-CRM body middleware, but every CRM mutation that reads JSON uses `readJsonObject`, which counts actual streamed bytes (not only `Content-Length`) and rejects bodies larger than 256 KiB with `PAYLOAD_TOO_LARGE` (413).
