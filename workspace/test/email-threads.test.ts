@@ -1,12 +1,20 @@
-import { test, expect } from "vitest";
+import { test, expect, describe } from "vitest";
 import { neon } from "@neondatabase/serverless";
 import { app } from "../src/index";
 
 const runtime = (globalThis as any).process?.env ?? {};
 const databaseUrl = runtime.DATABASE_URL as string | undefined;
-if (!databaseUrl) throw new Error("DATABASE_URL wajib tersedia; tes email-threads tidak boleh dilewati diam-diam");
-const sql = neon(databaseUrl);
-const integration = test;
+const databaseName = databaseUrl ? (() => {
+  try { return decodeURIComponent(new URL(databaseUrl).pathname.replace(/^\//, "")); }
+  catch { return ""; }
+})() : "";
+const integrationAllowed = Boolean(
+  databaseUrl && runtime.TEST_DATABASE_ALLOW_WRITE === "1" && /test/i.test(databaseName),
+);
+if (!integrationAllowed) {
+  console.warn("[integration tests skipped] Set DATABASE_URL to a dedicated database whose name contains 'test' and TEST_DATABASE_ALLOW_WRITE=1.");
+}
+const sql = databaseUrl ? neon(databaseUrl) : null;
 const env: any = {
   DATABASE_URL: databaseUrl ?? "postgres://unused:unused@127.0.0.1:1/unused",
   API_TOKEN: runtime.API_TOKEN ?? "email-test-token",
@@ -17,7 +25,8 @@ const env: any = {
 const headers = { Authorization: `Bearer ${env.API_TOKEN}`, "Content-Type": "application/json" };
 const request = (path: string, init: RequestInit = {}) => app.request(path, init, env);
 
-integration("thread detail, patch, archive, event log, and attachment metadata", async () => {
+describe.skipIf(!integrationAllowed)("Postgres write integration", () => {
+test("thread detail, patch, archive, event log, and attachment metadata", async () => {
   const marker = `email-thread-test-${crypto.randomUUID()}`;
   const threadRows = await sql!`INSERT INTO email_threads (subject, folder, snippet, last_message_at)
     VALUES (${marker}, 'inbox', 'test snippet', now()) RETURNING id::text AS id`;
@@ -69,7 +78,7 @@ integration("thread detail, patch, archive, event log, and attachment metadata",
   }
 });
 
-integration("thread list validates allowlists and returns BIGINT IDs as strings", async () => {
+test("thread list validates allowlists and returns BIGINT IDs as strings", async () => {
   const marker = `email-list-test-${crypto.randomUUID()}`;
   const inserted = await sql!`INSERT INTO email_threads (subject, folder, snippet, last_message_at)
     VALUES (${marker}, 'inbox', 'find-me', now()) RETURNING id::text AS id`;
@@ -101,4 +110,5 @@ integration("thread list validates allowlists and returns BIGINT IDs as strings"
     await sql!`DELETE FROM email_threads WHERE id = ${threadId}`;
     await sql!`DELETE FROM email_threads WHERE id = ${secondId}`;
   }
+});
 });
