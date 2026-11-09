@@ -654,16 +654,23 @@ crmRoutes.post("/clinics/:id/follow-ups", async (c) => {
       SELECT * FROM updated
       UNION ALL
       SELECT * FROM inserted
+    ), effective_followups AS (
+      SELECT f.id, f.clinic_id, f.scheduled_at, f.reason
+      FROM clinic_followups f
+      WHERE f.clinic_id = ${clinicId} AND f.completed = false
+        AND NOT EXISTS (SELECT 1 FROM saved WHERE saved.id = f.id)
+      UNION ALL
+      SELECT id, clinic_id, scheduled_at, reason FROM saved WHERE completed = false
     ), synced AS (
       UPDATE clinics
       SET next_followup_at = (
-            SELECT scheduled_at FROM clinic_followups
-            WHERE clinic_id = ${clinicId} AND completed = false
+            SELECT scheduled_at FROM effective_followups
+            WHERE clinic_id = ${clinicId}
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           next_followup_reason = (
-            SELECT reason FROM clinic_followups
-            WHERE clinic_id = ${clinicId} AND completed = false
+            SELECT reason FROM effective_followups
+            WHERE clinic_id = ${clinicId}
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           updated_at = now()
@@ -699,16 +706,23 @@ crmRoutes.patch("/follow-ups/:id", async (c) => {
       WHERE f.id = ${followupId} AND f.completed = false
         AND EXISTS (SELECT 1 FROM clinics WHERE id = f.clinic_id AND archived = false)
       RETURNING f.id, f.clinic_id, f.scheduled_at, f.reason, f.completed, f.completed_at, f.created_at
+    ), effective_followups AS (
+      SELECT f.id, f.clinic_id, f.scheduled_at, f.reason
+      FROM clinic_followups f
+      WHERE f.clinic_id = (SELECT clinic_id FROM updated) AND f.completed = false
+        AND NOT EXISTS (SELECT 1 FROM updated WHERE updated.id = f.id)
+      UNION ALL
+      SELECT id, clinic_id, scheduled_at, reason FROM updated WHERE completed = false
     ), synced AS (
       UPDATE clinics AS c
       SET next_followup_at = (
-            SELECT scheduled_at FROM clinic_followups
-            WHERE clinic_id = c.id AND completed = false
+            SELECT scheduled_at FROM effective_followups
+            WHERE clinic_id = c.id
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           next_followup_reason = (
-            SELECT reason FROM clinic_followups
-            WHERE clinic_id = c.id AND completed = false
+            SELECT reason FROM effective_followups
+            WHERE clinic_id = c.id
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           updated_at = now()
@@ -740,11 +754,13 @@ crmRoutes.post("/follow-ups/:id/complete", async (c) => {
       SET next_followup_at = (
             SELECT scheduled_at FROM clinic_followups
             WHERE clinic_id = c.id AND completed = false
+              AND id <> (SELECT id FROM completed)
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           next_followup_reason = (
             SELECT reason FROM clinic_followups
             WHERE clinic_id = c.id AND completed = false
+              AND id <> (SELECT id FROM completed)
             ORDER BY scheduled_at ASC LIMIT 1
           ),
           updated_at = now()
