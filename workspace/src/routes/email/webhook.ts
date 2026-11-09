@@ -67,7 +67,7 @@ async function verifySvix(
 
   const keyBytes = decodeBase64(secret.slice(6));
   if (!keyBytes?.length) return false;
-  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const key = await crypto.subtle.importKey("raw", new Uint8Array(keyBytes), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const signed = new TextEncoder().encode(`${id}.${timestamp}.${rawBody}`);
   const expected = new Uint8Array(await crypto.subtle.sign("HMAC", key, signed));
 
