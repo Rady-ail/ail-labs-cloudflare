@@ -1,5 +1,7 @@
+import { ValidationError } from "./http";
+
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const EMAIL_PATTERN = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/i;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
 const PHONE_PATTERN = /^628[1-9][0-9]{7,11}$/;
 
 export function isUuid(value: unknown): value is string {
@@ -12,7 +14,7 @@ export function isEmail(value: unknown): value is string {
 
 export function normalizePhoneId(value: unknown): string | null {
   if (typeof value !== "string") return null;
-  let phone = value.trim().replace(/[\\s().-]/g, "");
+  let phone = value.trim().replace(/[\s().-]/g, "");
   if (phone.startsWith("+")) phone = phone.slice(1);
   if (phone.startsWith("0062")) phone = "62" + phone.slice(4);
   else if (phone.startsWith("0")) phone = "62" + phone.slice(1);
@@ -33,6 +35,8 @@ export function pickAllowed<T extends Record<string, unknown>>(
 ): Partial<T> {
   const allowed = new Set(allowedKeys);
   const unknownKeys = Object.keys(body).filter((key) => !allowed.has(key));
-  if (unknownKeys.length > 0) throw new TypeError("Unknown fields: " + unknownKeys.join(", "));
+  if (unknownKeys.length > 0) {
+    throw new ValidationError("VALIDATION_ERROR", "Field tidak dikenal", { fields: unknownKeys });
+  }
   return body as Partial<T>;
 }

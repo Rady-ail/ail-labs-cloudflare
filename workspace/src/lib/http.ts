@@ -9,6 +9,13 @@ export type AppEnv = {
   Variables: AppVariables;
 };
 
+export class ValidationError extends Error {
+  constructor(public code: string, message: string, public details?: unknown) {
+    super(message);
+    this.name = "ValidationError";
+  }
+}
+
 export function newRequestId(): string {
   return crypto.randomUUID();
 }
@@ -34,8 +41,12 @@ export function fail(
   );
 }
 
-export const errorHandler: ErrorHandler<AppEnv> = (_error, c) =>
-  fail(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
+export const errorHandler: ErrorHandler<AppEnv> = (error, c) => {
+  if (error instanceof ValidationError) {
+    return fail(c, 400, error.code, error.message, error.details);
+  }
+  return fail(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
+};
 
 export const notFound: NotFoundHandler<AppEnv> = (c) =>
   fail(c, 404, "NOT_FOUND", "Endpoint tidak ditemukan");
