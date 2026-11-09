@@ -68,6 +68,7 @@ describe("CRM follow-ups", () => {
     expect(sql).toContain("INSERT INTO clinic_followups");
     expect(sql).toContain("next_followup_at");
     expect(sql).toContain("next_followup_reason");
+    expect(sql).toContain("effective_followups");
   });
 
   it("rejects unknown query parameters on the follow-up list", async () => {
@@ -77,6 +78,36 @@ describe("CRM follow-ups", () => {
     expect(response.status).toBe(400);
     expect(body.error.fields.unexpected).toBeDefined();
     expect(mocks.query).not.toHaveBeenCalled();
+  });
+
+  it("patches a pending follow-up and derives the next clinic follow-up", async () => {
+    mocks.query.mockResolvedValueOnce([{
+      id: followupId, clinic_id: clinicId, scheduled_at: "2026-11-13T10:00:00.000Z",
+      reason: "Reschedule", completed: false,
+    }]);
+    const response = await api().request(`/api/crm/follow-ups/${followupId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reason: "Reschedule" }),
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect(String(mocks.query.mock.calls[0][0])).toContain("effective_followups");
+  });
+
+  it("completes a follow-up and excludes it from the pending summary", async () => {
+    mocks.query.mockResolvedValueOnce([{
+      id: followupId, clinic_id: clinicId, completed: true,
+      completed_at: "2026-11-09T12:00:00.000Z",
+    }]);
+    const response = await api().request(`/api/crm/follow-ups/${followupId}/complete`, {
+      method: "POST",
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    const sql = String(mocks.query.mock.calls[0][0]);
+    expect(sql).toContain("completed = true");
+    expect(sql).toContain("id <> (SELECT id FROM completed)");
   });
 
   it("lists pending follow-ups", async () => {
