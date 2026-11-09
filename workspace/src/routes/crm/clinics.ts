@@ -171,7 +171,7 @@ crmRoutes.get("/clinics/:id", async (c) => {
   if (!isUuid(id)) badRequest("ID klinik tidak valid.");
   const data = await fetchClinicDetail(getSql(c.env), id);
   if (!data) {
-    return c.json({ error: { code: "CLINIC_NOT_FOUND", message: "Klinik tidak ditemukan.", request_id: c.get("requestId") } }, 404);
+    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
   }
   return c.json({ data }, 200);
 });
@@ -254,7 +254,7 @@ crmRoutes.patch("/clinics/:id", async (c) => {
       return c.json({ error: { code: "CLINIC_NOT_FOUND", message: "Klinik tidak ditemukan.", request_id: c.get("requestId") } }, 404);
     }
     if (existing[0].archived) {
-      return c.json({ error: { code: "ARCHIVED_CLINIC", message: "Klinik arsip tidak dapat diperbarui.", request_id: c.get("requestId") } }, 409);
+      return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diperbarui.");
     }
     return c.json({ error: { code: "CLINIC_NOT_FOUND", message: "Klinik tidak ditemukan.", request_id: c.get("requestId") } }, 404);
   }
