@@ -69,6 +69,13 @@ async function fetchClinicDetail(sql: ReturnType<typeof getSql>, id: string) {
 crmRoutes.get("/clinics", async (c) => {
   const sql = getSql(c.env);
   const query = c.req.query();
+  const allowedQuery = new Set(["search", "stage", "province", "tag", "sort", "order", "page", "limit", "interest", "archived"]);
+  const unknownQuery = Object.keys(query).filter((key) => !allowedQuery.has(key));
+  if (unknownQuery.length) {
+    throw new ValidationError("BAD_REQUEST", "Parameter tidak dikenal.", {
+      fields: Object.fromEntries(unknownQuery.map((key) => [key, "Parameter tidak dikenal."])),
+    });
+  }
   const search = query.search?.trim() || null;
   const stages = csv(query.stage);
   const provinces = csv(query.province);
@@ -275,9 +282,15 @@ crmRoutes.post("/clinics/:id/stage", async (c) => {
 
   const body = await readJsonObject(c);
   const keys = Object.keys(body);
-  if (keys.some((key) => key !== "stage") || keys.length !== 1) {
+  const unknownFields = keys.filter((key) => key !== "stage");
+  if (unknownFields.length) {
     throw new ValidationError("VALIDATION_ERROR", "Body hanya boleh memuat stage.", {
-      fields: Object.fromEntries(keys.filter((key) => key !== "stage").map((key) => [key, "Field tidak dikenal."])),
+      fields: Object.fromEntries(unknownFields.map((key) => [key, "Field tidak dikenal."])),
+    });
+  }
+  if (!Object.hasOwn(body, "stage")) {
+    throw new ValidationError("INVALID_STAGE", "Tahap klinik wajib diisi.", {
+      fields: { stage: "Tahap klinik wajib diisi." },
     });
   }
 
