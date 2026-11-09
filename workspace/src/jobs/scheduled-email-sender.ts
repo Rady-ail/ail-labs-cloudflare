@@ -45,9 +45,9 @@ async function updateFailure(
     const delaySeconds = 60 * (2 ** Math.max(0, draft.attempt - 1));
     await sql`WITH updated AS (
         UPDATE email_drafts SET
-          scheduled_at = now() + (${delaySeconds} || ' seconds')::interval,
+          scheduled_at = now() + make_interval(secs => ${delaySeconds}::int),
           metadata = (metadata - 'processing_at') || jsonb_build_object(
-            'last_error_code', ${reason}, 'last_retry_at', now()::text
+            'last_error_code', ${reason}::text, 'last_retry_at', now()::text
           ),
           updated_at = now()
         WHERE id = ${draft.id}::bigint AND status = 'scheduled'
@@ -55,15 +55,15 @@ async function updateFailure(
       )
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
       SELECT thread_id, id, 'send_job_retry', 'scheduled_sender',
-        jsonb_build_object('attempt', ${draft.attempt}, 'retry_in_seconds', ${delaySeconds},
-          'error_code', ${reason}) FROM updated`;
+        jsonb_build_object('attempt', ${draft.attempt}::int, 'retry_in_seconds', ${delaySeconds}::int,
+          'error_code', ${reason}::text) FROM updated`;
     return;
   }
 
   await sql`WITH updated AS (
       UPDATE email_drafts SET status = 'failed',
         metadata = (metadata - 'processing_at') || jsonb_build_object(
-          'last_error_code', ${reason}, 'failed_at', now()::text
+          'last_error_code', ${reason}::text, 'failed_at', now()::text
         ),
         updated_at = now()
       WHERE id = ${draft.id}::bigint AND status = 'scheduled'
@@ -71,7 +71,7 @@ async function updateFailure(
     )
     INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
     SELECT thread_id, id, 'send_job_failed', 'scheduled_sender',
-      jsonb_build_object('attempt', ${draft.attempt}, 'error_code', ${reason}) FROM updated`;
+      jsonb_build_object('attempt', ${draft.attempt}::int, 'error_code', ${reason}::text) FROM updated`;
 }
 
 async function markDryRun(sql: ReturnType<typeof getSql>, draft: ClaimedDraft): Promise<void> {
@@ -173,7 +173,7 @@ async function sendLive(
       UPDATE email_drafts SET status = 'sent', sent_at = now(),
         sent_message_id = ${messageRows[0].id}::bigint,
         metadata = (metadata - 'processing_at') || jsonb_build_object(
-          'resend_email_id', ${resendId}, 'sent_at', now()::text
+          'resend_email_id', ${resendId}::text, 'sent_at', now()::text
         ),
         updated_at = now()
       WHERE id = ${draft.id}::bigint AND status = 'scheduled'
@@ -181,7 +181,7 @@ async function sendLive(
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
       SELECT COALESCE(thread_id, ${threadId}::bigint), id, 'message_sent', 'scheduled_sender',
-        jsonb_build_object('resend_email_id', ${resendId}, 'job_id', ${jobId}) FROM updated
+        jsonb_build_object('resend_email_id', ${resendId}::text, 'job_id', ${jobId}::text) FROM updated
       RETURNING id
     )
     UPDATE email_threads SET folder = 'sent', last_message_at = now(), updated_at = now()
