@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import type { Context } from "hono";
 import type { AppEnv } from "../../lib/http";
-import { ValidationError } from "../../lib/http";
+import { ValidationError, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
 import { audit } from "../../lib/audit";
 import { readJsonObject } from "../../lib/body";
