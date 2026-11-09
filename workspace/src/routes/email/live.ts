@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { AppEnv } from "../../lib/http";
 import { ok, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
+import { linkInbound } from "./link";
 import { processReceived, resolveReceivedData } from "./webhook";
 import { assertNoQuery, assertQueryKeys, badRequest } from "./shared";
 
@@ -153,6 +154,25 @@ liveRoutes.post("/live/sync-contacts", async (c) => {
   }
   const last = items.length ? String(items[items.length - 1].id ?? "") : "";
   return ok(c, { seen: items.length, clinics_added: added, suppressed_added: blocked, has_more: Boolean(page.has_more), next_after: page.has_more ? last : null });
+});
+
+// Hubungkan email masuk yang belum tertaut ke klinik / supplier (idempoten, per 100 pesan).
+liveRoutes.post("/live/relink", async (c) => {
+  assertNoQuery(c);
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT id::text AS id FROM email_messages
+    WHERE direction = 'inbound' AND NOT (COALESCE(metadata, '{}'::jsonb) ? 'linked')
+    ORDER BY received_at ASC, id ASC LIMIT 100`;
+  const out = { processed: 0, clinic: 0, supplier: 0, none: 0, remaining: 0 };
+  for (const r of rows as Array<{ id: string }>) {
+    const kind = await linkInbound(sql, r.id);
+    out.processed += 1;
+    if (kind === "clinic") out.clinic += 1; else if (kind === "supplier") out.supplier += 1; else out.none += 1;
+  }
+  const left = await sql`SELECT count(*)::int AS n FROM email_messages
+    WHERE direction = 'inbound' AND NOT (COALESCE(metadata, '{}'::jsonb) ? 'linked')`;
+  out.remaining = Number((left[0] as Record<string, any>)?.n ?? 0);
+  return ok(c, out);
 });
 
 export { liveRoutes };

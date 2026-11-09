@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { AppEnv } from "../../lib/http";
 import { getSql } from "../../lib/db";
+import { linkInbound } from "./link";
 
 const webhookRoutes = new Hono<AppEnv>();
 const MAX_BODY_BYTES = 1_048_576;
@@ -237,6 +238,7 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
   await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
     VALUES (${threadId}::bigint, 'message_received', 'resend_webhook',
       ${JSON.stringify({ resend_email_id: resendId, message_id: messageId })}::jsonb)`;
+  try { await linkInbound(sql, String(inserted[0].id)); } catch { /* penautan gagal tidak boleh menghentikan penerimaan email */ }
 }
 
 async function processStatus(sql: ReturnType<typeof getSql>, type: string, data: Record<string, any>): Promise<void> {
