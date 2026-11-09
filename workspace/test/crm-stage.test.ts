@@ -83,11 +83,13 @@ describe("POST /api/crm/clinics/:id/stage", () => {
   });
 
   it("updates the stage and writes stage_change activity atomically", async () => {
-    mocks.query.mockResolvedValueOnce([{
-      id: clinicId,
-      previous_stage: "lead",
-      stage: "contacted",
-    }]);
+    mocks.query
+      .mockResolvedValueOnce([{ archived: false }])
+      .mockResolvedValueOnce([{
+        id: clinicId,
+        previous_stage: "lead",
+        stage: "contacted",
+      }]);
     const response = await request({ stage: "contacted" });
     const body = await response.json() as any;
 
