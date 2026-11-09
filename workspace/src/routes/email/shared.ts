@@ -25,7 +25,7 @@ export function assertQueryKeys(query: Record<string, string>, allowed: readonly
 }
 
 export function parseBigintId(value: string, label = "ID"): string {
-  if (!/^[1-9][0-9]{0,18}$/.test(value)) badRequest(`${label} tidak valid`);
+  if (!/^[1-9][0-9]{0,18}$/.test(value) || BigInt(value) > 9223372036854775807n) badRequest(`${label} tidak valid`);
   return value;
 }
 
@@ -85,7 +85,7 @@ export function validateDraftFields(body: Record<string, unknown>, partial = fal
 
 export function encodeCursor(lastAt: string, id: string): string {
   const raw = JSON.stringify({ at: lastAt, id });
-  return btoa(raw).replace(/\\+/g, "-").replace(/\\//g, "_").replace(/=+$/g, "");
+  return btoa(raw).split("+").join("-").split("/").join("_").replace(/=+$/g, "");
 }
 
 export function decodeCursor(value: string | undefined): { at: string; id: string } | null {
