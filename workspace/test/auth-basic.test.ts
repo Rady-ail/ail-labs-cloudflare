@@ -24,7 +24,7 @@ test("origin asing POST -> 403; origin sah lolos", async () => {
 });
 test("body > 256KB -> 413", async () => {
   const big = "a".repeat(262145);
-  const r = await req("/api/echo", { method: "POST", headers: { Authorization: "Bearer s3cret-token", "Content-Length": String(big.length) }, body: big });
+  const r = await req("/api/echo", { method: "POST", headers: { Authorization: "Bearer s3cret-token", Origin: "https://app.ail-aesthetic-labs.my.id", "Content-Length": String(big.length) }, body: big });
   expect(r.status).toBe(413);
 });
 test("health: DB tak terjangkau -> 503 tanpa bocor", async () => {
