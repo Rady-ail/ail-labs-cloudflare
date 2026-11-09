@@ -35,6 +35,11 @@ integration("draft -> approval -> idempotent schedule -> cancel, all events reco
     expect(created.data.status).toBe("draft");
     expect(created.data.threadId).toBe(threadId);
 
+    const edit = await request(`/api/email/drafts/${draftId}`, {
+      method: "PATCH", headers, body: JSON.stringify({ subject: `${marker} updated` }),
+    });
+    expect(edit.status).toBe(200);
+
     const requestApproval = await request(`/api/email/drafts/${draftId}/request-approval`, {
       method: "POST", headers, body: JSON.stringify({ comment: "Review requested" }),
     });
@@ -58,6 +63,20 @@ integration("draft -> approval -> idempotent schedule -> cancel, all events reco
     });
     expect(retry.status).toBe(200);
     expect((await retry.json() as any).data.jobId).toBe(first.jobId);
+
+    const lockedEdit = await request(`/api/email/drafts/${draftId}`, {
+      method: "PATCH", headers, body: JSON.stringify({ subject: "Must not edit scheduled draft" }),
+    });
+    expect(lockedEdit.status).toBe(409);
+
+    await sql!`UPDATE email_drafts SET metadata = metadata || jsonb_build_object('processing_at', now()::text)
+      WHERE id = ${draftId}`;
+    const claimedCancel = await request(`/api/email/drafts/${draftId}/cancel`, {
+      method: "POST", headers, body: JSON.stringify({ reason: "Cannot cancel claimed job" }),
+    });
+    expect(claimedCancel.status).toBe(409);
+    expect((await claimedCancel.json() as any).error.details.status).toBe("scheduled");
+    await sql!`UPDATE email_drafts SET metadata = metadata - 'processing_at' WHERE id = ${draftId}`;
 
     const cancel = await request(`/api/email/drafts/${draftId}/cancel`, {
       method: "POST", headers, body: JSON.stringify({ reason: "Operator cancelled test job" }),
