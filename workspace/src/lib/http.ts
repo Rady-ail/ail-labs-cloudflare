@@ -42,12 +42,40 @@ export function fail(
   );
 }
 
+function crmError(
+  c: Context<AppEnv>,
+  status: 400 | 401 | 403 | 404 | 409 | 413 | 422 | 500,
+  code: string,
+  message: string,
+  fields?: Record<string, string>,
+) {
+  return c.json(
+    { error: { code, message, ...(fields ? { fields } : {}), request_id: c.get("requestId") } },
+    status,
+  );
+}
+
 export const errorHandler: ErrorHandler<AppEnv> = (error, c) => {
+  const isCrm = c.req.path === "/api/crm" || c.req.path.startsWith("/api/crm/");
   if (error instanceof ValidationError) {
-    return fail(c, 400, error.code, error.message, error.details);
+    if (isCrm) {
+      const details = error.details as { fields?: Record<string, string> } | undefined;
+      const status = error.code === "PAYLOAD_TOO_LARGE" ? 413
+        : error.code === "BAD_REQUEST" ? 400
+        : error.code.startsWith("INVALID_") || error.code === "VALIDATION_ERROR" ? 422
+        : 400;
+      return crmError(c, status, error.code, error.message, details?.fields);
+    }
+    const status = error.code === "PAYLOAD_TOO_LARGE" ? 413 : 400;
+    return fail(c, status, error.code, error.message, error.details);
   }
+  if (isCrm) return crmError(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
   return fail(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
 };
 
-export const notFound: NotFoundHandler<AppEnv> = (c) =>
-  fail(c, 404, "NOT_FOUND", "Endpoint tidak ditemukan");
+export const notFound: NotFoundHandler<AppEnv> = (c) => {
+  if (c.req.path === "/api/crm" || c.req.path.startsWith("/api/crm/")) {
+    return crmError(c, 404, "NOT_FOUND", "Endpoint tidak ditemukan");
+  }
+  return fail(c, 404, "NOT_FOUND", "Endpoint tidak ditemukan");
+};
