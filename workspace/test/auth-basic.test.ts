@@ -19,12 +19,15 @@ test("API_TOKEN kosong tidak tertembus", async () => {
 });
 test("origin asing POST -> 403; origin sah lolos", async () => {
   const h = { Authorization: "Bearer s3cret-token", "Content-Type": "application/json" };
+  expect((await req("/api/echo", { method: "POST", headers: h, body: "{}" })).status).toBe(403);
   expect((await req("/api/echo", { method: "POST", headers: { ...h, Origin: "https://evil.example" }, body: "{}" })).status).toBe(403);
   expect((await req("/api/echo", { method: "POST", headers: { ...h, Origin: "https://app.ail-aesthetic-labs.my.id" }, body: "{}" })).status).toBe(200);
+  const devResponse = await app.request("/api/echo", { method: "POST", headers: { ...h, Origin: "http://localhost:5173" }, body: "{}" }, { ...env, DEV: "1" });
+  expect(devResponse.status).toBe(200);
 });
 test("body > 256KB -> 413", async () => {
   const big = "a".repeat(262145);
-  const r = await req("/api/echo", { method: "POST", headers: { Authorization: "Bearer s3cret-token", Origin: "https://app.ail-aesthetic-labs.my.id", "Content-Length": String(big.length) }, body: big });
+  const r = await req("/api/echo", { method: "POST", headers: { Authorization: "Bearer s3cret-token", Origin: "https://app.ail-aesthetic-labs.my.id" }, body: big });
   expect(r.status).toBe(413);
 });
 test("health: DB tak terjangkau -> 503 tanpa bocor", async () => {
