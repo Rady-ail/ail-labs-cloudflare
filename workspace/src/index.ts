@@ -21,7 +21,10 @@ app.use("/api/*", async (c, next) => {
   const method = c.req.method.toUpperCase();
   const path = c.req.path;
 
-  if (method === "POST" || method === "PATCH" || method === "PUT") {
+  if (
+    !path.startsWith("/api/crm/") &&
+    (method === "POST" || method === "PATCH" || method === "PUT")
+  ) {
     const contentLengthHeader = c.req.header("Content-Length");
     if (contentLengthHeader !== undefined) {
       const contentLength = Number(contentLengthHeader);
