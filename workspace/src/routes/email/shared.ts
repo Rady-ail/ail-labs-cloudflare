@@ -79,8 +79,10 @@ export function validateDraftFields(body: Record<string, unknown>, partial = fal
   }
   if (!partial && Object.hasOwn(body, "threadId")) {
     if (body.threadId === null) result.threadId = null;
-    else if (typeof body.threadId === "string") result.threadId = parseBigintId(body.threadId, "threadId");
-    else invalid("threadId harus berupa ID string atau null", { field: "threadId" });
+    else if (typeof body.threadId === "string"
+      && /^[1-9][0-9]{0,18}$/.test(body.threadId)
+      && BigInt(body.threadId) <= 9223372036854775807n) result.threadId = body.threadId;
+    else invalid("threadId harus berupa ID BIGINT string atau null", { field: "threadId" });
   }
   const total = (result.to?.length ?? 0) + (result.cc?.length ?? 0) + (result.bcc?.length ?? 0);
   if (total > 50) invalid("Maksimal 50 penerima gabungan", { field: "recipients" });
