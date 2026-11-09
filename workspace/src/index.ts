@@ -4,6 +4,7 @@ import type { AppEnv } from "./lib/http";
 import { errorHandler, notFound, newRequestId, fail } from "./lib/http";
 import { getSql } from "./lib/db";
 import { requireAuth } from "./lib/auth";
+import { crmRoutes } from "./routes/crm/clinics";
 
 const app = new Hono<AppEnv>();
 
@@ -55,6 +56,8 @@ app.get("/api/health", async (c) => {
     return c.json({ ok: false, db: false }, 503);
   }
 });
+
+app.route("/api/crm", crmRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);
