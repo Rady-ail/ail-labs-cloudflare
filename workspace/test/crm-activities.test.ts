@@ -62,6 +62,9 @@ describe("POST /api/crm/clinics/:id/activities", () => {
 
     expect(sql).toContain("orders_count");
     expect(sql).toContain("last_contact_at");
+    expect(sql).toContain("max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit'))");
+    expect(sql).not.toContain("max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit', 'order'))");
+
     expect(sql).toContain("INSERT INTO clinic_activities");
   });
 
