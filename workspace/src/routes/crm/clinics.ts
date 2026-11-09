@@ -4,7 +4,7 @@ import { ValidationError } from "../../lib/http";
 import { getSql } from "../../lib/db";
 import { audit } from "../../lib/audit";
 import { readJsonObject } from "../../lib/body";
-import { isUuid, clampInt } from "../../lib/validate";
+import { isUuid, clampInt, isEmail, normalizePhoneId } from "../../lib/validate";
 import { rowToClinic, STAGES, validateClinicInput } from "./clinicModel";
 
 const crmRoutes = new Hono<AppEnv>();
@@ -344,6 +344,172 @@ crmRoutes.post("/clinics/:id/archive", async (c) => {
     resourceId: id, requestId: c.get("requestId"), ok: true,
   });
   return c.json({ data: { id, archived: true } }, 200);
+});
+
+
+const CONTACT_FIELDS = ["name", "role", "phone", "email", "preferred_channel", "is_primary"] as const;
+const CONTACT_CHANNELS = ["whatsapp", "phone", "email"] as const;
+
+function validateContactInput(body: Record<string, unknown>, mode: "create" | "update") {
+  const allowed = new Set<string>(CONTACT_FIELDS);
+  const unknown = Object.keys(body).filter((key) => !allowed.has(key));
+  const fields: Record<string, string> = {};
+  for (const key of unknown) fields[key] = "Field tidak dikenal.";
+  const result: Record<string, unknown> = {};
+
+  if (mode === "create" && !Object.prototype.hasOwnProperty.call(body, "name")) {
+    fields.name = "Nama kontak wajib diisi.";
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "name")) {
+    const value = body.name;
+    if (typeof value !== "string" || value.trim().length < 1 || value.trim().length > 120) {
+      fields.name = "Nama kontak wajib diisi (maksimal 120 karakter).";
+    } else result.name = value.trim();
+  }
+  for (const key of ["role"] as const) {
+    if (!Object.prototype.hasOwnProperty.call(body, key)) continue;
+    const value = body[key];
+    if (value === null || (typeof value === "string" && value.trim() === "")) result[key] = null;
+    else if (typeof value !== "string" || value.trim().length > 120) fields[key] = "Maksimal 120 karakter.";
+    else result[key] = value.trim();
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "phone")) {
+    const value = body.phone;
+    if (value === null || (typeof value === "string" && value.trim() === "")) result.phone = null;
+    else {
+      const phone = normalizePhoneId(value);
+      if (!phone) fields.phone = "Nomor WhatsApp Indonesia tidak valid.";
+      else result.phone = phone;
+    }
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "email")) {
+    const value = body.email;
+    if (value === null || (typeof value === "string" && value.trim() === "")) result.email = null;
+    else if (typeof value !== "string" || !isEmail(value.trim())) fields.email = "Email tidak valid.";
+    else result.email = value.trim().toLowerCase();
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "preferred_channel")) {
+    const value = body.preferred_channel;
+    if (value === null) result.preferred_channel = null;
+    else if (typeof value !== "string" || !CONTACT_CHANNELS.includes(value as (typeof CONTACT_CHANNELS)[number])) {
+      fields.preferred_channel = "Kanal harus whatsapp, phone, email, atau null.";
+    } else result.preferred_channel = value;
+  }
+  if (Object.prototype.hasOwnProperty.call(body, "is_primary")) {
+    if (typeof body.is_primary !== "boolean") fields.is_primary = "Harus berupa boolean.";
+    else result.is_primary = body.is_primary;
+  }
+  if (Object.keys(fields).length) {
+    throw new ValidationError("VALIDATION_ERROR", "Data kontak tidak valid.", { fields });
+  }
+  if (mode === "update" && Object.keys(result).length === 0) {
+    throw new ValidationError("BAD_REQUEST", "Tidak ada perubahan kontak.");
+  }
+  return result;
+}
+
+async function requireActiveClinic(c: Parameters<typeof getSql>[0] extends never ? never : any, sql: ReturnType<typeof getSql>, clinicId: string) {
+  const rows = await sql`SELECT archived FROM clinics WHERE id = ${clinicId} LIMIT 1`;
+  if (!rows[0]) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+  if (rows[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
+  return null;
+}
+
+crmRoutes.get("/clinics/:id/contacts", async (c) => {
+  const clinicId = c.req.param("id");
+  if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
+  const sql = getSql(c.env);
+  const clinicError = await requireActiveClinic(c, sql, clinicId);
+  if (clinicError) return clinicError;
+  const contacts = await sql`SELECT id, clinic_id, name, role, phone, email, preferred_channel, is_primary, created_at
+    FROM clinic_contacts WHERE clinic_id = ${clinicId}
+    ORDER BY is_primary DESC, created_at ASC`;
+  return c.json({ data: contacts }, 200);
+});
+
+crmRoutes.post("/clinics/:id/contacts", async (c) => {
+  const clinicId = c.req.param("id");
+  if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
+  const input = validateContactInput(await readJsonObject(c), "create");
+  const sql = getSql(c.env);
+  const isPrimary = input.is_primary === true;
+  const clinicLock = sql`SELECT id FROM clinics WHERE id = ${clinicId} AND archived = false FOR UPDATE`;
+  const unsetPrimary = sql`UPDATE clinic_contacts SET is_primary = false
+    WHERE clinic_id = ${clinicId} AND is_primary = true`;
+  const insert = sql`INSERT INTO clinic_contacts
+      (clinic_id, name, role, phone, email, preferred_channel, is_primary)
+    SELECT ${clinicId}, ${input.name}, ${input.role ?? null}, ${input.phone ?? null},
+      ${input.email ?? null}, ${input.preferred_channel ?? null}, ${isPrimary}
+    WHERE EXISTS (SELECT 1 FROM clinics WHERE id = ${clinicId} AND archived = false)
+    RETURNING id, clinic_id, name, role, phone, email, preferred_channel, is_primary, created_at`;
+  const results = await (sql as any).transaction(isPrimary
+    ? [clinicLock, unsetPrimary, insert]
+    : [clinicLock, insert]);
+  const createdRows = (results[isPrimary ? 2 : 1] ?? []) as Record<string, unknown>[];
+  if (!createdRows[0]) {
+    const clinicError = await requireActiveClinic(c, sql, clinicId);
+    if (clinicError) return clinicError;
+    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+  }
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.contact.create", resourceType: "clinic_contact",
+    resourceId: String(createdRows[0].id), requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: createdRows[0] }, 201);
+});
+
+crmRoutes.patch("/clinics/:id/contacts/:contactId", async (c) => {
+  const clinicId = c.req.param("id");
+  const contactId = c.req.param("contactId");
+  if (!isUuid(clinicId) || !isUuid(contactId)) badRequest("ID kontak tidak valid.");
+  const input = validateContactInput(await readJsonObject(c), "update");
+  const sql = getSql(c.env);
+  const clinicLock = sql`SELECT id FROM clinics WHERE id = ${clinicId} AND archived = false FOR UPDATE`;
+  const unsetPrimary = sql`UPDATE clinic_contacts SET is_primary = false
+    WHERE clinic_id = ${clinicId} AND id <> ${contactId} AND is_primary = true`;
+  const update = sql`UPDATE clinic_contacts SET
+      name = CASE WHEN ${Object.hasOwn(input, "name")} THEN ${input.name ?? null} ELSE name END,
+      role = CASE WHEN ${Object.hasOwn(input, "role")} THEN ${input.role ?? null} ELSE role END,
+      phone = CASE WHEN ${Object.hasOwn(input, "phone")} THEN ${input.phone ?? null} ELSE phone END,
+      email = CASE WHEN ${Object.hasOwn(input, "email")} THEN ${input.email ?? null} ELSE email END,
+      preferred_channel = CASE WHEN ${Object.hasOwn(input, "preferred_channel")} THEN ${input.preferred_channel ?? null} ELSE preferred_channel END,
+      is_primary = CASE WHEN ${Object.hasOwn(input, "is_primary")} THEN ${input.is_primary ?? false} ELSE is_primary END
+    WHERE id = ${contactId} AND clinic_id = ${clinicId}
+      AND EXISTS (SELECT 1 FROM clinics WHERE id = ${clinicId} AND archived = false)
+    RETURNING id, clinic_id, name, role, phone, email, preferred_channel, is_primary, created_at`;
+  const statements = input.is_primary === true
+    ? [clinicLock, unsetPrimary, update]
+    : [clinicLock, update];
+  const results = await (sql as any).transaction(statements);
+  const updatedRows = (results[input.is_primary === true ? 2 : 1] ?? []) as Record<string, unknown>[];
+  if (!updatedRows[0]) {
+    const clinicError = await requireActiveClinic(c, sql, clinicId);
+    if (clinicError) return clinicError;
+    return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+  }
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.contact.update", resourceType: "clinic_contact",
+    resourceId: contactId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: updatedRows[0] }, 200);
+});
+
+crmRoutes.delete("/clinics/:id/contacts/:contactId", async (c) => {
+  const clinicId = c.req.param("id");
+  const contactId = c.req.param("contactId");
+  if (!isUuid(clinicId) || !isUuid(contactId)) badRequest("ID kontak tidak valid.");
+  const sql = getSql(c.env);
+  const clinicError = await requireActiveClinic(c, sql, clinicId);
+  if (clinicError) return clinicError;
+  const rows = await sql`DELETE FROM clinic_contacts
+    WHERE id = ${contactId} AND clinic_id = ${clinicId}
+    RETURNING id`;
+  if (!rows[0]) return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.contact.delete", resourceType: "clinic_contact",
+    resourceId: contactId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: { id: contactId, deleted: true } }, 200);
 });
 
 export { crmRoutes };
