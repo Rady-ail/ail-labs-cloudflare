@@ -105,6 +105,23 @@ function eventPayload(value: unknown): Record<string, any> | null {
   return value as Record<string, any>;
 }
 
+async function resolveReceivedData(env: AppEnv["Bindings"], data: Record<string, any>): Promise<Record<string, any>> {
+  if ((typeof data.text === "string" && data.text.length)
+    || (typeof data.html === "string" && data.html.length)
+    || !env.RESEND_API_KEY || typeof data.email_id !== "string") return data;
+  try {
+    const response = await fetch(`https://api.resend.com/emails/receiving/${encodeURIComponent(data.email_id)}`, {
+      headers: { Authorization: `Bearer ${env.RESEND_API_KEY}` },
+    });
+    if (!response.ok) return data;
+    const detail = eventPayload(await response.json());
+    if (!detail) return data;
+    return { ...data, ...detail, email_id: data.email_id ?? detail.id };
+  } catch {
+    return data;
+  }
+}
+
 async function processReceived(sql: ReturnType<typeof getSql>, data: Record<string, any>): Promise<void> {
   const resendId = cleanText(data.email_id, 200);
   if (!resendId) return;
@@ -173,7 +190,7 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
       snippet = ${bodyText.slice(0, 240)}, folder = 'inbox', updated_at = now()
     WHERE id = ${threadId}::bigint`;
   await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
-    VALUES (${threadId}::bigint, 'resend_email_received', 'resend_webhook',
+    VALUES (${threadId}::bigint, 'message_received', 'resend_webhook',
       ${JSON.stringify({ resend_email_id: resendId, message_id: messageId })}::jsonb)`;
 }
 
@@ -241,7 +258,7 @@ webhookRoutes.post("/api/webhooks/resend", async (c) => {
   try {
     const sql = getSql(c.env);
     if (parsed.type === "email.received") {
-      await processReceived(sql, eventPayload(parsed.data) ?? {});
+      await processReceived(sql, await resolveReceivedData(c.env, eventPayload(parsed.data) ?? {}));
     } else if (parsed.type.startsWith("email.")) {
       await processStatus(sql, parsed.type, eventPayload(parsed.data) ?? {});
     }
