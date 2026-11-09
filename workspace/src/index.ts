@@ -6,6 +6,7 @@ import { errorHandler, notFound, newRequestId, fail } from "./lib/http";
 import { getSql } from "./lib/db";
 import { requireAuth } from "./lib/auth";
 import { crmRoutes } from "./routes/crm/clinics";
+import { supplierRoutes } from "./routes/supplier";
 import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
@@ -105,6 +106,7 @@ app.get("/api/health", async (c) => {
 });
 
 app.route("/api/crm", crmRoutes);
+app.route("/api/supplier", supplierRoutes);
 app.route("/api/email", threadsRoutes);
 app.route("/api/email", draftsRoutes);
 app.route("/api/email", liveRoutes);

@@ -30,7 +30,7 @@ export function created<T>(c: Context<AppEnv>, data: T, meta: Record<string, unk
 }
 
 function isCrmPath(c: Context<AppEnv>): boolean {
-  return c.req.path === "/api/crm" || c.req.path.startsWith("/api/crm/");
+  return ["/api/crm", "/api/supplier"].some((p) => c.req.path === p || c.req.path.startsWith(p + "/"));
 }
 
 function crmError(
