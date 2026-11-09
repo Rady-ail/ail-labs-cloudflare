@@ -200,8 +200,14 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
   }
   const row = rows[0] as Record<string, any> | undefined;
   if (!row) {
-    const actual = await sql`SELECT status, idempotency_key FROM email_drafts WHERE id = ${draftId} LIMIT 1`;
+    const actual = await sql`SELECT status, idempotency_key, metadata FROM email_drafts WHERE id = ${draftId} LIMIT 1`;
     if (!actual[0]) return fail(c, 404, "DRAFT_NOT_FOUND", "Draft tidak ditemukan");
+    if (actual[0].status === "scheduled" && actual[0].idempotency_key === key) {
+      const existingJobId = (actual[0] as Record<string, any>).metadata?.job_id;
+      if (typeof existingJobId === "string") {
+        return ok(c, { draftId: String(draftId), status: "scheduled", jobId: existingJobId });
+      }
+    }
     return fail(c, 409, "STATE_CONFLICT", "Draft tidak dapat disetujui pada status ini", { status: actual[0].status });
   }
   if (String(row.id) !== String(draftId)) return fail(c, 409, "STATE_CONFLICT", "idempotencyKey sudah digunakan");
