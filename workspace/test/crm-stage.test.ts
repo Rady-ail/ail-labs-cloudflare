@@ -103,6 +103,6 @@ describe("POST /api/crm/clinics/:id/stage", () => {
     expect(statement).toContain("UPDATE clinics");
     expect(statement).toContain("INSERT INTO clinic_activities");
     expect(statement).toContain("'stage_change'");
-    expect(mocks.query).toHaveBeenCalledTimes(2); // atomic mutation + audit record
+    expect(mocks.query).toHaveBeenCalledTimes(3); // active-clinic guard + atomic mutation + audit record
   });
 });
