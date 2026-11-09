@@ -36,7 +36,7 @@ export function iso(value: unknown): string | null {
 }
 
 export function escapeLike(value: string): string {
-  return value.replace(/[\\\\%_]/g, (character) => `\\\\${character}`);
+  return value.replace(/[!%_\\]/g, "!$&");
 }
 
 export function parseRecipients(value: unknown, field: string): string[] {
