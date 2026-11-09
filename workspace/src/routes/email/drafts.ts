@@ -4,7 +4,7 @@ import { ok, created, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
 import { readJsonObject } from "../../lib/body";
 import {
-  actor, assertAllowedKeys, invalid, jsonString, parseBigintId, validateDraftFields,
+  actor, assertAllowedKeys, invalid, jsonString, parseBigintId, parseRecipients, validateDraftFields,
 } from "./shared";
 
 const draftsRoutes = new Hono<AppEnv>();
@@ -153,13 +153,11 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
     return fail(c, 409, "STATE_CONFLICT", "Draft belum meminta persetujuan", { status: draft.status });
   }
   const recipients = [
-    ...(Array.isArray(draft.to_recipients) ? draft.to_recipients : []),
-    ...(Array.isArray(draft.cc_recipients) ? draft.cc_recipients : []),
-    ...(Array.isArray(draft.bcc_recipients) ? draft.bcc_recipients : []),
+    ...parseRecipients(draft.to_recipients, "to"),
+    ...parseRecipients(draft.cc_recipients, "cc"),
+    ...parseRecipients(draft.bcc_recipients, "bcc"),
   ];
-  if (recipients.length > 50 || recipients.some((value) => typeof value !== "string" || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/i.test(value))) {
-    invalid("Penerima draft tidak valid; persetujuan ditolak");
-  }
+  if (recipients.length > 50) invalid("Maksimal 50 penerima gabungan; persetujuan ditolak");
   if (typeof draft.subject !== "string" || draft.subject.length > 300
     || typeof draft.body_text !== "string" || draft.body_text.length > 50000) {
     invalid("Isi draft tidak valid; persetujuan ditolak");
