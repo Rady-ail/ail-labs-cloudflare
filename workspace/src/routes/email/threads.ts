@@ -218,19 +218,19 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
         is_starred = CASE WHEN ${hasStarred} THEN ${hasStarred ? body.isStarred : null}::boolean ELSE t.is_starred END,
         updated_at = now()
       FROM before b WHERE t.id = b.id
-      RETURNING t.id::text AS id, t.is_read AS "isRead", t.is_starred AS "isStarred"
+      RETURNING t.id::text AS id, t.is_read, t.is_starred
     ), events AS (
       INSERT INTO email_events (thread_id, event_type, actor, event_data)
       SELECT b.id, 'thread_marked_read', ${actor(c)}, jsonb_build_object('isRead', u.is_read)
       FROM before b JOIN updated u ON u.id::bigint = b.id
-      WHERE ${hasRead} AND b.is_read IS DISTINCT FROM u.isRead
+      WHERE ${hasRead} AND b.is_read IS DISTINCT FROM u.is_read
       UNION ALL
-      SELECT b.id, 'thread_marked_starred', ${actor(c)}, jsonb_build_object('isStarred', u.isStarred)
+      SELECT b.id, 'thread_marked_starred', ${actor(c)}, jsonb_build_object('isStarred', u.is_starred)
       FROM before b JOIN updated u ON u.id::bigint = b.id
-      WHERE ${hasStarred} AND b.is_starred IS DISTINCT FROM u.isStarred
+      WHERE ${hasStarred} AND b.is_starred IS DISTINCT FROM u.is_starred
       RETURNING id
     )
-    SELECT id, "isRead", "isStarred" FROM updated`;
+    SELECT id, is_read AS "isRead", is_starred AS "isStarred" FROM updated`;
   const updated = rows[0] as Record<string, unknown> | undefined;
   if (!updated) return fail(c, 404, "THREAD_NOT_FOUND", "Email thread tidak ditemukan");
   return ok(c, { id: String(updated.id), isRead: Boolean(updated.isRead), isStarred: Boolean(updated.isStarred) });
