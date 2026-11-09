@@ -27,7 +27,7 @@ function api() {
 }
 
 function postFollowup(body: unknown) {
-  return api().request(`/api/crm/clinics/${clinicId}/follow-ups`, {
+  return api().request(`/api/crm/clinics/${clinicId}/followups`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -85,7 +85,7 @@ describe("CRM follow-ups", () => {
       id: followupId, clinic_id: clinicId, scheduled_at: "2026-11-13T10:00:00.000Z",
       reason: "Reschedule", completed: false,
     }]);
-    const response = await api().request(`/api/crm/follow-ups/${followupId}`, {
+    const response = await api().request(`/api/crm/followups/${followupId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ reason: "Reschedule" }),
@@ -100,7 +100,7 @@ describe("CRM follow-ups", () => {
       id: followupId, clinic_id: clinicId, completed: true,
       completed_at: "2026-11-09T12:00:00.000Z",
     }]);
-    const response = await api().request(`/api/crm/follow-ups/${followupId}/complete`, {
+    const response = await api().request(`/api/crm/followups/${followupId}/complete`, {
       method: "POST",
     }, {} as AppEnv["Bindings"]);
 
