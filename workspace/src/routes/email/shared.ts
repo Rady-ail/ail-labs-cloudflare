@@ -100,9 +100,11 @@ export function decodeCursor(value: string | undefined): { at: string; id: strin
     const normalized = value.replace(/-/g, "+").replace(/_/g, "/");
     const raw = atob(normalized + "=".repeat((4 - normalized.length % 4) % 4));
     const parsed = JSON.parse(raw) as { at?: unknown; id?: unknown };
-    if (typeof parsed.at !== "string" || Number.isNaN(Date.parse(parsed.at))) badRequest("Cursor tidak valid");
+    if (typeof parsed.at !== "string"
+      || !/^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$/.test(parsed.at)
+      || Number.isNaN(Date.parse(parsed.at))) badRequest("Cursor tidak valid");
     if (typeof parsed.id !== "string") badRequest("Cursor tidak valid");
-    return { at: new Date(parsed.at).toISOString(), id: parseBigintId(parsed.id, "Cursor ID") };
+    return { at: parsed.at, id: parseBigintId(parsed.id, "Cursor ID") };
   } catch (error) {
     if (error instanceof ValidationError) throw error;
     badRequest("Cursor tidak valid");
