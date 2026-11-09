@@ -77,7 +77,7 @@ app.use("/api/*", async (c, next) => {
 
   if (!isWebhook) {
     const ip = c.req.header("CF-Connecting-IP") ?? c.req.header("X-Forwarded-For")?.split(",")[0]?.trim() ?? "unknown";
-    const bearer = c.req.header("Authorization")?.match(/^Bearer\s+(.+)$/i)?.[1] ?? "";
+    const bearer = c.req.header("Authorization")?.match(/^Bearer\s+(.+)$/i)?.[1] ?? c.req.header("Cf-Access-Jwt-Assertion") ?? "";
     const key = await rateKey(ip, bearer);
     const now = Date.now();
     let bucket = rateBuckets.get(key);
