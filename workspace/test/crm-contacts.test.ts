@@ -111,6 +111,33 @@ describe("clinic contacts", () => {
     expect((await response.json() as any).data.deleted).toBe(true);
   });
 
+  it("supports the documented PATCH /contacts/:contactId route", async () => {
+    mocks.transaction.mockResolvedValueOnce([
+      [{ clinic_id: clinicId }],
+      [],
+      [{ id: contactId, clinic_id: clinicId, name: "Dr A", is_primary: true }],
+    ]);
+    const response = await app().request(`/api/crm/contacts/${contactId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_primary: true }),
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect(mocks.transaction).toHaveBeenCalledTimes(1);
+    expect(String(mocks.query.mock.calls[0][0])).toContain("INSERT INTO audit_log");
+  });
+
+  it("supports the documented DELETE /contacts/:contactId route", async () => {
+    mocks.query.mockResolvedValueOnce([{ id: contactId }]);
+    const response = await app().request(`/api/crm/contacts/${contactId}`, {
+      method: "DELETE",
+    }, {} as AppEnv["Bindings"]);
+
+    expect(response.status).toBe(200);
+    expect((await response.json() as any).data.deleted).toBe(true);
+  });
+
   it("requires a name when creating a contact", async () => {
     const response = await post({ phone: "081234567890" });
     const body = await response.json() as any;
