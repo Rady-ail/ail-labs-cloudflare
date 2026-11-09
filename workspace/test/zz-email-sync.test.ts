@@ -55,3 +55,28 @@ describe("unduh lampiran", () => {
     expect((await app.request("/api/email/attachments/999999/download", { headers: H }, env)).status).toBe(404);
   });
 });
+
+describe("sinkron kontak Resend", () => {
+  test("menambah klinik baru, melewati yang sudah ada, mencatat berhenti langganan", async () => {
+    const db: any = await getDb();
+    await db.exec(`INSERT INTO clinics (name, city, province, email) VALUES ('Sudah Ada','K','P','ada@klinik.id')`);
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ has_more: false, data: [
+      { id: "c1", email: "ADA@klinik.id", first_name: "Sudah Ada" },
+      { id: "c2", email: "baru@klinik.id", first_name: "Klinik", last_name: "Baru" },
+      { id: "c3", email: "stop@klinik.id", first_name: "Klinik Stop", unsubscribed: true },
+      { id: "c4", email: "radyp13@gmail.com", first_name: "Rady (salinan)" },
+      { id: "c5", email: "rusak", first_name: "x" },
+    ] }), { status: 200 })));
+    const call = () => app.request("/api/email/live/sync-contacts", { method: "POST", headers: H, body: JSON.stringify({ province: "DKI Jakarta" }) }, env);
+    const j: any = await (await call()).json();
+    expect(j.data.clinics_added).toBe(2);
+    expect(j.data.suppressed_added).toBe(1);
+    const again: any = await (await call()).json();
+    expect(again.data.clinics_added).toBe(0);
+    expect(again.data.suppressed_added).toBe(0);
+    const r = (await db.query(`SELECT name, province FROM clinics WHERE email='baru@klinik.id'`)).rows[0];
+    expect(r.name).toBe("Klinik Baru");
+    expect(r.province).toBe("DKI Jakarta");
+    expect((await app.request("/api/email/live/sync-contacts", { method: "POST", headers: H, body: JSON.stringify({ x: 1 }) }, env)).status).toBe(400);
+  });
+});

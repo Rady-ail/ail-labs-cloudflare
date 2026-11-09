@@ -98,4 +98,61 @@ liveRoutes.get("/attachments/:id/download", async (c) => {
     "Cache-Control": "private, no-store", "X-Content-Type-Options": "nosniff" } });
 });
 
+// Tarik kontak dari Resend ke CRM (klinik) dan daftar jangan-kirim. Satu halaman per panggilan.
+liveRoutes.post("/live/sync-contacts", async (c) => {
+  assertNoQuery(c);
+  if (!c.env.RESEND_API_KEY) return fail(c, 503, "RESEND_UNAVAILABLE", "Kunci Resend belum diatur");
+  let body: Record<string, unknown> = {};
+  try { body = (await c.req.json()) as Record<string, unknown>; } catch { body = {}; }
+  const unknown = Object.keys(body).filter((k) => !["segment_id", "after", "province"].includes(k));
+  if (unknown.length) badRequest("Field tidak dikenal");
+  const segment = body.segment_id === undefined ? "" : String(body.segment_id);
+  if (segment && !/^[A-Za-z0-9-]{8,80}$/.test(segment)) badRequest("segment_id tidak valid");
+  const after = body.after === undefined ? "" : String(body.after);
+  if (after && !/^[A-Za-z0-9-]{8,80}$/.test(after)) badRequest("after tidak valid");
+  const province = body.province === undefined ? "-" : String(body.province).trim().slice(0, 80);
+  if (!province) badRequest("province tidak valid");
+  const qs = new URLSearchParams({ limit: "100" });
+  if (segment) qs.set("segment_id", segment);
+  if (after) qs.set("after", after);
+  const res = await fetch(`https://api.resend.com/contacts?${qs}`, { headers: { Authorization: `Bearer ${c.env.RESEND_API_KEY}` } });
+  if (!res.ok) return fail(c, 503, "RESEND_ERROR", "Resend menolak permintaan");
+  const page = (await res.json()) as { data?: Array<Record<string, any>>; has_more?: boolean };
+  const items = Array.isArray(page.data) ? page.data : [];
+  const seen = new Set<string>();
+  const rows: Array<{ name: string; email: string }> = [];
+  const stops: Array<{ email: string }> = [];
+  for (const item of items) {
+    const email = typeof item.email === "string" ? item.email.trim().toLowerCase() : "";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) continue;
+    if (email.endsWith("@inbox.ail-aesthetic-labs.my.id") || /salinan/i.test(String(item.first_name ?? ""))) continue;
+    if (seen.has(email)) continue;
+    seen.add(email);
+    const name = [item.first_name, item.last_name].filter((x) => typeof x === "string" && x.trim()).join(" ").trim().slice(0, 200) || email;
+    rows.push({ name, email });
+    if (item.unsubscribed === true) stops.push({ email });
+  }
+  const sql = getSql(c.env);
+  let added = 0;
+  let blocked = 0;
+  if (rows.length) {
+    const ins = await sql`INSERT INTO clinics (name, city, province, stage, email, notes)
+      SELECT v.name, '-', ${province}, 'lead', v.email, 'Sumber: kontak Resend'
+      FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb) AS v(name text, email text)
+      WHERE NOT EXISTS (SELECT 1 FROM clinics c WHERE lower(c.email) = v.email)
+      RETURNING 1`;
+    added = ins.length;
+  }
+  if (stops.length) {
+    const sup = await sql`INSERT INTO email_suppressions (email, reason, source)
+      SELECT v.email, 'unsubscribe', 'resend_contacts'
+      FROM jsonb_to_recordset(${JSON.stringify(stops)}::jsonb) AS v(email text)
+      WHERE NOT EXISTS (SELECT 1 FROM email_suppressions s WHERE lower(s.email) = v.email)
+      RETURNING 1`;
+    blocked = sup.length;
+  }
+  const last = items.length ? String(items[items.length - 1].id ?? "") : "";
+  return ok(c, { seen: items.length, clinics_added: added, suppressed_added: blocked, has_more: Boolean(page.has_more), next_after: page.has_more ? last : null });
+});
+
 export { liveRoutes };
