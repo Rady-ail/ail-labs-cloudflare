@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { bodyLimit } from "hono/body-limit";
 import type { Env } from "./env";
 import type { AppEnv } from "./lib/http";
 import { errorHandler, notFound, newRequestId, fail } from "./lib/http";
@@ -48,29 +49,18 @@ app.use("/api/*", async (c, next) => {
   const isWebhook = path === "/api/webhooks/resend";
 
   if (!isWebhook && method !== "GET" && method !== "HEAD" && path !== "/api/crm" && !path.startsWith("/api/crm/")) {
-    const clonedBody = c.req.raw.clone().body;
-    if (clonedBody) {
-      const reader = clonedBody.getReader();
-      let totalBytes = 0;
-      try {
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-          totalBytes += value.byteLength;
-          if (totalBytes > 262144) {
-            await reader.cancel();
-            return fail(c, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar");
-          }
-        }
-      } finally {
-        reader.releaseLock();
-      }
-    }
+    const limited = bodyLimit({
+      maxSize: 262144,
+      onError: (ctx) => fail(ctx as any, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar"),
+    });
+    const res = await limited(c, async () => {});
+    if (res) return res;
   }
 
-  if (!isWebhook && method !== "GET") {
+  if (!isWebhook && path !== "/api/health") {
     const origin = c.req.header("Origin");
-    if (!isAllowedOrigin(origin, c.env.DEV === "1")) {
+    const hasBearer = /^Bearer\s+\S+$/i.test(c.req.header("Authorization") ?? "");
+    if (origin ? !isAllowedOrigin(origin, c.env.DEV === "1") : !hasBearer) {
       return fail(c, 403, "FORBIDDEN", "Origin tidak diizinkan");
     }
   }
