@@ -472,7 +472,7 @@ crmRoutes.post("/clinics/:id/contacts", async (c) => {
 
 
 
-const ACTIVITY_TYPES = ["call", "whatsapp", "email", "visit", "order", "note", "stage_change"] as const;
+const ACTIVITY_TYPES = ["note", "call", "whatsapp", "email", "catalog", "order", "stage_change"] as const;
 
 crmRoutes.post("/clinics/:id/activities", async (c) => {
   const clinicId = c.req.param("id");
@@ -519,7 +519,7 @@ crmRoutes.post("/clinics/:id/activities", async (c) => {
       SELECT
         count(*) FILTER (WHERE type IN ('call', 'whatsapp', 'email'))::int AS interactions_count,
         count(*) FILTER (WHERE type = 'order')::int AS orders_count,
-        max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit')) AS last_contact_at
+        max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email')) AS last_contact_at
       FROM activity_rows
     ), updated AS (
       UPDATE clinics
