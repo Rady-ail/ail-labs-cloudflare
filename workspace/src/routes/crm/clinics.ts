@@ -267,4 +267,63 @@ crmRoutes.patch("/clinics/:id", async (c) => {
   return c.json({ data, message: "Data berhasil diperbarui." }, 200);
 });
 
+
+crmRoutes.post("/clinics/:id/stage", async (c) => {
+  const id = c.req.param("id");
+  if (!isUuid(id)) badRequest("ID klinik tidak valid.");
+
+  const body = await readJsonObject(c);
+  const keys = Object.keys(body);
+  if (keys.some((key) => key !== "stage") || keys.length !== 1) {
+    throw new ValidationError("VALIDATION_ERROR", "Body hanya boleh memuat stage.", {
+      fields: Object.fromEntries(keys.filter((key) => key !== "stage").map((key) => [key, "Field tidak dikenal."])),
+    });
+  }
+
+  const stage = body.stage;
+  if (typeof stage !== "string" || !STAGES.includes(stage as (typeof STAGES)[number])) {
+    throw new ValidationError("INVALID_STAGE", "Tahap klinik tidak valid.", {
+      fields: { stage: "Pilih salah satu tahap yang tersedia." },
+    });
+  }
+
+  const sql = getSql(c.env);
+  const rows = await sql`WITH current_clinic AS (
+      SELECT id, stage
+      FROM clinics
+      WHERE id = ${id} AND archived = false
+      FOR UPDATE
+    ), updated AS (
+      UPDATE clinics AS clinic
+      SET stage = ${stage}, updated_at = now()
+      FROM current_clinic
+      WHERE clinic.id = current_clinic.id
+      RETURNING clinic.id, current_clinic.stage AS previous_stage, clinic.stage AS stage
+    ), activity AS (
+      INSERT INTO clinic_activities (clinic_id, type, summary, detail, occurred_at)
+      SELECT id, 'stage_change', 'Perubahan tahap klinik',
+        previous_stage || ' → ' || stage, now()
+      FROM updated
+      WHERE previous_stage IS DISTINCT FROM stage
+      RETURNING id
+    )
+    SELECT id, previous_stage, stage FROM updated`;
+
+  const updated = rows[0] as Record<string, unknown> | undefined;
+  if (!updated) {
+    const existing = await sql`SELECT archived FROM clinics WHERE id = ${id} LIMIT 1`;
+    if (!existing[0]) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+    if (existing[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
+    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+  }
+
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.stage_change", resourceType: "clinic",
+    resourceId: id, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({
+    data: { id, previous_stage: updated.previous_stage, stage: updated.stage },
+  }, 200);
+});
+
 export { crmRoutes };
