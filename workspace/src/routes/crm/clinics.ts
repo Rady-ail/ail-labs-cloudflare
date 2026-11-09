@@ -859,4 +859,94 @@ crmRoutes.get("/regions/summary", async (c) => {
   return c.json({ data: rows }, 200);
 });
 
+
+crmRoutes.patch("/contacts/:contactId", async (c) => {
+  const contactId = c.req.param("contactId");
+  if (!isUuid(contactId)) badRequest("ID kontak tidak valid.");
+  const input = validateContactInput(await readJsonObject(c), "update");
+  const sql = getSql(c.env);
+  const clinicLock = sql`SELECT c.id AS clinic_id
+    FROM clinics c JOIN clinic_contacts cc ON cc.clinic_id = c.id
+    WHERE cc.id = ${contactId} AND c.archived = false
+    FOR UPDATE OF c`;
+  const unsetPrimary = sql`UPDATE clinic_contacts
+    SET is_primary = false
+    WHERE clinic_id = (SELECT clinic_id FROM clinic_contacts WHERE id = ${contactId})
+      AND id <> ${contactId} AND is_primary = true
+      AND EXISTS (SELECT 1 FROM clinics c
+        WHERE c.id = clinic_contacts.clinic_id AND c.archived = false)
+      AND EXISTS (SELECT 1 FROM clinic_contacts WHERE id = ${contactId})`;
+  const update = sql`UPDATE clinic_contacts SET
+      name = CASE WHEN ${Object.hasOwn(input, "name")} THEN ${input.name ?? null} ELSE name END,
+      role = CASE WHEN ${Object.hasOwn(input, "role")} THEN ${input.role ?? null} ELSE role END,
+      phone = CASE WHEN ${Object.hasOwn(input, "phone")} THEN ${input.phone ?? null} ELSE phone END,
+      email = CASE WHEN ${Object.hasOwn(input, "email")} THEN ${input.email ?? null} ELSE email END,
+      preferred_channel = CASE WHEN ${Object.hasOwn(input, "preferred_channel")} THEN ${input.preferred_channel ?? null} ELSE preferred_channel END,
+      is_primary = CASE WHEN ${Object.hasOwn(input, "is_primary")} THEN ${input.is_primary ?? false} ELSE is_primary END
+    WHERE id = ${contactId}
+      AND EXISTS (SELECT 1 FROM clinics c WHERE c.id = clinic_contacts.clinic_id AND c.archived = false)
+    RETURNING id, clinic_id, name, role, phone, email, preferred_channel, is_primary, created_at`;
+  const results = await (sql as any).transaction(input.is_primary === true
+    ? [clinicLock, unsetPrimary, update]
+    : [clinicLock, update]);
+  const updatedRows = (results[input.is_primary === true ? 2 : 1] ?? []) as Record<string, unknown>[];
+  if (!updatedRows[0]) {
+    const existing = await sql`SELECT c.archived FROM clinic_contacts cc
+      JOIN clinics c ON c.id = cc.clinic_id WHERE cc.id = ${contactId} LIMIT 1`;
+    if (!existing[0]) return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+    if (existing[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
+    return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+  }
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.contact.update", resourceType: "clinic_contact",
+    resourceId: contactId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: updatedRows[0] }, 200);
+});
+
+crmRoutes.delete("/contacts/:contactId", async (c) => {
+  const contactId = c.req.param("contactId");
+  if (!isUuid(contactId)) badRequest("ID kontak tidak valid.");
+  const sql = getSql(c.env);
+  const rows = await sql`DELETE FROM clinic_contacts
+    WHERE id = ${contactId}
+      AND EXISTS (SELECT 1 FROM clinics c
+        WHERE c.id = clinic_contacts.clinic_id AND c.archived = false)
+    RETURNING id`;
+  if (!rows[0]) {
+    const existing = await sql`SELECT c.archived FROM clinic_contacts cc
+      JOIN clinics c ON c.id = cc.clinic_id WHERE cc.id = ${contactId} LIMIT 1`;
+    if (!existing[0]) return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+    if (existing[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
+    return fail(c, 404, "CONTACT_NOT_FOUND", "Kontak tidak ditemukan.");
+  }
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.contact.delete", resourceType: "clinic_contact",
+    resourceId: contactId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: { id: contactId, deleted: true } }, 200);
+});
+
+crmRoutes.get("/clinics/:id/activities", async (c) => {
+  const clinicId = c.req.param("id");
+  if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
+  const query = c.req.query();
+  const unknown = Object.keys(query).filter((key) => key !== "limit");
+  if (unknown.length) {
+    throw new ValidationError("BAD_REQUEST", "Parameter tidak dikenal.", {
+      fields: Object.fromEntries(unknown.map((key) => [key, "Parameter tidak dikenal."])),
+    });
+  }
+  const limit = clampInt(query.limit, 1, 200, 100);
+  const sql = getSql(c.env);
+  const clinicError = await requireActiveClinic(c, sql, clinicId);
+  if (clinicError) return clinicError;
+  const rows = await sql`SELECT id, clinic_id, type, summary, detail, occurred_at, created_at
+    FROM clinic_activities
+    WHERE clinic_id = ${clinicId}
+    ORDER BY occurred_at DESC
+    LIMIT ${limit}`;
+  return c.json({ data: rows }, 200);
+});
+
 export { crmRoutes };
