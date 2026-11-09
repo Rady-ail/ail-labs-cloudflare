@@ -262,8 +262,8 @@ webhookRoutes.post("/api/webhooks/resend", async (c) => {
   const id = c.req.header("svix-id") ?? "";
   const timestamp = c.req.header("svix-timestamp") ?? "";
   const signature = c.req.header("svix-signature") ?? "";
-  const rawBytes = new Uint8Array(await c.req.raw.arrayBuffer());
-  if (rawBytes.byteLength > MAX_BODY_BYTES) return c.json({ error: "Payload too large" }, 413);
+  const rawBytes = await readBoundedBody(c.req.raw, MAX_BODY_BYTES);
+  if (!rawBytes) return c.json({ error: "Payload too large" }, 413);
   const rawBody = new TextDecoder().decode(rawBytes);
 
   let valid = false;
