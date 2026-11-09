@@ -177,6 +177,21 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
     : [];
   let threadId = parent[0]?.thread_id ? String(parent[0].thread_id) : null;
   if (!threadId) {
+    const fallback = await sql`SELECT t.id::text AS thread_id
+      FROM email_threads t
+      WHERE regexp_replace(lower(t.subject), '^((re|fwd|fw):[[:space:]]*)+', '', 'g')
+          = regexp_replace(lower(${subject}), '^((re|fwd|fw):[[:space:]]*)+', '', 'g')
+        AND t.last_message_at >= now() - interval '30 days'
+        AND t.folder <> 'archive'
+        AND EXISTS (
+          SELECT 1 FROM email_messages m
+          WHERE m.thread_id = t.id AND lower(m.from_email) = ${from}
+        )
+      ORDER BY t.last_message_at DESC, t.id DESC
+      LIMIT 1`;
+    threadId = fallback[0]?.thread_id ? String(fallback[0].thread_id) : null;
+  }
+  if (!threadId) {
     const thread = await sql`INSERT INTO email_threads
         (subject, folder, snippet, last_message_at, created_at, updated_at)
       VALUES (${subject}, 'inbox', ${bodyText.slice(0, 240)}, ${receivedAt}::timestamptz,
