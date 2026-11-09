@@ -205,11 +205,6 @@ async function processStatus(sql: ReturnType<typeof getSql>, type: string, data:
       WHERE resend_email_id = ${resendId}
         AND NOT (metadata ? ${eventKey})
       RETURNING id::text AS id, thread_id::text AS thread_id`;
-  if (!rows.length) return;
-  await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
-    VALUES (${rows[0].thread_id}::bigint, ${eventKey}, 'resend_webhook',
-      ${JSON.stringify({ resend_email_id: resendId })}::jsonb)`;
-
   if (type === "email.bounced" || type === "email.complained") {
     const recipients = addresses(data.to ?? data.email?.to);
     for (const email of recipients) {
@@ -219,6 +214,10 @@ async function processStatus(sql: ReturnType<typeof getSql>, type: string, data:
           reason = EXCLUDED.reason, source = EXCLUDED.source`;
     }
   }
+  if (!rows.length) return;
+  await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
+    VALUES (${rows[0].thread_id}::bigint, ${eventKey}, 'resend_webhook',
+      ${JSON.stringify({ resend_email_id: resendId })}::jsonb)`;
 }
 
 webhookRoutes.post("/api/webhooks/resend", async (c) => {
