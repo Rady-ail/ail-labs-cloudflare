@@ -56,6 +56,18 @@ integration("scheduled sender claims at most 10 due drafts and defaults to dry-r
 });
 
 
+function stubResendResponse(status: number, payload: Record<string, unknown>) {
+  const originalFetch = globalThis.fetch;
+  const fetchMock = vi.fn(async (...args: Parameters<typeof fetch>) => {
+    if (String(args[0]).startsWith("https://api.resend.com/")) {
+      return new Response(JSON.stringify(payload), { status });
+    }
+    return originalFetch(...args);
+  });
+  vi.stubGlobal("fetch", fetchMock);
+  return fetchMock;
+}
+
 async function createScheduledDraft(sql: ReturnType<typeof neon>, marker: string) {
   const rows = await sql`INSERT INTO email_drafts
     (subject, to_recipients, cc_recipients, bcc_recipients, body_text, status, scheduled_at, metadata)
@@ -71,8 +83,7 @@ integration("live sender records a successful mocked Resend response", async () 
   const marker = `sender-live-success-${crypto.randomUUID()}`;
   const id = await createScheduledDraft(sql, marker);
   const resendId = `resend-${crypto.randomUUID()}`;
-  const fetchMock = vi.fn(async () => new Response(JSON.stringify({ id: resendId }), { status: 200 }));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubResendResponse(200, { id: resendId });
   try {
     await runScheduledEmailSender({
       DATABASE_URL: databaseUrl!, API_TOKEN: "sender-test-token",
@@ -98,8 +109,7 @@ integration("live sender schedules retry after mocked Resend 500", async () => {
   const sql = neon(databaseUrl!);
   const marker = `sender-live-retry-${crypto.randomUUID()}`;
   const id = await createScheduledDraft(sql, marker);
-  const fetchMock = vi.fn(async () => new Response(JSON.stringify({ message: "temporary" }), { status: 500 }));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubResendResponse(500, { message: "temporary" });
   try {
     await runScheduledEmailSender({
       DATABASE_URL: databaseUrl!, API_TOKEN: "sender-test-token",
@@ -122,8 +132,7 @@ integration("live sender marks mocked permanent Resend 422 as failed", async () 
   const sql = neon(databaseUrl!);
   const marker = `sender-live-permanent-${crypto.randomUUID()}`;
   const id = await createScheduledDraft(sql, marker);
-  const fetchMock = vi.fn(async () => new Response(JSON.stringify({ message: "invalid payload" }), { status: 422 }));
-  vi.stubGlobal("fetch", fetchMock);
+  const fetchMock = stubResendResponse(422, { message: "invalid payload" });
   try {
     await runScheduledEmailSender({
       DATABASE_URL: databaseUrl!, API_TOKEN: "sender-test-token",
