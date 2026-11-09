@@ -326,4 +326,24 @@ crmRoutes.post("/clinics/:id/stage", async (c) => {
   }, 200);
 });
 
+
+crmRoutes.post("/clinics/:id/archive", async (c) => {
+  const id = c.req.param("id");
+  if (!isUuid(id)) badRequest("ID klinik tidak valid.");
+
+  const sql = getSql(c.env);
+  const rows = await sql`UPDATE clinics
+    SET archived = true, updated_at = now()
+    WHERE id = ${id}
+    RETURNING id, archived`;
+  const clinic = rows[0] as Record<string, unknown> | undefined;
+  if (!clinic) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.archive", resourceType: "clinic",
+    resourceId: id, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: { id, archived: true } }, 200);
+});
+
 export { crmRoutes };
