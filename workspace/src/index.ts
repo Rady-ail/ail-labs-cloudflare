@@ -47,7 +47,7 @@ app.use("/api/*", async (c, next) => {
   const path = c.req.path;
   const isWebhook = path === "/api/webhooks/resend";
 
-  if (!isWebhook && method !== "GET" && method !== "HEAD" && !path.startsWith("/api/crm/")) {
+  if (!isWebhook && method !== "GET" && method !== "HEAD" && path !== "/api/crm" && !path.startsWith("/api/crm/")) {
     const clonedBody = c.req.raw.clone().body;
     if (clonedBody) {
       const reader = clonedBody.getReader();
