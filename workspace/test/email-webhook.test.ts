@@ -79,3 +79,60 @@ test("Resend webhook accepts a correctly signed event envelope", async () => {
   expect(response.status).toBe(200);
   await expect(response.json()).resolves.toMatchObject({ received: true });
 });
+
+import { neon } from "@neondatabase/serverless";
+
+const runtime = (globalThis as any).process?.env ?? {};
+const databaseUrl = runtime.DATABASE_URL as string | undefined;
+const integration = databaseUrl ? test : test.skip;
+
+integration("signed received event is deduplicated and stores sanitized attachment metadata", async () => {
+  const sql = neon(databaseUrl!);
+  const resendId = `webhook-test-${crypto.randomUUID()}`;
+  const body = JSON.stringify({
+    type: "email.received",
+    data: {
+      email_id: resendId,
+      from: "Clinic Sender <clinic@example.test>",
+      to: ["alexa@ail-aesthetic-labs.my.id"],
+      subject: "Inbound test",
+      text: "Hello\\u0001 clinic",
+      message_id: `<${crypto.randomUUID()}@example.test>`,
+      attachments: [{ id: "att-test", filename: "brief.pdf", content_type: "application/pdf", size: 128 }],
+    },
+  });
+  const headers = await signedHeaders(body);
+  const requestEnv = { ...env, DATABASE_URL: databaseUrl! };
+
+  try {
+    const first = await app.request("/api/webhooks/resend", { method: "POST", headers, body }, requestEnv);
+    expect(first.status).toBe(200);
+    const secondHeaders = await signedHeaders(body);
+    const second = await app.request("/api/webhooks/resend", {
+      method: "POST", headers: secondHeaders, body,
+    }, requestEnv);
+    expect(second.status).toBe(200);
+
+    const rows = await sql`SELECT id::text AS id, thread_id::text AS thread_id, body_text
+      FROM email_messages WHERE resend_email_id = ${resendId}`;
+    expect(rows).toHaveLength(1);
+    expect(rows[0].body_text).toBe("Hello clinic");
+
+    const attachments = await sql`SELECT filename, content_type, byte_size, provider_attachment_id
+      FROM email_attachments WHERE message_id = ${rows[0].id}::bigint`;
+    expect(attachments).toHaveLength(1);
+    expect(attachments[0]).toMatchObject({
+      filename: "brief.pdf",
+      content_type: "application/pdf",
+      byte_size: 128,
+      provider_attachment_id: "att-test",
+    });
+  } finally {
+    const rows = await sql`SELECT id::text AS id, thread_id::text AS thread_id
+      FROM email_messages WHERE resend_email_id = ${resendId}`;
+    if (rows[0]) {
+      await sql`DELETE FROM email_events WHERE thread_id = ${rows[0].thread_id}::bigint`;
+      await sql`DELETE FROM email_threads WHERE id = ${rows[0].thread_id}::bigint`;
+    }
+  }
+});
