@@ -17,3 +17,7 @@ node_modules/
 .dev.vars
 .dev.vars.*
 .cf-token
+
+# Local Claude memory store (repo is public; never commit)
+.claude/memory/
+.claude/settings.local.json

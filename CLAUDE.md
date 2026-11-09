@@ -5,6 +5,7 @@ Correct, safe, verifiable work. Minimal effort that is still right (see "Hemat t
 ## Repo facts
 - Public site + catalog API for AIL LABS (B2B medical/aesthetic distribution). Static pages in `public/`, API in `routes/`+`src/worker.js`, Cloudflare Workers, Neon Postgres.
 - Push/merge to `main` deploys automatically (`.github/workflows/deploy.yml`). Check first: `npm run build` (static integrity audit; also blocks private data in public pages).
+- Automation (hooks, `npm test`, `npm run memory`, skill `site-qa`): `docs/memory-os/AUTOMATION.md`. Hooks ask before deploy/destructive actions; never bypass them.
 - `public/` is PUBLIC. Never put personal data, supplier/customer data, credentials or internal strategy in it.
 
 ## Boot (each session)

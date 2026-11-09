@@ -1,4 +1,7 @@
-# Safe Memory Hooks — Design, Not Executable
+# Safe Memory Hooks — Design
+
+> Implemented (2026-11-09): `.claude/hooks/ail-guard.js` + `scripts/memory.js`. See `AUTOMATION.md`.
+> Memory writes stay explicit (opt-in CLI), not silent PostToolUse capture.
 
 Hook event schemas vary by Claude Code version. Implement only against current official docs and test locally.
 

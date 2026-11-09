@@ -31,6 +31,9 @@ jobs:
       - name: Static integrity audit
         run: npm run build
 
+      - name: Unit tests (catalog agent + Claude guard hooks)
+        run: npm test
+
       - name: Wrangler dry-run
         run: npx wrangler@4.86.0 deploy --dry-run
 

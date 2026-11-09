@@ -32,6 +32,9 @@ jobs:
       - name: Build and static integrity audit
         run: npm run build
 
+      - name: Unit tests (catalog agent + Claude guard hooks)
+        run: npm test
+
       - name: Check visitor route syntax
         run: node --check routes/visitors.js
 
