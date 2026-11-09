@@ -41,7 +41,7 @@ draftsRoutes.post("/drafts", async (c) => {
         sent_at, cancelled_at, created_at, updated_at
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-      SELECT thread_id, id, 'draft_created', ${actor(c)}, '{}'::jsonb FROM inserted
+      SELECT thread_id, id, 'draft_created', ${actor(c)}::text, '{}'::jsonb FROM inserted
       RETURNING id
     )
     SELECT * FROM inserted`;
@@ -82,7 +82,7 @@ draftsRoutes.patch("/drafts/:draftId", async (c) => {
         sent_at, cancelled_at, created_at, updated_at
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-      SELECT thread_id, id, 'draft_updated', ${actor(c)}, '{}'::jsonb FROM updated
+      SELECT thread_id, id, 'draft_updated', ${actor(c)}::text, '{}'::jsonb FROM updated
       RETURNING id
     )
     SELECT * FROM updated`;
@@ -106,7 +106,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
   const comment = typeof body.comment === "string" ? body.comment.trim() : null;
   const sql = getSql(c.env);
   const rows = await sql`WITH updated AS (
-      UPDATE email_drafts SET status = 'needs_ok', requested_by = ${actor(c)},
+      UPDATE email_drafts SET status = 'needs_ok', requested_by = ${actor(c)}::text,
         metadata = metadata || jsonb_build_object('requested_at', now()::text, 'approval_comment', ${comment}::text),
         updated_at = now()
       WHERE id = ${draftId} AND status = 'draft'
@@ -119,7 +119,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
       RETURNING t.id
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-      SELECT thread_id, id, 'approval_requested', ${actor(c)},
+      SELECT thread_id, id, 'approval_requested', ${actor(c)}::text,
         jsonb_build_object('comment', ${comment}::text) FROM updated
       RETURNING id
     )
@@ -171,30 +171,30 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
   let rows: any[];
   try {
     rows = await sql`WITH updated AS (
-        UPDATE email_drafts SET status = 'scheduled', approved_by = ${actor(c)},
+        UPDATE email_drafts SET status = 'scheduled', approved_by = ${actor(c)}::text,
           approved_at = now(), scheduled_at = now() + interval '10 seconds',
-          idempotency_key = ${key}, metadata = metadata || jsonb_build_object('job_id', ${jobId}::text),
+          idempotency_key = ${key}::text, metadata = metadata || jsonb_build_object('job_id', ${jobId}::text),
           updated_at = now()
         WHERE id = ${draftId} AND status = 'needs_ok' AND idempotency_key IS NULL
         RETURNING id, thread_id, idempotency_key, metadata, scheduled_at
       ), event AS (
         INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-        SELECT thread_id, id, 'draft_approved', ${actor(c)}, jsonb_build_object('scheduled_at', scheduled_at)
+        SELECT thread_id, id, 'draft_approved', ${actor(c)}::text, jsonb_build_object('scheduled_at', scheduled_at)
         FROM updated RETURNING id
       ), job_event AS (
         INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-        SELECT thread_id, id, 'send_job_created', ${actor(c)},
+        SELECT thread_id, id, 'send_job_created', ${actor(c)}::text,
           jsonb_build_object('job_id', metadata->>'job_id', 'scheduled_at', scheduled_at)
         FROM updated RETURNING id
       )
       SELECT id::text AS id, idempotency_key, metadata, scheduled_at FROM updated
       UNION ALL
       SELECT id::text AS id, idempotency_key, metadata, scheduled_at
-      FROM email_drafts WHERE id = ${draftId} AND idempotency_key = ${key}
+      FROM email_drafts WHERE id = ${draftId} AND idempotency_key = ${key}::text
         AND NOT EXISTS (SELECT 1 FROM updated)`;
   } catch (error) {
     if ((error as { code?: string })?.code === "23505") {
-      const existing = await sql`SELECT id::text AS id, status, metadata FROM email_drafts WHERE idempotency_key = ${key} LIMIT 1`;
+      const existing = await sql`SELECT id::text AS id, status, metadata FROM email_drafts WHERE idempotency_key = ${key}::text LIMIT 1`;
       if (existing[0] && String(existing[0].id) === String(draftId) && existing[0].status === "scheduled") {
         const existingJobId = (existing[0] as Record<string, any>).metadata?.job_id;
         return ok(c, { draftId: String(draftId), status: "scheduled", jobId: existingJobId });
@@ -239,7 +239,7 @@ draftsRoutes.post("/drafts/:draftId/cancel", async (c) => {
       RETURNING id::text AS id, thread_id, status, cancelled_at, metadata
     ), event AS (
       INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
-      SELECT thread_id, id::bigint, 'send_job_cancelled', ${actor(c)},
+      SELECT thread_id, id::bigint, 'send_job_cancelled', ${actor(c)}::text,
         jsonb_build_object('reason', ${reason}::text) FROM updated
       RETURNING id
     )
