@@ -1,0 +1,19 @@
+{
+  "name": "AIL LABS Workspace",
+  "short_name": "AIL LABS",
+  "description": "Workspace operasional internal AIL LABS.",
+  "lang": "id",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#09111f",
+  "theme_color": "#09111f",
+  "icons": [
+    {
+      "src": "/ail-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
