@@ -41,7 +41,7 @@ function crmError(
   fields?: Record<string, string>,
 ) {
   return c.json(
-    { error: { code, message, ...(fields ? { fields } : {}), request_id: c.get("requestId") } },
+    { error: { code, message, fields: fields ?? {}, request_id: c.get("requestId") } },
     status,
   );
 }
