@@ -154,7 +154,7 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
   const resendId = cleanText(data.email_id, 200);
   if (!resendId) return;
 
-  const existing = await sql`SELECT id FROM email_messages WHERE resend_email_id = ${resendId} LIMIT 1`;
+  const existing = await sql`SELECT id FROM email_messages WHERE resend_email_id = ${resendId}::text LIMIT 1`;
   if (existing.length) return;
 
   const from = address(data.from);
@@ -245,7 +245,7 @@ async function processStatus(sql: ReturnType<typeof getSql>, type: string, data:
       SET metadata = metadata || jsonb_build_object('delivery_status', ${type}::text, ${eventKey}::text, ${JSON.stringify({
         occurred_at: cleanText(data.created_at, 80) || new Date().toISOString(),
       })}::jsonb)
-      WHERE resend_email_id = ${resendId}
+      WHERE resend_email_id = ${resendId}::text
         AND NOT (metadata ? ${eventKey}::text)
       RETURNING id::text AS id, thread_id::text AS thread_id`;
   if (type === "email.bounced" || type === "email.complained") {
