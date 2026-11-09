@@ -1274,4 +1274,168 @@ kampanyeRoutes.get("/summary", async (c) => {
   });
 });
 
+// ============================================================
+// DAFTAR KIRIM MANUAL (WhatsApp dan Email/Gmail)
+// Aplikasi hanya menampilkan daftar dan mencatat tanda "sudah dikirim".
+// Tidak ada pengiriman pesan dan tidak ada panggilan eksternal.
+// ============================================================
+
+async function loadCampaignForManual(c: any, sql: any, id: string) {
+  if (!isUuid(id)) bad("ID kampanye tidak valid.");
+  const campaign = await findCampaign(sql, id);
+  if (!campaign) {
+    return { error: fail(c, 404, "CAMPAIGN_NOT_FOUND", "Kampanye tidak ditemukan.") };
+  }
+  return { campaign };
+}
+
+// Penerima layak: klinik tidak diarsip, punya kontak untuk saluran, cocok filter, dan (email) tidak ada di daftar bounce.
+function recipientBase(sql: any, campaign: Record<string, any>) {
+  const filter = campaign.audience_filter as AudienceFilter;
+  const stages = filter.stage ?? null;
+  const regions = filter.region ?? null;
+  const channel = String(campaign.channel);
+  return { stages, regions, channel, sql };
+}
+
+kampanyeRoutes.get("/campaigns/:id/recipients", async (c) => {
+  const q = c.req.query();
+  const unknown = Object.keys(q).filter((k) => !["page", "limit"].includes(k));
+  if (unknown.length) {
+    bad("Parameter tidak dikenal.", Object.fromEntries(unknown.map((k) => [k, "Parameter tidak dikenal."])));
+  }
+  const page = clampInt(q.page, 1, 100000, 1);
+  const limit = clampInt(q.limit, 1, 200, 100);
+  const sql = getSql(c.env);
+  const loaded = await loadCampaignForManual(c, sql, c.req.param("id"));
+  if (loaded.error) return loaded.error;
+  const campaign = loaded.campaign as Record<string, any>;
+  const { stages, regions, channel } = recipientBase(sql, campaign);
+  const offset = (page - 1) * limit;
+
+  const [rows, totals] = await Promise.all([
+    sql`
+      WITH base AS (
+        SELECT c.id, c.name, c.province, c.stage, c.created_at,
+          CASE WHEN ${channel}::text = 'email'
+            THEN (COALESCE(NULLIF(trim(c.email), ''), (SELECT NULLIF(trim(cc.email), '') FROM clinic_contacts cc WHERE cc.clinic_id = c.id AND NULLIF(trim(cc.email), '') IS NOT NULL ORDER BY cc.is_primary DESC, cc.created_at ASC LIMIT 1)))
+            ELSE NULLIF(trim(c.phone), '') END AS contact
+        FROM clinics c
+        WHERE c.archived = false
+          AND (${stages}::text[] IS NULL OR c.stage = ANY(${stages}::text[]))
+          AND (${regions}::text[] IS NULL OR c.province = ANY(${regions}::text[]))
+      )
+      SELECT b.id AS clinic_id, b.name, b.province, b.stage, b.contact,
+             COALESCE(r.state, 'belum') AS state, r.updated_at AS marked_at
+      FROM base b
+      LEFT JOIN campaign_recipients r ON r.clinic_id = b.id AND r.campaign_id = ${campaign.id}
+      WHERE b.contact IS NOT NULL
+        AND NOT (${channel}::text = 'email' AND EXISTS (SELECT 1 FROM email_suppressions es WHERE lower(es.email) = lower(b.contact)))
+      ORDER BY (r.state = 'terkirim_manual') ASC NULLS FIRST, b.created_at ASC, b.id ASC
+      LIMIT ${limit} OFFSET ${offset}
+    `,
+    sql`
+      WITH base AS (
+        SELECT c.id,
+          CASE WHEN ${channel}::text = 'email'
+            THEN (COALESCE(NULLIF(trim(c.email), ''), (SELECT NULLIF(trim(cc.email), '') FROM clinic_contacts cc WHERE cc.clinic_id = c.id AND NULLIF(trim(cc.email), '') IS NOT NULL ORDER BY cc.is_primary DESC, cc.created_at ASC LIMIT 1)))
+            ELSE NULLIF(trim(c.phone), '') END AS contact
+        FROM clinics c
+        WHERE c.archived = false
+          AND (${stages}::text[] IS NULL OR c.stage = ANY(${stages}::text[]))
+          AND (${regions}::text[] IS NULL OR c.province = ANY(${regions}::text[]))
+      )
+      SELECT
+        count(*)::int AS total,
+        count(*) FILTER (WHERE r.state = 'terkirim_manual')::int AS sent_total,
+        count(*) FILTER (
+          WHERE r.state = 'terkirim_manual'
+            AND (r.updated_at AT TIME ZONE 'Asia/Makassar')::date = (now() AT TIME ZONE 'Asia/Makassar')::date
+        )::int AS sent_today
+      FROM base b
+      LEFT JOIN campaign_recipients r ON r.clinic_id = b.id AND r.campaign_id = ${campaign.id}
+      WHERE b.contact IS NOT NULL
+        AND NOT (${channel}::text = 'email' AND EXISTS (SELECT 1 FROM email_suppressions es WHERE lower(es.email) = lower(b.contact)))
+    `,
+  ]);
+  const t = totals[0] ?? { total: 0, sent_total: 0, sent_today: 0 };
+  return ok(
+    c,
+    rows.map((r: Record<string, any>) => ({
+      clinic_id: String(r.clinic_id),
+      name: r.name,
+      province: r.province,
+      stage: r.stage,
+      phone: channel === "whatsapp" ? r.contact : null,
+      email: channel === "email" ? r.contact : null,
+      state: r.state,
+      marked_at: r.state === "terkirim_manual" ? iso(r.marked_at) : null,
+    })),
+    {
+      page,
+      limit,
+      channel,
+      total: Number(t.total),
+      total_pages: Math.ceil(Number(t.total) / limit),
+      sent_total: Number(t.sent_total),
+      sent_today: Number(t.sent_today),
+      daily_limit: campaign.daily_limit,
+      messages_sent_by_app: 0,
+    },
+  );
+});
+
+kampanyeRoutes.put("/campaigns/:id/recipients/:clinicId", async (c) => {
+  const clinicId = c.req.param("clinicId");
+  if (!isUuid(clinicId)) bad("ID klinik tidak valid.");
+  const body = await readJsonObject(c);
+  unknownFields(body, ["state"]);
+  if (body.state !== "terkirim_manual" && body.state !== "antre") {
+    invalid("State tidak valid.", { state: "Gunakan terkirim_manual atau antre." });
+  }
+  const state = body.state as string;
+  const sql = getSql(c.env);
+  const loaded = await loadCampaignForManual(c, sql, c.req.param("id"));
+  if (loaded.error) return loaded.error;
+  const campaign = loaded.campaign as Record<string, any>;
+  if (campaign.status === "dibatalkan") {
+    return fail(c, 409, "CAMPAIGN_CLOSED", "Kampanye dibatalkan tidak dapat diubah.");
+  }
+  const { stages, regions, channel } = recipientBase(sql, campaign);
+
+  const eligible = await sql`
+    WITH base AS (
+      SELECT c.id,
+        CASE WHEN ${channel}::text = 'email'
+          THEN (COALESCE(NULLIF(trim(c.email), ''), (SELECT NULLIF(trim(cc.email), '') FROM clinic_contacts cc WHERE cc.clinic_id = c.id AND NULLIF(trim(cc.email), '') IS NOT NULL ORDER BY cc.is_primary DESC, cc.created_at ASC LIMIT 1)))
+          ELSE NULLIF(trim(c.phone), '') END AS contact
+      FROM clinics c
+      WHERE c.id = ${clinicId} AND c.archived = false
+        AND (${stages}::text[] IS NULL OR c.stage = ANY(${stages}::text[]))
+        AND (${regions}::text[] IS NULL OR c.province = ANY(${regions}::text[]))
+    )
+    SELECT b.id FROM base b
+    WHERE b.contact IS NOT NULL
+      AND NOT (${channel}::text = 'email' AND EXISTS (SELECT 1 FROM email_suppressions es WHERE lower(es.email) = lower(b.contact)))
+  `;
+  if (!eligible.length) {
+    return fail(c, 404, "RECIPIENT_NOT_FOUND", "Klinik tidak ada di daftar penerima kampanye ini.");
+  }
+  await sql`
+    INSERT INTO campaign_recipients (campaign_id, clinic_id, state)
+    VALUES (${campaign.id}, ${clinicId}, ${state})
+    ON CONFLICT (campaign_id, clinic_id)
+    DO UPDATE SET state = EXCLUDED.state, reason = NULL, updated_at = now()
+  `;
+  await audit(sql, {
+    actor: c.get("actor"),
+    action: state === "terkirim_manual" ? "kampanye.recipient.mark_sent" : "kampanye.recipient.unmark",
+    resourceType: "campaign",
+    resourceId: String(campaign.id),
+    requestId: c.get("requestId"),
+    ok: true,
+  });
+  return ok(c, { campaign_id: String(campaign.id), clinic_id: clinicId, state, messages_sent_by_app: 0 });
+});
+
 export { kampanyeRoutes };
