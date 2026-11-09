@@ -199,7 +199,7 @@ async function processStatus(sql: ReturnType<typeof getSql>, type: string, data:
   if (!resendId) return;
   const eventKey = `resend_${type.replace(/[^a-z0-9_]/gi, "_")}`;
   const rows = await sql`UPDATE email_messages
-      SET metadata = metadata || jsonb_build_object(${eventKey}, ${JSON.stringify({
+      SET metadata = metadata || jsonb_build_object('delivery_status', ${type}, ${eventKey}, ${JSON.stringify({
         occurred_at: cleanText(data.created_at, 80) || new Date().toISOString(),
       })}::jsonb)
       WHERE resend_email_id = ${resendId}
