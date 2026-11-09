@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import type { AppEnv } from "../../lib/http";
 import { ValidationError } from "../../lib/http";
 import { getSql } from "../../lib/db";
@@ -408,7 +409,7 @@ function validateContactInput(body: Record<string, unknown>, mode: "create" | "u
   return result;
 }
 
-async function requireActiveClinic(c: Parameters<typeof getSql>[0] extends never ? never : any, sql: ReturnType<typeof getSql>, clinicId: string) {
+async function requireActiveClinic(c: Context<AppEnv>, sql: ReturnType<typeof getSql>, clinicId: string) {
   const rows = await sql`SELECT archived FROM clinics WHERE id = ${clinicId} LIMIT 1`;
   if (!rows[0]) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
   if (rows[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
