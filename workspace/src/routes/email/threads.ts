@@ -61,15 +61,15 @@ threadsRoutes.get("/threads", async (c) => {
           WHERE tl.thread_id = t.id AND l.name = ${label}
         ))
         AND (${pattern}::text IS NULL OR
-          t.subject ILIKE ${pattern} ESCAPE '\\'
+          t.subject ILIKE ${pattern} ESCAPE '!'
           OR EXISTS (SELECT 1 FROM email_messages m
             WHERE m.thread_id = t.id AND (
-              m.from_email ILIKE ${pattern} ESCAPE '\\'
-              OR COALESCE(m.body_text, '') ILIKE ${pattern} ESCAPE '\\'
+              m.from_email ILIKE ${pattern} ESCAPE '!'
+              OR COALESCE(m.body_text, '') ILIKE ${pattern} ESCAPE '!'
             ))
           OR EXISTS (SELECT 1 FROM contacts co
             WHERE co.id = t.contact_id AND (
-              co.display_name ILIKE ${pattern} ESCAPE '\\' OR co.email ILIKE ${pattern} ESCAPE '\\'
+              co.display_name ILIKE ${pattern} ESCAPE '!' OR co.email ILIKE ${pattern} ESCAPE '!'
             )))
         AND (${cursor?.at ?? null}::timestamptz IS NULL OR
           (COALESCE(t.last_message_at, t.created_at), t.id) < (${cursor?.at ?? null}::timestamptz, ${cursor?.id ?? null}::bigint))
@@ -97,15 +97,15 @@ threadsRoutes.get("/threads", async (c) => {
           WHERE tl.thread_id = t.id AND l.name = ${label}
         ))
         AND (${pattern}::text IS NULL OR
-          t.subject ILIKE ${pattern} ESCAPE '\\'
+          t.subject ILIKE ${pattern} ESCAPE '!'
           OR EXISTS (SELECT 1 FROM email_messages m
             WHERE m.thread_id = t.id AND (
-              m.from_email ILIKE ${pattern} ESCAPE '\\'
-              OR COALESCE(m.body_text, '') ILIKE ${pattern} ESCAPE '\\'
+              m.from_email ILIKE ${pattern} ESCAPE '!'
+              OR COALESCE(m.body_text, '') ILIKE ${pattern} ESCAPE '!'
             ))
           OR EXISTS (SELECT 1 FROM contacts co
             WHERE co.id = t.contact_id AND (
-              co.display_name ILIKE ${pattern} ESCAPE '\\' OR co.email ILIKE ${pattern} ESCAPE '\\'
+              co.display_name ILIKE ${pattern} ESCAPE '!' OR co.email ILIKE ${pattern} ESCAPE '!'
             )))`,
   ]);
 
