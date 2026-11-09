@@ -76,7 +76,7 @@ draftsRoutes.patch("/drafts/:draftId", async (c) => {
         bcc_recipients = CASE WHEN ${Object.hasOwn(input, "bcc")} THEN ${jsonString(input.bcc)}::jsonb ELSE bcc_recipients END,
         body_text = CASE WHEN ${Object.hasOwn(input, "bodyText")} THEN ${input.bodyText ?? null} ELSE body_text END,
         updated_at = now()
-      WHERE id = ${draftId} AND status IN ('draft', 'needs_ok')
+      WHERE id = ${draftId}::bigint AND status IN ('draft', 'needs_ok')
       RETURNING id, thread_id, subject, to_recipients, cc_recipients, bcc_recipients,
         body_text, status, requested_by, approved_by, approved_at, scheduled_at,
         sent_at, cancelled_at, created_at, updated_at
@@ -109,7 +109,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
       UPDATE email_drafts SET status = 'needs_ok', requested_by = ${actor(c)}::text,
         metadata = metadata || jsonb_build_object('requested_at', now()::text, 'approval_comment', ${comment}::text),
         updated_at = now()
-      WHERE id = ${draftId} AND status = 'draft'
+      WHERE id = ${draftId}::bigint AND status = 'draft'
       RETURNING id, thread_id, subject, to_recipients, cc_recipients, bcc_recipients,
         body_text, status, requested_by, approved_by, approved_at, scheduled_at,
         sent_at, cancelled_at, created_at, updated_at
@@ -175,7 +175,7 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
           approved_at = now(), scheduled_at = now() + interval '10 seconds',
           idempotency_key = ${key}::text, metadata = metadata || jsonb_build_object('job_id', ${jobId}::text),
           updated_at = now()
-        WHERE id = ${draftId} AND status = 'needs_ok' AND idempotency_key IS NULL
+        WHERE id = ${draftId}::bigint AND status = 'needs_ok' AND idempotency_key IS NULL
         RETURNING id, thread_id, idempotency_key, metadata, scheduled_at
       ), event AS (
         INSERT INTO email_events (thread_id, draft_id, event_type, actor, event_data)
@@ -234,7 +234,7 @@ draftsRoutes.post("/drafts/:draftId/cancel", async (c) => {
       UPDATE email_drafts SET status = 'cancelled', cancelled_at = now(),
         metadata = metadata || jsonb_build_object('cancel_reason', ${reason}::text),
         updated_at = now()
-      WHERE id = ${draftId} AND status = 'scheduled'
+      WHERE id = ${draftId}::bigint AND status = 'scheduled'
         AND COALESCE(metadata->>'processing_at', '') = ''
       RETURNING id::text AS id, thread_id, status, cancelled_at, metadata
     ), event AS (
