@@ -4,8 +4,9 @@ import { app } from "../src/index";
 
 const runtime = (globalThis as any).process?.env ?? {};
 const databaseUrl = runtime.DATABASE_URL as string | undefined;
-const sql = databaseUrl ? neon(databaseUrl) : null;
-const integration = test.skipIf(!sql);
+if (!databaseUrl) throw new Error("DATABASE_URL wajib tersedia; tes email-threads tidak boleh dilewati diam-diam");
+const sql = neon(databaseUrl);
+const integration = test;
 const env: any = {
   DATABASE_URL: databaseUrl ?? "postgres://unused:unused@127.0.0.1:1/unused",
   API_TOKEN: runtime.API_TOKEN ?? "email-test-token",
