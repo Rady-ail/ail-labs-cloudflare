@@ -8,6 +8,7 @@ import { crmRoutes } from "./routes/crm/clinics";
 import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
+import { webhookRoutes } from "./routes/email/webhook";
 
 const app = new Hono<AppEnv>();
 
@@ -31,7 +32,7 @@ app.use("/api/*", async (c, next) => {
     const contentLengthHeader = c.req.header("Content-Length");
     if (contentLengthHeader !== undefined) {
       const contentLength = Number(contentLengthHeader);
-      const limit = path === "/api/email/webhook/resend" ? 1048576 : 262144;
+      const limit = path === "/api/webhooks/resend" ? 1048576 : 262144;
       if (Number.isFinite(contentLength) && contentLength > limit) {
         return fail(c, 413, "PAYLOAD_TOO_LARGE", "Ukuran payload terlalu besar");
       }
@@ -45,7 +46,7 @@ app.use("/api/*", async (c, next) => {
     }
   }
 
-  if (path === "/api/health" || path === "/api/email/webhook/resend") {
+  if (path === "/api/health" || path === "/api/webhooks/resend") {
     await next();
     return;
   }
@@ -67,6 +68,7 @@ app.route("/api/crm", crmRoutes);
 app.route("/api/email", threadsRoutes);
 app.route("/api/email", draftsRoutes);
 app.route("/api/email", liveRoutes);
+app.route("/", webhookRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);
