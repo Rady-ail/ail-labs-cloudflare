@@ -512,4 +512,82 @@ crmRoutes.delete("/clinics/:id/contacts/:contactId", async (c) => {
   return c.json({ data: { id: contactId, deleted: true } }, 200);
 });
 
+
+const ACTIVITY_TYPES = ["call", "whatsapp", "email", "visit", "order", "note", "stage_change"] as const;
+
+crmRoutes.post("/clinics/:id/activities", async (c) => {
+  const clinicId = c.req.param("id");
+  if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
+  const body = await readJsonObject(c);
+  const allowed = new Set(["type", "summary", "detail", "occurred_at"]);
+  const unknown = Object.keys(body).filter((key) => !allowed.has(key));
+  const fields: Record<string, string> = {};
+  for (const key of unknown) fields[key] = "Field tidak dikenal.";
+
+  if (typeof body.type !== "string" || !ACTIVITY_TYPES.includes(body.type as (typeof ACTIVITY_TYPES)[number])) {
+    fields.type = "Jenis aktivitas tidak valid.";
+  }
+  if (typeof body.summary !== "string" || body.summary.trim().length < 1 || body.summary.trim().length > 240) {
+    fields.summary = "Ringkasan wajib diisi (maksimal 240 karakter).";
+  }
+  if (body.detail !== undefined && body.detail !== null &&
+    (typeof body.detail !== "string" || body.detail.length > 4000)) {
+    fields.detail = "Detail maksimal 4000 karakter.";
+  }
+  let occurredAt: string | null = null;
+  if (body.occurred_at !== undefined) {
+    if (typeof body.occurred_at !== "string" || Number.isNaN(Date.parse(body.occurred_at))) {
+      fields.occurred_at = "Waktu aktivitas tidak valid.";
+    } else occurredAt = new Date(body.occurred_at).toISOString();
+  }
+  if (Object.keys(fields).length) {
+    throw new ValidationError("VALIDATION_ERROR", "Data aktivitas tidak valid.", { fields });
+  }
+
+  const type = body.type as (typeof ACTIVITY_TYPES)[number];
+  const summary = (body.summary as string).trim();
+  const detail = typeof body.detail === "string" ? body.detail.trim() || null : null;
+  const sql = getSql(c.env);
+  const rows = await sql`WITH inserted AS (
+      INSERT INTO clinic_activities (clinic_id, type, summary, detail, occurred_at)
+      SELECT ${clinicId}, ${type}, ${summary}, ${detail}, COALESCE(${occurredAt}::timestamptz, now())
+      WHERE EXISTS (SELECT 1 FROM clinics WHERE id = ${clinicId} AND archived = false)
+      RETURNING id, clinic_id, type, summary, detail, occurred_at, created_at
+    ), activity_rows AS (
+      SELECT type, occurred_at FROM clinic_activities WHERE clinic_id = ${clinicId}
+      UNION ALL
+      SELECT type, occurred_at FROM inserted
+    ), stats AS (
+      SELECT
+        count(*) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit'))::int AS interactions_count,
+        count(*) FILTER (WHERE type = 'order')::int AS orders_count,
+        max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit', 'order')) AS last_contact_at
+      FROM activity_rows
+    ), updated AS (
+      UPDATE clinics
+      SET interactions_count = stats.interactions_count,
+          orders_count = stats.orders_count,
+          last_contact_at = stats.last_contact_at,
+          updated_at = now()
+      FROM stats
+      WHERE clinics.id = ${clinicId} AND EXISTS (SELECT 1 FROM inserted)
+      RETURNING clinics.id
+    )
+    SELECT inserted.* FROM inserted JOIN updated ON updated.id = inserted.clinic_id`;
+
+  const activity = rows[0] as Record<string, unknown> | undefined;
+  if (!activity) {
+    const existing = await sql`SELECT archived FROM clinics WHERE id = ${clinicId} LIMIT 1`;
+    if (!existing[0]) return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+    if (existing[0].archived) return fail(c, 409, "ARCHIVED_CLINIC", "Klinik arsip tidak dapat diubah.");
+    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+  }
+
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.activity.create", resourceType: "clinic_activity",
+    resourceId: String(activity.id), requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: activity }, 201);
+});
+
 export { crmRoutes };
