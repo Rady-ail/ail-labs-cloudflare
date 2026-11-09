@@ -33,7 +33,7 @@ describe("POST /api/crm/clinics/:id/activities", () => {
   beforeEach(() => mocks.query.mockReset().mockResolvedValue([]));
 
   it("rejects unsupported activity types", async () => {
-    const response = await send({ type: "sms", summary: "Follow up" });
+    const response = await send({ type: "visit", summary: "Follow up" });
     const body = await response.json() as any;
 
     expect(response.status).toBe(422);
@@ -62,8 +62,8 @@ describe("POST /api/crm/clinics/:id/activities", () => {
 
     expect(sql).toContain("orders_count");
     expect(sql).toContain("last_contact_at");
-    expect(sql).toContain("max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit'))");
-    expect(sql).not.toContain("max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit', 'order'))");
+    expect(sql).toContain("max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email'))");
+    expect(sql).not.toContain("'visit'");
 
     expect(sql).toContain("INSERT INTO clinic_activities");
   });
