@@ -480,8 +480,12 @@ crmRoutes.post("/clinics/:id/activities", async (c) => {
   const body = await readJsonObject(c);
   const allowed = new Set(["type", "summary", "detail", "occurred_at"]);
   const unknown = Object.keys(body).filter((key) => !allowed.has(key));
+  if (unknown.length) {
+    throw new ValidationError("BAD_REQUEST", "Field aktivitas tidak dikenal.", {
+      fields: Object.fromEntries(unknown.map((key) => [key, "Field tidak dikenal."])),
+    });
+  }
   const fields: Record<string, string> = {};
-  for (const key of unknown) fields[key] = "Field tidak dikenal.";
   if (typeof body.type !== "string" || !ACTIVITY_TYPES.includes(body.type as (typeof ACTIVITY_TYPES)[number])) {
     fields.type = "Jenis aktivitas tidak valid.";
   }
