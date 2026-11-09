@@ -37,7 +37,9 @@ threadsRoutes.get("/threads", async (c) => {
     sql`SELECT t.id::text AS id, t.subject, COALESCE(t.snippet, '') AS snippet,
         CASE WHEN ${folder} = 'drafts' THEN 'drafts' WHEN ${folder} = 'archive' THEN 'archive' ELSE t.folder END AS folder,
         t.is_read AS "isRead", t.is_starred AS "isStarred", t.needs_approval AS "needsApproval",
-        t.last_message_at AS "lastMessageAt", COALESCE(t.last_message_at, t.created_at) AS "cursorAt",
+        t.last_message_at AS "lastMessageAt",
+        to_char(COALESCE(t.last_message_at, t.created_at) AT TIME ZONE 'UTC',
+          'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "cursorAt",
         COALESCE((SELECT json_agg(json_build_object('id', l.id::text, 'name', l.name, 'color', l.color)
           ORDER BY l.name) FROM email_thread_labels tl JOIN email_labels l ON l.id = tl.label_id
           WHERE tl.thread_id = t.id), '[]'::json) AS labels
@@ -114,7 +116,7 @@ threadsRoutes.get("/threads", async (c) => {
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
   const last = pageRows[pageRows.length - 1] as Record<string, unknown> | undefined;
   const nextCursor = hasMore && last
-    ? encodeCursor(new Date(String(last.cursorAt)).toISOString(), String(last.id))
+    ? encodeCursor(String(last.cursorAt), String(last.id))
     : null;
   return ok(c, {
     items: pageRows.map((row: Record<string, any>) => ({
