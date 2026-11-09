@@ -796,4 +796,34 @@ crmRoutes.get("/follow-ups", async (c) => {
   return c.json({ data: rows }, 200);
 });
 
+
+crmRoutes.get("/regions/summary", async (c) => {
+  const query = c.req.query();
+  const unknown = Object.keys(query);
+  if (unknown.length) {
+    throw new ValidationError("BAD_REQUEST", "Parameter tidak dikenal.", {
+      fields: Object.fromEntries(unknown.map((key) => [key, "Parameter tidak dikenal."])),
+    });
+  }
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT
+      province,
+      count(*)::int AS clinics_count,
+      count(*) FILTER (WHERE stage = 'lead')::int AS lead_count,
+      count(*) FILTER (WHERE stage = 'contacted')::int AS contacted_count,
+      count(*) FILTER (WHERE stage = 'catalog_sent')::int AS catalog_sent_count,
+      count(*) FILTER (WHERE stage = 'negotiating')::int AS negotiating_count,
+      count(*) FILTER (WHERE stage = 'ordered')::int AS ordered_count,
+      count(*) FILTER (WHERE stage = 'active')::int AS active_count,
+      count(*) FILTER (WHERE stage = 'inactive')::int AS inactive_count,
+      COALESCE(sum(interactions_count), 0)::int AS interactions_count,
+      COALESCE(sum(orders_count), 0)::int AS orders_count,
+      count(*) FILTER (WHERE next_followup_at IS NOT NULL)::int AS clinics_with_followup
+    FROM clinics
+    WHERE archived = false
+    GROUP BY province
+    ORDER BY province ASC`;
+  return c.json({ data: rows }, 200);
+});
+
 export { crmRoutes };
