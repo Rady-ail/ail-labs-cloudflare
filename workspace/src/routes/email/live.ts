@@ -2,11 +2,12 @@ import { Hono } from "hono";
 import type { AppEnv } from "../../lib/http";
 import { ok, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
-import { assertQueryKeys, badRequest } from "./shared";
+import { assertNoQuery, assertQueryKeys, badRequest } from "./shared";
 
 const liveRoutes = new Hono<AppEnv>();
 
 liveRoutes.get("/live/status", async (c) => {
+  assertNoQuery(c);
   try {
     const sql = getSql(c.env);
     await sql`SELECT 1`;
