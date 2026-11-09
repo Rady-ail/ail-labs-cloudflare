@@ -88,7 +88,14 @@ app.use("/api/*", async (c, next) => {
     bucket.count += 1;
     if (bucket.count > RATE_LIMIT) return fail(c, 429, "RATE_LIMITED", "Terlalu banyak permintaan");
     if (rateBuckets.size > 10000) {
-      for (const [bucketKey, value] of rateBuckets) if (value.resetAt <= now) rateBuckets.delete(bucketKey);
+      for (const [bucketKey, value] of rateBuckets) {
+        if (value.resetAt <= now) rateBuckets.delete(bucketKey);
+      }
+      while (rateBuckets.size > 10000) {
+        const oldestKey = rateBuckets.keys().next().value;
+        if (!oldestKey) break;
+        rateBuckets.delete(oldestKey);
+      }
     }
   }
 
