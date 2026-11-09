@@ -227,11 +227,11 @@ async function processStatus(sql: ReturnType<typeof getSql>, type: string, data:
   if (!resendId) return;
   const eventKey = `resend_${type.replace(/[^a-z0-9_]/gi, "_")}`;
   const rows = await sql`UPDATE email_messages
-      SET metadata = metadata || jsonb_build_object('delivery_status', ${type}, ${eventKey}, ${JSON.stringify({
+      SET metadata = metadata || jsonb_build_object('delivery_status', ${type}::text, ${eventKey}::text, ${JSON.stringify({
         occurred_at: cleanText(data.created_at, 80) || new Date().toISOString(),
       })}::jsonb)
       WHERE resend_email_id = ${resendId}
-        AND NOT (metadata ? ${eventKey})
+        AND NOT (metadata ? ${eventKey}::text)
       RETURNING id::text AS id, thread_id::text AS thread_id`;
   if (type === "email.bounced" || type === "email.complained") {
     const recipients = addresses(data.to ?? data.email?.to);
