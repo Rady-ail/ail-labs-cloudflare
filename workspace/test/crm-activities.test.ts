@@ -57,6 +57,9 @@ describe("POST /api/crm/clinics/:id/activities", () => {
     const sql = String(mocks.query.mock.calls[0][0]);
     expect(sql).toContain("count(*) FILTER");
     expect(sql).toContain("interactions_count");
+    expect(sql).toContain("type IN ('call', 'whatsapp', 'email')");
+    expect(sql).not.toContain("type IN ('call', 'whatsapp', 'email', 'visit')");
+
     expect(sql).toContain("orders_count");
     expect(sql).toContain("last_contact_at");
     expect(sql).toContain("INSERT INTO clinic_activities");
