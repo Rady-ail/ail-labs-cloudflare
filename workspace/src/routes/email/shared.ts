@@ -2,6 +2,7 @@ import type { Context } from "hono";
 import type { AppEnv } from "../../lib/http";
 import { ValidationError } from "../../lib/http";
 import { isEmail } from "../../lib/validate";
+import { readJsonObject } from "../../lib/body";
 
 export type EmailSql = ReturnType<typeof import("../../lib/db").getSql>;
 
@@ -103,7 +104,7 @@ export function decodeCursor(value: string | undefined): { at: string; id: strin
 }
 
 export async function readOptionalJsonObject(c: Context<AppEnv>): Promise<Record<string, unknown>> {
-  return c.req.raw.body ? await (await import("../../lib/body")).readJsonObject(c) : {};
+  return c.req.raw.body ? await readJsonObject(c) : {};
 }
 
 export async function insertEmailEvent(
