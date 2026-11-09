@@ -590,4 +590,210 @@ crmRoutes.post("/clinics/:id/activities", async (c) => {
   return c.json({ data: activity }, 201);
 });
 
+
+function validateFollowUpInput(body: Record<string, unknown>, mode: "create" | "update") {
+  const allowed = new Set(["scheduled_at", "reason"]);
+  const fields: Record<string, string> = {};
+  for (const key of Object.keys(body)) if (!allowed.has(key)) fields[key] = "Field tidak dikenal.";
+  const result: { scheduled_at?: string; reason?: string } = {};
+
+  if (mode === "create" && (!Object.hasOwn(body, "scheduled_at") || !Object.hasOwn(body, "reason"))) {
+    if (!Object.hasOwn(body, "scheduled_at")) fields.scheduled_at = "Tanggal follow-up wajib diisi.";
+    if (!Object.hasOwn(body, "reason")) fields.reason = "Alasan follow-up wajib diisi.";
+  }
+  if (Object.hasOwn(body, "scheduled_at")) {
+    const value = body.scheduled_at;
+    if (typeof value !== "string" || Number.isNaN(Date.parse(value))) {
+      fields.scheduled_at = "Tanggal follow-up tidak valid.";
+    } else result.scheduled_at = new Date(value).toISOString();
+  }
+  if (Object.hasOwn(body, "reason")) {
+    const value = body.reason;
+    if (typeof value !== "string" || value.trim().length < 1 || value.trim().length > 240) {
+      fields.reason = "Alasan wajib diisi (maksimal 240 karakter).";
+    } else result.reason = value.trim();
+  }
+  if (Object.keys(fields).length) {
+    throw new ValidationError("VALIDATION_ERROR", "Data follow-up tidak valid.", { fields });
+  }
+  if (mode === "update" && Object.keys(result).length === 0) {
+    throw new ValidationError("BAD_REQUEST", "Tidak ada perubahan follow-up.");
+  }
+  return result;
+}
+
+crmRoutes.post("/clinics/:id/follow-ups", async (c) => {
+  const clinicId = c.req.param("id");
+  if (!isUuid(clinicId)) badRequest("ID klinik tidak valid.");
+  const input = validateFollowUpInput(await readJsonObject(c), "create");
+  const sql = getSql(c.env);
+  const rows = await sql`WITH active_clinic AS (
+      SELECT id FROM clinics WHERE id = ${clinicId} AND archived = false FOR UPDATE
+    ), pending AS (
+      SELECT f.id FROM clinic_followups f
+      JOIN active_clinic clinic ON clinic.id = f.clinic_id
+      WHERE f.completed = false
+      ORDER BY f.scheduled_at ASC
+      LIMIT 1
+      FOR UPDATE
+    ), updated AS (
+      UPDATE clinic_followups
+      SET scheduled_at = ${input.scheduled_at}, reason = ${input.reason}
+      WHERE id = (SELECT id FROM pending)
+      RETURNING id, clinic_id, scheduled_at, reason, completed, completed_at, created_at
+    ), inserted AS (
+      INSERT INTO clinic_followups (clinic_id, scheduled_at, reason)
+      SELECT ${clinicId}, ${input.scheduled_at}, ${input.reason}
+      FROM active_clinic
+      WHERE NOT EXISTS (SELECT 1 FROM pending)
+      RETURNING id, clinic_id, scheduled_at, reason, completed, completed_at, created_at
+    ), saved AS (
+      SELECT * FROM updated
+      UNION ALL
+      SELECT * FROM inserted
+    ), synced AS (
+      UPDATE clinics
+      SET next_followup_at = (
+            SELECT scheduled_at FROM clinic_followups
+            WHERE clinic_id = ${clinicId} AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          next_followup_reason = (
+            SELECT reason FROM clinic_followups
+            WHERE clinic_id = ${clinicId} AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          updated_at = now()
+      WHERE id = ${clinicId} AND EXISTS (SELECT 1 FROM saved)
+      RETURNING id
+    )
+    SELECT saved.* FROM saved JOIN synced ON synced.id = saved.clinic_id`;
+
+  const followup = rows[0] as Record<string, unknown> | undefined;
+  if (!followup) {
+    const clinicError = await requireActiveClinic(c, sql, clinicId);
+    if (clinicError) return clinicError;
+    return fail(c, 404, "CLINIC_NOT_FOUND", "Klinik tidak ditemukan.");
+  }
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.followup.set", resourceType: "clinic_followup",
+    resourceId: String(followup.id), requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: followup }, 201);
+});
+
+crmRoutes.patch("/follow-ups/:id", async (c) => {
+  const followupId = c.req.param("id");
+  if (!isUuid(followupId)) badRequest("ID follow-up tidak valid.");
+  const input = validateFollowUpInput(await readJsonObject(c), "update");
+  const sql = getSql(c.env);
+  const scheduledAt = input.scheduled_at ?? null;
+  const reason = input.reason ?? null;
+  const rows = await sql`WITH updated AS (
+      UPDATE clinic_followups AS f
+      SET scheduled_at = COALESCE(${scheduledAt}::timestamptz, f.scheduled_at),
+          reason = COALESCE(${reason}::text, f.reason)
+      WHERE f.id = ${followupId} AND f.completed = false
+        AND EXISTS (SELECT 1 FROM clinics WHERE id = f.clinic_id AND archived = false)
+      RETURNING f.id, f.clinic_id, f.scheduled_at, f.reason, f.completed, f.completed_at, f.created_at
+    ), synced AS (
+      UPDATE clinics AS c
+      SET next_followup_at = (
+            SELECT scheduled_at FROM clinic_followups
+            WHERE clinic_id = c.id AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          next_followup_reason = (
+            SELECT reason FROM clinic_followups
+            WHERE clinic_id = c.id AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          updated_at = now()
+      WHERE c.id = (SELECT clinic_id FROM updated)
+      RETURNING c.id
+    )
+    SELECT updated.* FROM updated JOIN synced ON synced.id = updated.clinic_id`;
+  const followup = rows[0] as Record<string, unknown> | undefined;
+  if (!followup) return fail(c, 404, "FOLLOWUP_NOT_FOUND", "Follow-up aktif tidak ditemukan.");
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.followup.update", resourceType: "clinic_followup",
+    resourceId: followupId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: followup }, 200);
+});
+
+crmRoutes.post("/follow-ups/:id/complete", async (c) => {
+  const followupId = c.req.param("id");
+  if (!isUuid(followupId)) badRequest("ID follow-up tidak valid.");
+  const sql = getSql(c.env);
+  const rows = await sql`WITH completed AS (
+      UPDATE clinic_followups AS f
+      SET completed = true, completed_at = COALESCE(f.completed_at, now())
+      WHERE f.id = ${followupId}
+        AND EXISTS (SELECT 1 FROM clinics WHERE id = f.clinic_id AND archived = false)
+      RETURNING f.id, f.clinic_id, f.scheduled_at, f.reason, f.completed, f.completed_at, f.created_at
+    ), synced AS (
+      UPDATE clinics AS c
+      SET next_followup_at = (
+            SELECT scheduled_at FROM clinic_followups
+            WHERE clinic_id = c.id AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          next_followup_reason = (
+            SELECT reason FROM clinic_followups
+            WHERE clinic_id = c.id AND completed = false
+            ORDER BY scheduled_at ASC LIMIT 1
+          ),
+          updated_at = now()
+      WHERE c.id = (SELECT clinic_id FROM completed)
+      RETURNING c.id
+    )
+    SELECT completed.* FROM completed JOIN synced ON synced.id = completed.clinic_id`;
+  const followup = rows[0] as Record<string, unknown> | undefined;
+  if (!followup) return fail(c, 404, "FOLLOWUP_NOT_FOUND", "Follow-up tidak ditemukan.");
+  await audit(sql, {
+    actor: c.get("actor"), action: "clinic.followup.complete", resourceType: "clinic_followup",
+    resourceId: followupId, requestId: c.get("requestId"), ok: true,
+  });
+  return c.json({ data: followup }, 200);
+});
+
+crmRoutes.get("/follow-ups", async (c) => {
+  const query = c.req.query();
+  const allowed = new Set(["status", "from", "to", "limit"]);
+  const unknown = Object.keys(query).filter((key) => !allowed.has(key));
+  if (unknown.length) {
+    throw new ValidationError("BAD_REQUEST", "Parameter tidak dikenal.", {
+      fields: Object.fromEntries(unknown.map((key) => [key, "Parameter tidak dikenal."])),
+    });
+  }
+  const status = query.status ?? "pending";
+  if (status !== "pending" && status !== "completed" && status !== "all") {
+    throw new ValidationError("BAD_REQUEST", "Filter status tidak valid.", {
+      fields: { status: "Gunakan pending, completed, atau all." },
+    });
+  }
+  const from = query.from ?? null;
+  const to = query.to ?? null;
+  if ((from !== null && Number.isNaN(Date.parse(from))) || (to !== null && Number.isNaN(Date.parse(to)))) {
+    throw new ValidationError("BAD_REQUEST", "Rentang tanggal tidak valid.", {
+      fields: { date: "Gunakan tanggal ISO yang valid." },
+    });
+  }
+  const limit = clampInt(query.limit, 1, 200, 100);
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT f.id, f.clinic_id, c.name AS clinic_name, c.city, c.province,
+      f.scheduled_at, f.reason, f.completed, f.completed_at, f.created_at
+    FROM clinic_followups f
+    JOIN clinics c ON c.id = f.clinic_id
+    WHERE c.archived = false
+      AND (${status} = 'all' OR (${status} = 'pending' AND f.completed = false)
+        OR (${status} = 'completed' AND f.completed = true))
+      AND (${from}::timestamptz IS NULL OR f.scheduled_at >= ${from}::timestamptz)
+      AND (${to}::timestamptz IS NULL OR f.scheduled_at <= ${to}::timestamptz)
+    ORDER BY f.completed ASC, f.scheduled_at ASC
+    LIMIT ${limit}`;
+  return c.json({ data: rows }, 200);
+});
+
 export { crmRoutes };
