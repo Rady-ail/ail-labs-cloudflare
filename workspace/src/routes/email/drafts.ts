@@ -145,7 +145,8 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
   const key = body.idempotencyKey.trim();
   const sql = getSql(c.env);
 
-  const prior = await sql`SELECT id::text AS id, status, idempotency_key, metadata
+  const prior = await sql`SELECT id::text AS id, status, idempotency_key, metadata,
+      subject, body_text, to_recipients, cc_recipients, bcc_recipients
     FROM email_drafts WHERE id = ${draftId} LIMIT 1`;
   const draft = prior[0] as Record<string, any> | undefined;
   if (!draft) return fail(c, 404, "DRAFT_NOT_FOUND", "Draft tidak ditemukan");
