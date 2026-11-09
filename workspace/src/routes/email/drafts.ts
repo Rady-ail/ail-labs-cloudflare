@@ -4,7 +4,7 @@ import { ok, created, fail } from "../../lib/http";
 import { getSql } from "../../lib/db";
 import { readJsonObject } from "../../lib/body";
 import {
-  actor, assertAllowedKeys, invalid, jsonString, parseBigintId, parseRecipients, validateDraftFields,
+  actor, assertAllowedKeys, assertNoQuery, invalid, jsonString, parseBigintId, parseRecipients, validateDraftFields,
 } from "./shared";
 
 const draftsRoutes = new Hono<AppEnv>();
@@ -24,6 +24,7 @@ function draftView(row: Record<string, any>) {
 }
 
 draftsRoutes.post("/drafts", async (c) => {
+  assertNoQuery(c);
   const body = await readJsonObject(c);
   const input = validateDraftFields(body, false);
   const sql = getSql(c.env);
@@ -50,6 +51,7 @@ draftsRoutes.post("/drafts", async (c) => {
 });
 
 draftsRoutes.patch("/drafts/:draftId", async (c) => {
+  assertNoQuery(c);
   const draftId = parseBigintId(c.req.param("draftId"), "draftId");
   const body = await readJsonObject(c);
   const input = validateDraftFields(body, true);
@@ -94,6 +96,7 @@ draftsRoutes.patch("/drafts/:draftId", async (c) => {
 });
 
 draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
+  assertNoQuery(c);
   const draftId = parseBigintId(c.req.param("draftId"), "draftId");
   const body = await readJsonObject(c);
   assertAllowedKeys(body, ["comment"]);
@@ -131,6 +134,7 @@ draftsRoutes.post("/drafts/:draftId/request-approval", async (c) => {
 });
 
 draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
+  assertNoQuery(c);
   const draftId = parseBigintId(c.req.param("draftId"), "draftId");
   const body = await readJsonObject(c);
   assertAllowedKeys(body, ["approvalDecision", "idempotencyKey"]);
@@ -216,6 +220,7 @@ draftsRoutes.post("/drafts/:draftId/approve", async (c) => {
 });
 
 draftsRoutes.post("/drafts/:draftId/cancel", async (c) => {
+  assertNoQuery(c);
   const draftId = parseBigintId(c.req.param("draftId"), "draftId");
   const body = await readJsonObject(c);
   assertAllowedKeys(body, ["reason"]);
