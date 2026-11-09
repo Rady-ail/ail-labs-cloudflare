@@ -36,6 +36,6 @@ test("body > 256KB -> 413", async () => {
   expect(r.status).toBe(413);
 });
 test("health: DB tak terjangkau -> 503 tanpa bocor", async () => {
-  const r = await req("/api/health"); const t = await r.text();
+  const r = await req("/api/health", { headers: { Origin: allowedOrigin } }); const t = await r.text();
   expect(r.status).toBe(503); expect(t).not.toContain("postgres");
 });
