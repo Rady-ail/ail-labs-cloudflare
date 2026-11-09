@@ -68,7 +68,7 @@ function stubResendResponse(status: number, payload: Record<string, unknown>) {
   return fetchMock;
 }
 
-async function createScheduledDraft(sql: ReturnType<typeof neon>, marker: string) {
+async function createScheduledDraft(sql: any, marker: string) {
   const rows = await sql`INSERT INTO email_drafts
     (subject, to_recipients, cc_recipients, bcc_recipients, body_text, status, scheduled_at, metadata)
     VALUES (${marker}, '["recipient@example.test"]'::jsonb, '[]'::jsonb, '[]'::jsonb,
@@ -90,8 +90,8 @@ integration("live sender records a successful mocked Resend response", async () 
       RESEND_API_KEY: "test-resend-key", RESEND_WEBHOOK_SECRET: "",
       EMAIL_SEND_MODE: "live",
     });
-    const rows = await sql`SELECT status, sent_message_id::text AS sent_message_id
-      FROM email_drafts WHERE id = ${id}::bigint`;
+    const rows = (await sql`SELECT status, sent_message_id::text AS sent_message_id
+      FROM email_drafts WHERE id = ${id}::bigint`) as Array<Record<string, any>>;
     expect(rows[0].status).toBe("sent");
     expect(rows[0].sent_message_id).toBeTruthy();
     expect(fetchMock).toHaveBeenCalledTimes(1);
