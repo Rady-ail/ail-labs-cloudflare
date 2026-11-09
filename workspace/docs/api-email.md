@@ -57,7 +57,7 @@ Example approval:
 
 The Worker Cron invokes the sender once per minute; at most 10 due drafts are claimed per run using row locking/atomic claim. A claim older than 10 minutes can be recovered. Suppressed recipients and invalid drafts are marked failed without sending.
 
-- `EMAIL_SEND_MODE=dry-run` (default): no Resend request is made; the job is recorded as completed with `dry_run=true` and a dry-run event.
+- `EMAIL_SEND_MODE=dry-run` (default): no Resend request is made; the draft status is changed to `sent` with `dry_run=true` and a dry-run event. This status means the scheduled job was consumed in dry-run mode, not that an email was transmitted.
 - `EMAIL_SEND_MODE=live`: sends through Resend using the stable job ID as the provider idempotency key. Successful provider responses create the outbound message and mark the draft sent.
 - Network failures, HTTP 429 and HTTP 5xx are retried up to three attempts with exponential delays (60 seconds, then 120 seconds). Other HTTP errors and permanent validation/configuration failures are not retried. Exhausted retries become `failed`.
 - Bounce/complaint suppression is checked before a send. The webhook maintains the suppression list.
