@@ -75,7 +75,9 @@ export const errorHandler: ErrorHandler<AppEnv> = (error, c) => {
         : 400;
       return crmError(c, status, error.code, error.message, details?.fields);
     }
-    const status = error.code === "PAYLOAD_TOO_LARGE" ? 413 : 400;
+    const status = error.code === "PAYLOAD_TOO_LARGE" ? 413
+      : error.code.startsWith("INVALID_") || error.code === "VALIDATION_ERROR" ? 422
+      : 400;
     return fail(c, status, error.code, error.message, error.details);
   }
   if (isCrmPath(c)) return crmError(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
