@@ -221,11 +221,11 @@ threadsRoutes.patch("/threads/:threadId", async (c) => {
       RETURNING t.id::text AS id, t.is_read, t.is_starred
     ), events AS (
       INSERT INTO email_events (thread_id, event_type, actor, event_data)
-      SELECT b.id, 'thread_marked_read', ${actor(c)}, jsonb_build_object('isRead', u.is_read)
+      SELECT b.id, 'thread_marked_read', ${actor(c)}::text, jsonb_build_object('isRead', u.is_read)
       FROM before b JOIN updated u ON u.id::bigint = b.id
       WHERE ${hasRead} AND b.is_read IS DISTINCT FROM u.is_read
       UNION ALL
-      SELECT b.id, 'thread_marked_starred', ${actor(c)}, jsonb_build_object('isStarred', u.is_starred)
+      SELECT b.id, 'thread_marked_starred', ${actor(c)}::text, jsonb_build_object('isStarred', u.is_starred)
       FROM before b JOIN updated u ON u.id::bigint = b.id
       WHERE ${hasStarred} AND b.is_starred IS DISTINCT FROM u.is_starred
       RETURNING id
@@ -250,7 +250,7 @@ threadsRoutes.post("/threads/:threadId/archive", async (c) => {
       RETURNING t.id::text AS id
     ), events AS (
       INSERT INTO email_events (thread_id, event_type, actor, event_data)
-      SELECT b.id, 'thread_archived', ${actor(c)}, '{}'::jsonb
+      SELECT b.id, 'thread_archived', ${actor(c)}::text, '{}'::jsonb
       FROM before b JOIN updated u ON u.id::bigint = b.id
       WHERE b.is_archived = false
       RETURNING id
