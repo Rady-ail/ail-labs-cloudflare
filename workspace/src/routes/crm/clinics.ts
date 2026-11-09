@@ -517,9 +517,9 @@ crmRoutes.post("/clinics/:id/activities", async (c) => {
       SELECT type, occurred_at FROM inserted
     ), stats AS (
       SELECT
-        count(*) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit'))::int AS interactions_count,
+        count(*) FILTER (WHERE type IN ('call', 'whatsapp', 'email'))::int AS interactions_count,
         count(*) FILTER (WHERE type = 'order')::int AS orders_count,
-        max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit', 'order')) AS last_contact_at
+        max(occurred_at) FILTER (WHERE type IN ('call', 'whatsapp', 'email', 'visit')) AS last_contact_at
       FROM activity_rows
     ), updated AS (
       UPDATE clinics
