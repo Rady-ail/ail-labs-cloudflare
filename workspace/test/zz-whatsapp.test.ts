@@ -67,3 +67,19 @@ describe("whatsapp pesan, laporan, sampel tertahan", () => {
     expect(d.items.filter((i: any) => i.kind === "sampel_tertahan").map((i: any) => i.title)).toEqual(["Sup AWB"]);
   });
 });
+
+describe("antrean WA & supplier diam", () => {
+  test("antrean hanya lead belum dihubungi bernomor valid; supplier diam muncul", async () => {
+    const db = await getDb();
+    await db.exec(`INSERT INTO clinics (name, city, province, stage, phone, interest) VALUES
+      ('Antri Tinggi', 'x', 'x', 'lead', '6281100000001', 3), ('Antri Rendah', 'x', 'x', 'lead', '6281100000002', 1),
+      ('Nomor Buruk', 'x', 'x', 'lead', '0812', 3), ('Sudah Kontak', 'x', 'x', 'contacted', '6281100000003', 3);
+      INSERT INTO suppliers (slug, name, category, status, last_activity_on) VALUES ('sup-diam', 'Sup Diam', 'skincare_oem', 'menunggu_balasan', CURRENT_DATE - 12)`);
+    const a: any = ((await (await app.request("/api/whatsapp/antrean", { headers: H }, env)).json()) as any).data;
+    const names = a.items.map((i: any) => i.name).filter((n: string) => n.startsWith("Antri") || n === "Nomor Buruk" || n === "Sudah Kontak");
+    expect(names).toEqual(["Antri Tinggi", "Antri Rendah"]);
+    const d: any = ((await (await app.request("/api/pengingat", { headers: H }, env)).json()) as any).data;
+    const s = d.items.find((i: any) => i.kind === "supplier_diam" && i.title === "Sup Diam");
+    expect(s.severity).toBe("tinggi");
+  });
+});

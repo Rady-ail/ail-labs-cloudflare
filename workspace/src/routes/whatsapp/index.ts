@@ -44,3 +44,21 @@ whatsappRoutes.get("/pesan", async (c) => {
   }));
   return ok(c, { items });
 });
+
+// Antrean kirim hari ini: klinik lead yang belum pernah dihubungi, nomor WA valid, urut minat tertinggi.
+whatsappRoutes.get("/antrean", async (c) => {
+  const limit = Math.min(30, Math.max(1, Number(c.req.query("limit")) || 15));
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT id::text AS id, name, city, province, phone, interest
+    FROM clinics
+    WHERE archived = false AND stage = 'lead' AND last_contact_at IS NULL AND interactions_count = 0
+      AND phone ~ '^62[0-9]{8,13}$'
+      AND NOT EXISTS (SELECT 1 FROM clinic_activities a WHERE a.clinic_id = clinics.id AND a.type = 'whatsapp')
+    ORDER BY interest DESC NULLS LAST, created_at ASC LIMIT ${limit}`;
+  const total = (await sql`SELECT count(*)::int AS n FROM clinics
+    WHERE archived = false AND stage = 'lead' AND last_contact_at IS NULL AND interactions_count = 0 AND phone ~ '^62[0-9]{8,13}$'`)[0] as Record<string, any>;
+  return ok(c, {
+    items: rows.map((r: Record<string, any>) => ({ id: String(r.id), name: r.name, city: r.city === "-" ? null : r.city, province: r.province === "-" ? null : r.province, phone: r.phone, interest: r.interest ?? null })),
+    total_menunggu: Number(total?.n ?? 0),
+  });
+});
