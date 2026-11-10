@@ -6,9 +6,8 @@
 <link rel="apple-touch-icon" href="/images/logo.png">
 <title>AIL LABS — Command Center</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link id="ail-typography-preload" rel="preload" href="/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="stylesheet" href="/styles/ail-typography.css">
 <style>
   :root{
     /* ---- Metallic Teal ---- */
@@ -27,7 +26,7 @@
   *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
   html,body{margin:0;padding:0;}
   body{
-    font-family:'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family:var(--font-sf);
     color:var(--ink-900); min-height:100vh; position:relative; overflow-x:hidden;
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
@@ -161,10 +160,10 @@
     background: radial-gradient(circle at 32% 26%, var(--gold-500), var(--green-500) 46%, var(--green-900) 100%);
     display:flex; align-items:center; justify-content:center;
     box-shadow: inset 0 1px 1px rgba(238,246,246,0.5), 0 8px 24px rgba(42,130,136,0.45), 0 0 30px -6px rgba(111,201,207,0.6);
-    font-family:'Fraunces',serif; color:#fff; font-weight:600; font-size:22px;
+    font-family:var(--font-sf); color:#fff; font-weight:600; font-size:22px;
   }
   #loginScreen h2{
-    margin:0 0 2px; text-align:center; font-family:'Fraunces',serif; font-weight:600;
+    margin:0 0 2px; text-align:center; font-family:var(--font-sf); font-weight:600;
     font-size:21px; color:var(--ink-900);
   }
   #loginScreen .sub{ text-align:center; margin:0 0 20px; font-size:12.5px; color:var(--ink-400); }
@@ -194,7 +193,7 @@
     color:#fff; box-shadow:0 16px 34px rgba(1,10,11,0.45), 0 0 40px -12px rgba(42,130,136,0.5);
   }
   header h1{
-    font-family:'Fraunces',serif; font-weight:600; font-size:16px; margin:0; letter-spacing:.2px;
+    font-family:var(--font-sf); font-weight:600; font-size:16px; margin:0; letter-spacing:.2px;
     display:flex; align-items:center; gap:9px;
   }
   header h1::before{
@@ -212,7 +211,7 @@
   .procurement-ai-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px}
   .procurement-card{padding:22px;border-radius:24px}
   .procurement-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:18px}
-  .procurement-head h3{margin:4px 0 4px;font-family:'Fraunces',serif;font-size:22px}
+  .procurement-head h3{margin:4px 0 4px;font-family:var(--font-sf);font-size:22px}
   .eyebrow{font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--gold-500)}
   .ai-badge,.ai-score{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(111,201,207,.35);background:rgba(111,201,207,.10);border-radius:999px;padding:7px 11px;font-size:11px;font-weight:800;color:var(--gold-500)}
   .ai-score{min-width:58px;font-size:15px}
@@ -245,7 +244,7 @@
     transition: transform .2s var(--spring);
   }
   .stat-card:hover{ transform:translateY(-2px); }
-  .stat-card .num{ font-family:'Fraunces',serif; font-size:26px; font-weight:600; color:var(--ink-900); }
+  .stat-card .num{ font-family:var(--font-sf); font-size:26px; font-weight:600; color:var(--ink-900); }
   .stat-card .lbl{ font-size:11.5px; color:var(--ink-400); font-weight:600; text-transform:uppercase; letter-spacing:.4px; margin-top:2px; }
 
   /* ---------- tabs (chip style) ---------- */
@@ -322,7 +321,7 @@
     border-radius:var(--radius-xl); padding:24px; width:100%; max-width:440px;
     max-height:90vh; overflow-y:auto; animation:fadeUp .28s var(--spring);
   }
-  .modal h3{ margin:0 0 16px; font-family:'Fraunces',serif; font-weight:600; font-size:19px; color:var(--ink-900); }
+  .modal h3{ margin:0 0 16px; font-family:var(--font-sf); font-weight:600; font-size:19px; color:var(--ink-900); }
   .field{ margin-bottom:13px; }
   .field label{ display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; margin-bottom:6px; color:var(--ink-600); }
   .field input, .field select, .field textarea{
@@ -351,7 +350,7 @@
 
   /* ---------- analytics ---------- */
   .chart-card{ border-radius:var(--radius-lg); padding:18px; margin-bottom:16px; }
-  .chart-card h4{ margin:0 0 14px; font-family:'Fraunces',serif; font-weight:600; font-size:15px; color:var(--ink-900); }
+  .chart-card h4{ margin:0 0 14px; font-family:var(--font-sf); font-weight:600; font-size:15px; color:var(--ink-900); }
   .bar-chart{ display:flex; align-items:flex-end; gap:6px; height:140px; }
   .bar-chart .bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; min-width:0; }
   .bar-chart .bar{ width:100%; max-width:22px; border-radius:6px 6px 2px 2px; background:linear-gradient(180deg, var(--green-500), var(--green-800)); transition:height .3s var(--spring); }
