@@ -4,6 +4,7 @@ import type { AppEnv } from "./lib/http";
 import { errorHandler, fail, newRequestId, notFound } from "./lib/http";
 import { getSql } from "./lib/db";
 import { requireAuth } from "./lib/auth";
+import { aiRoutes } from "./routes/ai";
 
 const app = new Hono<AppEnv>();
 
@@ -37,6 +38,8 @@ app.get("/api/health", async (c) => {
     return c.json({ ok: false, db: false, time: new Date().toISOString() }, 503);
   }
 });
+
+app.route("/api/ai", aiRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);
