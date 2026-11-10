@@ -8,6 +8,11 @@ export interface Env {
   CF_ACCESS_AUD?: string;
   WHATSAPP_VERIFY_TOKEN?: string;
   WHATSAPP_APP_SECRET?: string;
+  WHATSAPP_TOKEN?: string;
+  WHATSAPP_PHONE_NUMBER_ID?: string;
+  WHATSAPP_TEMPLATE?: string;
+  WHATSAPP_TEMPLATE_LANG?: string;
+  WHATSAPP_SEND_MODE?: string;
   KATALOG_DATABASE_URL?: string;
   ANTHROPIC_API_KEY?: string;
   ANTHROPIC_MODEL?: string;
