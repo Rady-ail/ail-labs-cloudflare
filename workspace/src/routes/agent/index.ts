@@ -18,7 +18,11 @@ async function gpt(env: any, messages: { role: string; content: string }[], maxT
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${env.OPENAI_API_KEY}` },
     body: JSON.stringify({ model: env.OPENAI_MODEL || "gpt-4o-mini", messages, max_tokens: maxTokens, temperature: 0.3 }),
   });
-  if (!res.ok) throw new Error(`openai_${res.status}`);
+  if (!res.ok) {
+    let kode = "";
+    try { kode = String(((await res.json()) as any)?.error?.code ?? ""); } catch { /* abaikan */ }
+    throw new Error(`openai_${res.status}_${kode}`);
+  }
   const j: any = await res.json();
   return String(j?.choices?.[0]?.message?.content ?? "").trim();
 }
@@ -36,6 +40,16 @@ async function konteks(sql: any): Promise<string> {
   const sampel = await sql`SELECT s.name, ss.state, ss.awb FROM supplier_samples ss JOIN suppliers s ON s.id = ss.supplier_id
     WHERE ss.state IN ('diminta','disepakati','dikirim','diuji') AND s.name !~* '(liyin|yolanda)' LIMIT 25`;
   return JSON.stringify({ klinik: lap, supplier_menunggu_balasan: tunggu, bea_menunggu_keputusan_rady: bea, sampel_berjalan: sampel });
+}
+
+function alasan(e: unknown): string {
+  const m = String((e as Error)?.message ?? "");
+  if (m.includes("openai_401")) return "Kunci OpenAI ditolak (salah/dicabut). Buat key baru lalu pasang ulang.";
+  if (m.includes("openai_429")) return m.includes("insufficient_quota") ? "Saldo OpenAI habis/belum diisi. Isi saldo di platform.openai.com." : "Terlalu banyak permintaan ke OpenAI, coba lagi sebentar.";
+  if (m.includes("openai_403")) return "Izin key OpenAI kurang (pakai izin Model capabilities).";
+  if (m.includes("openai_404")) return "Model OpenAI tidak tersedia untuk akun ini.";
+  if (m.startsWith("openai_")) return "OpenAI menolak permintaan (" + m.slice(7) + ").";
+  return "Gagal membaca data aplikasi untuk asisten.";
 }
 
 agentRoutes.get("/status", (c) =>
@@ -58,8 +72,8 @@ agentRoutes.post("/chat", async (c) => {
       ...hist, { role: "user", content: pesan },
     ]);
     return ok(c, { jawaban });
-  } catch {
-    return fail(c, 503, "AI_GAGAL", "Asisten AI sedang tidak bisa dihubungi");
+  } catch (e) {
+    return fail(c, 503, "AI_GAGAL", alasan(e));
   }
 });
 
@@ -75,7 +89,7 @@ agentRoutes.post("/poles", async (c) => {
       { role: "user", content: `Pesan terakhir supplier:\n${pesanSupplier}\n\nDraf saya:\n${teks}` },
     ], 900);
     return ok(c, { teks: hasil });
-  } catch {
-    return fail(c, 503, "AI_GAGAL", "Asisten AI sedang tidak bisa dihubungi");
+  } catch (e) {
+    return fail(c, 503, "AI_GAGAL", alasan(e));
   }
 });
