@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Env } from "../env";
 
 export type AppEnv = {
@@ -15,14 +16,14 @@ export function newRequestId(): string {
 
 export function fail(
   c: Context<AppEnv>,
-  status: number,
+  status: ContentfulStatusCode,
   code: string,
   message: string,
   details?: unknown,
 ) {
   return c.json(
     { error: { code, message, ...(details === undefined ? {} : { details }) }, meta: { requestId: c.get("requestId") } },
-    status as 400,
+    status,
   );
 }
 
