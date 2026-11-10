@@ -16,7 +16,7 @@
   line-gap-override:0%;
 }
 :root{
-  --font-sf:-apple-system,BlinkMacSystemFont,"Inter Variable","Inter","AIL Inter Fallback","Helvetica Neue",Arial,sans-serif;
+  --font-sf:"Inter Variable","Inter","AIL Inter Fallback",-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
   --ail-type-10:11px; /* HIG floor: smallest step is 11 */
   --ail-type-11:11px;
   --ail-type-12:12px;
