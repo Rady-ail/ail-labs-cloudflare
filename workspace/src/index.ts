@@ -17,6 +17,8 @@ import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
 import { webhookRoutes } from "./routes/email/webhook";
+import { whatsappRoutes } from "./routes/whatsapp";
+import { whatsappWebhookRoutes } from "./routes/whatsapp/webhook";
 import { runScheduledEmailSender } from "./jobs/scheduled-email-sender";
 
 const app = new Hono<AppEnv>();
@@ -53,7 +55,7 @@ app.use("*", async (c, next) => {
 app.use("/api/*", async (c, next) => {
   const method = c.req.method.toUpperCase();
   const path = c.req.path;
-  const isWebhook = path === "/api/webhooks/resend";
+  const isWebhook = path === "/api/webhooks/resend" || path === "/api/webhooks/whatsapp";
 
   if (!isWebhook && method !== "GET" && method !== "HEAD" && path !== "/api/crm" && !path.startsWith("/api/crm/")) {
     const limited = bodyLimit({
@@ -122,7 +124,9 @@ app.route("/api/kampanye", kampanyeRoutes);
 app.route("/api/email", threadsRoutes);
 app.route("/api/email", draftsRoutes);
 app.route("/api/email", liveRoutes);
+app.route("/api/whatsapp", whatsappRoutes);
 app.route("/", webhookRoutes);
+app.route("/", whatsappWebhookRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);

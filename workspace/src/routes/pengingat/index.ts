@@ -22,7 +22,7 @@ pengingatRoutes.get("/", async (c) => {
   const limit = clampInt(q.limit, 1, 100, 50);
   const sql = getSql(c.env);
 
-  const [klinik, lewat, habis, sampel, pesanan, kampanye, counts, email, keputusan] = await Promise.all([
+  const [klinik, lewat, habis, sampel, pesanan, kampanye, counts, email, keputusan, followup] = await Promise.all([
     sql`SELECT id, name, next_followup_reason AS reason, next_followup_at AS at, (now() - next_followup_at > interval '3 days') AS high
         FROM clinics WHERE archived = false AND next_followup_at IS NOT NULL AND next_followup_at <= now()
         ORDER BY next_followup_at ASC LIMIT ${PER_KIND}`,
@@ -55,7 +55,8 @@ pengingatRoutes.get("/", async (c) => {
         (SELECT count(*)::int FROM email_threads t JOIN LATERAL (SELECT direction, from_email FROM email_messages m WHERE m.thread_id = t.id ORDER BY m.received_at DESC, m.id DESC LIMIT 1) lm ON true
           WHERE t.metadata ? 'link' AND lm.direction = 'inbound' AND lower(lm.from_email) NOT IN ('radyp13@gmail.com', 'rady@ail-aesthetic-labs.my.id')
             AND t.last_message_at >= now() - interval '14 days' AND LOWER(t.subject) NOT LIKE '%liyin%' AND LOWER(COALESCE(t.metadata->'link'->>'name', '')) !~ '(liyin|yolanda)') AS email_belum_dibalas,
-        (SELECT count(*)::int FROM supplier_samples ss JOIN suppliers s ON s.id = ss.supplier_id WHERE ss.state IN ('disepakati', 'diuji') AND s.archived_at IS NULL AND s.name !~* '(liyin|yolanda)') AS sampel_keputusan`,
+        (SELECT count(*)::int FROM supplier_samples ss JOIN suppliers s ON s.id = ss.supplier_id WHERE ss.state IN ('disepakati', 'diuji') AND s.archived_at IS NULL AND s.name !~* '(liyin|yolanda)') AS sampel_keputusan,
+        (SELECT count(*)::int FROM clinics WHERE archived = false AND stage = 'contacted' AND next_followup_at IS NULL AND last_contact_at IS NOT NULL AND last_contact_at <= now() - interval '3 days') AS klinik_follow_up`,
     sql`SELECT t.id, t.subject, t.last_message_at AS at, t.metadata->'link'->>'name' AS who, t.metadata->'link'->>'kind' AS lk
         FROM email_threads t JOIN LATERAL (SELECT direction, from_email FROM email_messages m WHERE m.thread_id = t.id ORDER BY m.received_at DESC, m.id DESC LIMIT 1) lm ON true
         WHERE t.metadata ? 'link' AND lm.direction = 'inbound' AND lower(lm.from_email) NOT IN ('radyp13@gmail.com', 'rady@ail-aesthetic-labs.my.id')
@@ -65,6 +66,10 @@ pengingatRoutes.get("/", async (c) => {
         FROM supplier_samples ss JOIN suppliers s ON s.id = ss.supplier_id
         WHERE ss.state IN ('disepakati', 'diuji') AND s.archived_at IS NULL AND s.name !~* '(liyin|yolanda)'
         ORDER BY s.last_activity_on DESC NULLS LAST LIMIT ${PER_KIND}`,
+    sql`SELECT id, name, last_contact_at AS at, floor(extract(epoch FROM (now() - last_contact_at)) / 86400)::int AS hari
+        FROM clinics WHERE archived = false AND stage = 'contacted' AND next_followup_at IS NULL
+          AND last_contact_at IS NOT NULL AND last_contact_at <= now() - interval '3 days'
+        ORDER BY last_contact_at ASC LIMIT ${PER_KIND}`,
   ]);
 
   const items: Item[] = [
@@ -75,6 +80,7 @@ pengingatRoutes.get("/", async (c) => {
     ...pesanan.map((r: Record<string, any>): Item => ({ kind: "pesanan_baru", ref_id: String(r.id), title: `Pesanan ${r.customer_name}`, detail: null, due_at: iso(r.created_at), severity: "sedang" })),
     ...email.map((r: Record<string, any>): Item => ({ kind: "email_belum_dibalas", ref_id: String(r.id), title: `${r.who ?? "Pengirim"} · ${r.subject ?? "(tanpa subjek)"}`, detail: r.lk === "clinic" ? "Klinik" : "Supplier", due_at: iso(r.at), severity: "sedang" })),
     ...keputusan.map((r: Record<string, any>): Item => ({ kind: "sampel_keputusan", ref_id: String(r.id), title: r.supplier, detail: `${r.description ?? ""} (${r.state})`.trim(), due_at: dstr(r.at), severity: "sedang" })),
+    ...followup.map((r: Record<string, any>): Item => ({ kind: "klinik_follow_up", ref_id: String(r.id), title: r.name, detail: `Belum ada balasan ${r.hari} hari sejak kontak terakhir`, due_at: iso(r.at), severity: Number(r.hari) >= 7 ? "tinggi" : "sedang" })),
     ...kampanye.map((r: Record<string, any>): Item => ({ kind: "kampanye_jadwal", ref_id: String(r.id), title: r.name, detail: null, due_at: iso(r.scheduled_at), severity: "info" })),
   ];
   items.sort((a, b) => RANK[a.severity] - RANK[b.severity] || (a.due_at ?? "9999").localeCompare(b.due_at ?? "9999"));
