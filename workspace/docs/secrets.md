@@ -28,3 +28,9 @@ npx wrangler secret put OPENAI_API_KEY --config wrangler.jsonc
 ```
 
 Enter each value only in Wrangler's interactive prompt. Do not paste it into terminal commands, shell history, or chat. If Access JWT authentication is used, set the non-secret `CF_ACCESS_TEAM_DOMAIN` and `CF_ACCESS_AUD` under Worker Variables in Cloudflare. Keep the Bearer path available only as an explicitly provisioned fallback.
+
+## AI (opsional)
+
+- `OPENAI_API_KEY`: tanpa ini `/api/ai/draft` membalas 503.
+- `OPENAI_MODEL`: opsional, default `gpt-4o-mini`.
+- `AI_PLAYBOOK`: aturan kerja internal (mis. Aturan Emas sourcing), diisi sebagai secret Worker. Jangan taruh isinya di repo ini karena repo publik.
