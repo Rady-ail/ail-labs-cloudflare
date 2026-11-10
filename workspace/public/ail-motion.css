@@ -1,0 +1,22 @@
+/* AIL Workspace — lapisan gerak tambahan (additive). Semua efek mati saat gerak dikurangi. */
+@media (prefers-reduced-motion: no-preference) {
+  .glass-panel, .kpi-card, .content-panel, .sup-card, .sup-tile, .worker-item, .pg-item, .system-item {
+    transition: translate .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .28s ease;
+  }
+  @media (hover: hover) {
+    .kpi-card:hover, .sup-card:hover, .sup-tile:hover, .worker-item:hover, .pg-item:hover {
+      translate: 0 -3px;
+      box-shadow: 0 14px 34px -14px rgba(6,182,212,.35), 0 2px 6px rgba(0,0,0,.12);
+    }
+  }
+  .nav-link, .mobile-nav-item, .theme-button, .gs-trigger, button {
+    transition: background-color .2s ease, color .2s ease, border-color .2s ease, scale .16s ease;
+  }
+  .nav-link:active, .mobile-nav-item:active, .theme-button:active, .gs-trigger:active, button:active { scale: .97; }
+  .nav-link.active { position: relative; }
+  .status-dot, .online-indicator { animation: ail-pulse 2.4s ease-in-out infinite; }
+  @keyframes ail-pulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
+}
+#ail-progress { position: fixed; inset: 0 0 auto 0; height: 2px; z-index: 90; pointer-events: none;
+  background: linear-gradient(90deg,#06b6d4,#f07b4f); transform-origin: left; scale: 0 1; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { #ail-progress { display: none; } }
