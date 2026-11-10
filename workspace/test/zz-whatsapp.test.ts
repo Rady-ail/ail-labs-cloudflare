@@ -181,3 +181,20 @@ describe("situs katalog", () => {
     expect(v2.status).toBe(400);
   });
 });
+
+describe("agent Claude", () => {
+  test("chat via Anthropic (mock) dan status dua penyedia", async () => {
+    const orig = globalThis.fetch; let url = ""; let hdr: any = null; let sent: any = null;
+    globalThis.fetch = (async (u: any, init: any) => { url = String(u); hdr = init.headers; sent = JSON.parse(init.body); return new Response(JSON.stringify({ content: [{ type: "text", text: "Halo dari Claude." }] })); }) as any;
+    try {
+      const e2 = { ...env, ANTHROPIC_API_KEY: "ak" };
+      const st = (await (await app.request("/api/agent/status", { headers: H }, e2)).json() as any).data;
+      expect(st.claude).toBe(true); expect(st.gpt).toBe(false);
+      const r = await app.request("/api/agent/chat", { method: "POST", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ pesan: "hai" }) }, e2);
+      expect(r.status).toBe(200);
+      const d = (await r.json() as any).data; expect(d.jawaban).toBe("Halo dari Claude."); expect(d.penyedia).toBe("claude");
+      expect(url).toContain("api.anthropic.com"); expect(hdr["x-api-key"]).toBe("ak");
+      expect(sent.system).toContain("KONTEKS"); expect(sent.messages.every((m: any) => m.role !== "system")).toBe(true);
+    } finally { globalThis.fetch = orig; }
+  });
+});

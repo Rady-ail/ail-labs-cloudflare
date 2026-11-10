@@ -9,6 +9,8 @@ export interface Env {
   WHATSAPP_VERIFY_TOKEN?: string;
   WHATSAPP_APP_SECRET?: string;
   KATALOG_DATABASE_URL?: string;
+  ANTHROPIC_API_KEY?: string;
+  ANTHROPIC_MODEL?: string;
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
   DEV?: string;
