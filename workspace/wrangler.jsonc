@@ -2,6 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "ail-labs-workspace",
   "main": "src/index.ts",
+  "routes": [{ "pattern": "app.ail-aesthetic-labs.my.id", "custom_domain": true }],
   "compatibility_date": "2026-11-10",
   "assets": {
     "directory": "./public",
