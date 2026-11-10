@@ -198,3 +198,37 @@ describe("agent Claude", () => {
     } finally { globalThis.fetch = orig; }
   });
 });
+
+describe("pusat kerja", () => {
+  const J = { ...H, "Content-Type": "application/json" };
+  test("endpoint baca berjalan di database nyata (pglite)", async () => {
+    for (const p of ["prioritas", "sampel", "persetujuan", "skor", "agenda", "ringkasan-pagi"]) {
+      const r = await app.request(`/api/pusat/${p}`, { headers: H }, env);
+      expect(r.status, p).toBe(200);
+    }
+    expect((await app.request("/api/pusat/prioritas", {}, env)).status).toBe(401);
+  });
+  test("agenda: buat, tampil, hapus, validasi", async () => {
+    const bad = await app.request("/api/pusat/agenda", { method: "POST", headers: J, body: JSON.stringify({ judul: "", mulai: "x" }) }, env);
+    expect(bad.status).toBe(400);
+    const t = new Date(Date.now() + 86400000).toISOString();
+    const r = await app.request("/api/pusat/agenda", { method: "POST", headers: J, body: JSON.stringify({ judul: "Zoom Humedix", mulai: t, jenis: "zoom" }) }, env);
+    expect(r.status).toBe(200); const id = ((await r.json()) as any).data.id;
+    const l = ((await (await app.request("/api/pusat/agenda", { headers: H }, env)).json()) as any).data;
+    expect(l.some((x: any) => x.judul === "Zoom Humedix")).toBe(true);
+    expect((await app.request(`/api/pusat/agenda/${id}`, { method: "DELETE", headers: H }, env)).status).toBe(200);
+  });
+  test("skor supplier, ekspor csv, dry-run ringkasan", async () => {
+    const { skorSupplier } = await import("../src/routes/pusat");
+    expect(skorSupplier({ status: "hold", hari: 3, sampel: [], bea: [] }).label).toBe("HOLD");
+    expect(skorSupplier({ status: "sampel_berjalan", hari: 2, sampel: ["diuji"], bea: [] }).label).toBe("GO");
+    expect(skorSupplier({ status: "kandidat", hari: 90, sampel: [], bea: [] }).label).toBe("EXIT");
+    for (const j of ["klinik", "supplier", "sampel", "pesanan"]) {
+      const r = await app.request(`/api/pusat/ekspor/${j}`, { headers: H }, env);
+      expect(r.status, j).toBe(200); expect(r.headers.get("content-type")).toContain("text/csv");
+    }
+    expect((await app.request("/api/pusat/ekspor/xx", { headers: H }, env)).status).toBe(404);
+    const k = await app.request("/api/pusat/ringkasan-pagi/kirim", { method: "POST", headers: H }, env);
+    expect(((await k.json()) as any).data.terkirim).toBe(false);
+  });
+});
