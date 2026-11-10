@@ -83,3 +83,49 @@ describe("antrean WA & supplier diam", () => {
     expect(s.severity).toBe("tinggi");
   });
 });
+
+describe("paket & bea, email.sent, supplier diam baru", () => {
+  test("paket list/patch; pengingat bea; supplier diam hormati arah email terakhir", async () => {
+    const db = await getDb();
+    await db.exec(`INSERT INTO suppliers (slug, name, category, status, last_activity_on) VALUES
+        ('sup-bea', 'Sup Bea', 'skincare_oem', 'sampel_berjalan', CURRENT_DATE), ('sup-ball', 'Sup Bola Kita', 'skincare_oem', 'menunggu_balasan', CURRENT_DATE - 20);
+      INSERT INTO supplier_samples (supplier_id, description, state, awb, duty_amount_idr, duty_decision)
+        SELECT id, 'Sampel bea', 'dikirim', 'AWB999', 155144, 'belum' FROM suppliers WHERE slug = 'sup-bea';`);
+    const sid = (await db.query(`SELECT id FROM suppliers WHERE slug = 'sup-ball'`)).rows[0] as any;
+    await db.exec(`INSERT INTO email_threads (subject, last_message_at, metadata) VALUES ('Bola', now() - interval '3 days', '{"link":{"kind":"supplier","id":"${sid.id}","name":"Sup Bola Kita"}}');
+      INSERT INTO email_messages (thread_id, direction, from_email, subject, body_text, received_at) SELECT id, 'inbound', 'x@sup.com', 'Bola', 'hi', now() - interval '3 days' FROM email_threads WHERE subject = 'Bola'`);
+    const list: any = ((await (await app.request("/api/paket", { headers: H }, env)).json()) as any).data;
+    const it = list.items.find((i: any) => i.awb === "AWB999");
+    expect(it.duty_amount_idr).toBe(155144); expect(list.menunggu_keputusan).toBeGreaterThanOrEqual(1);
+    const bad = await app.request(`/api/paket/${it.id}`, { method: "PATCH", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ duty_decision: "x" }) }, env);
+    expect(bad.status).toBe(422);
+    const ok2 = await app.request(`/api/paket/${it.id}`, { method: "PATCH", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ duty_decision: "tidak_bayar" }) }, env);
+    expect(ok2.status).toBe(200);
+    const d: any = ((await (await app.request("/api/pengingat", { headers: H }, env)).json()) as any).data;
+    expect(d.items.some((i: any) => i.kind === "bea_keputusan" && i.title === "Sup Bea")).toBe(false);
+    expect(d.items.some((i: any) => i.kind === "supplier_diam" && i.title === "Sup Bola Kita")).toBe(false);
+  });
+  test("email.sent dari Alexa tercatat di thread yang cocok, idempoten; pengirim lain diabaikan", async () => {
+    const db = await getDb();
+    await db.exec(`INSERT INTO email_threads (subject, last_message_at) VALUES ('Quote X', now() - interval '1 day');
+      INSERT INTO email_messages (thread_id, direction, from_email, to_recipients, subject, body_text, received_at)
+        SELECT id, 'inbound', 'sales@sup.com', '[]', 'Quote X', 'hi', now() - interval '1 day' FROM email_threads WHERE subject = 'Quote X'`);
+    const secretBytes = new TextEncoder().encode("rahasia-uji-12345678");
+    const secret = "whsec_" + btoa(String.fromCharCode(...secretBytes));
+    const wenv: any = { ...env, RESEND_WEBHOOK_SECRET: secret };
+    async function post(payload: any) {
+      const raw = JSON.stringify(payload); const id = "msg_" + Math.random().toString(36).slice(2); const ts = String(Math.floor(Date.now() / 1000));
+      const key = await crypto.subtle.importKey("raw", secretBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+      const mac = new Uint8Array(await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${ts}.${raw}`)));
+      return app.request("/api/webhooks/resend", { method: "POST", body: raw, headers: { "svix-id": id, "svix-timestamp": ts, "svix-signature": "v1," + btoa(String.fromCharCode(...mac)) } }, wenv);
+    }
+    const ev = (from: string) => ({ type: "email.sent", data: { email_id: "re_sent_1", from, to: ["sales@sup.com"], subject: "Re: Quote X", created_at: new Date().toISOString() } });
+    expect((await post(ev("Alexa | AIL LABS <alexa@inbox.ail-aesthetic-labs.my.id>"))).status).toBe(200);
+    expect((await post(ev("Alexa | AIL LABS <alexa@inbox.ail-aesthetic-labs.my.id>"))).status).toBe(200);
+    const rows = (await db.query(`SELECT direction FROM email_messages WHERE resend_email_id = 're_sent_1'`)).rows;
+    expect(rows.length).toBe(1); expect((rows[0] as any).direction).toBe("outbound");
+    const other = { type: "email.sent", data: { email_id: "re_sent_2", from: "rady@ail-aesthetic-labs.my.id", to: ["sales@sup.com"], subject: "Re: Quote X" } };
+    expect((await post(other)).status).toBe(200);
+    expect((await db.query(`SELECT 1 FROM email_messages WHERE resend_email_id = 're_sent_2'`)).rows.length).toBe(0);
+  });
+});

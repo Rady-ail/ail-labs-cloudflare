@@ -241,6 +241,56 @@ async function processReceived(sql: ReturnType<typeof getSql>, data: Record<stri
   try { await linkInbound(sql, String(inserted[0].id)); } catch { /* penautan gagal tidak boleh menghentikan penerimaan email */ }
 }
 
+// Catat email keluar dari Alexa (dikirim lewat Resend di luar aplikasi) ke thread yang sesuai.
+async function processSent(sql: ReturnType<typeof getSql>, env: AppEnv["Bindings"], data: Record<string, any>): Promise<void> {
+  const resendId = cleanText(data.email_id, 200);
+  if (!resendId) return;
+  const from = address(data.from);
+  if (!from.endsWith("@inbox.ail-aesthetic-labs.my.id")) return;
+  const to = addresses(data.to);
+  if (!to.length) return;
+  const exists = await sql`SELECT id FROM email_messages WHERE resend_email_id = ${resendId}::text LIMIT 1`;
+  if (exists.length) return;
+
+  const subject = cleanText(data.subject, 300) || "(No subject)";
+  let bodyText = "";
+  if (env.RESEND_API_KEY) {
+    try {
+      const r = await fetch(`https://api.resend.com/emails/${encodeURIComponent(resendId)}`, { headers: { Authorization: `Bearer ${env.RESEND_API_KEY}` } });
+      if (r.ok) {
+        const d = eventPayload(await r.json()) ?? {};
+        bodyText = cleanText(d.text, 50_000) || textFromHtml(d.html);
+      }
+    } catch { /* isi tidak wajib */ }
+  }
+  const sentAt = typeof data.created_at === "string" && !Number.isNaN(Date.parse(data.created_at))
+    ? new Date(data.created_at).toISOString() : new Date().toISOString();
+
+  const found = await sql`SELECT t.id::text AS thread_id FROM email_threads t
+    WHERE regexp_replace(lower(t.subject), '^((re|fwd|fw):[[:space:]]*)+', '', 'g')
+        = regexp_replace(lower(${subject}), '^((re|fwd|fw):[[:space:]]*)+', '', 'g')
+      AND t.last_message_at >= now() - interval '60 days' AND t.folder <> 'archive'
+      AND EXISTS (SELECT 1 FROM email_messages m WHERE m.thread_id = t.id
+        AND (lower(m.from_email) = ANY(${to}::text[]) OR m.to_recipients ?| ${to}::text[]))
+    ORDER BY t.last_message_at DESC, t.id DESC LIMIT 1`;
+  let threadId = found[0]?.thread_id ? String(found[0].thread_id) : null;
+  if (!threadId) {
+    const t = await sql`INSERT INTO email_threads (subject, folder, snippet, last_message_at, is_read, created_at, updated_at)
+      VALUES (${subject}, 'sent', ${bodyText.slice(0, 240)}, ${sentAt}::timestamptz, true, now(), now()) RETURNING id::text AS id`;
+    threadId = String(t[0].id);
+  }
+  const ins = await sql`INSERT INTO email_messages (thread_id, resend_email_id, direction, from_email, to_recipients, cc_recipients,
+      subject, body_text, sent_at, received_at, metadata)
+    VALUES (${threadId}::bigint, ${resendId}, 'outbound', ${from}, ${JSON.stringify(to)}::jsonb, ${JSON.stringify(addresses(data.cc))}::jsonb,
+      ${subject}, ${bodyText}, ${sentAt}::timestamptz, ${sentAt}::timestamptz, ${JSON.stringify({ provider: "resend", captured: "email.sent" })}::jsonb)
+    ON CONFLICT (resend_email_id) DO NOTHING RETURNING id::text AS id`;
+  if (!ins.length) return;
+  await sql`UPDATE email_threads SET snippet = ${bodyText.slice(0, 240)}, last_message_at = GREATEST(last_message_at, ${sentAt}::timestamptz),
+      updated_at = now() WHERE id = ${threadId}::bigint`;
+  await sql`INSERT INTO email_events (thread_id, event_type, actor, event_data)
+    VALUES (${threadId}::bigint, 'message_sent_captured', 'resend_webhook', ${JSON.stringify({ resend_email_id: resendId })}::jsonb)`;
+}
+
 async function processStatus(sql: ReturnType<typeof getSql>, type: string, data: Record<string, any>): Promise<void> {
   const resendId = cleanText(data.email_id, 200);
   if (!resendId) return;
@@ -305,6 +355,8 @@ webhookRoutes.post("/api/webhooks/resend", async (c) => {
     const sql = getSql(c.env);
     if (parsed.type === "email.received") {
       await processReceived(sql, await resolveReceivedData(c.env, eventPayload(parsed.data) ?? {}));
+    } else if (parsed.type === "email.sent") {
+      await processSent(sql, c.env, eventPayload(parsed.data) ?? {});
     } else if (parsed.type.startsWith("email.")) {
       await processStatus(sql, parsed.type, eventPayload(parsed.data) ?? {});
     }
