@@ -111,17 +111,32 @@ async function verifyAccessJwt(token: string, teamDomain: string, audience: stri
   }
 }
 
+// Batas percobaan masuk gagal per IP (best-effort per isolate): mencegah tebak kata sandi.
+const failedLogins = new Map<string, { count: number; resetAt: number }>();
+const FAIL_WINDOW_MS = 10 * 60_000;
+const FAIL_LIMIT = 10;
+
 export const requireAuth: MiddlewareHandler<AppEnv> = async (c, next) => {
   const authorization = c.req.header("Authorization");
   const bearer = authorization?.match(/^Bearer\s+(.+)$/i)?.[1];
+  const ip = c.req.header("CF-Connecting-IP") ?? "unknown";
+  const now = Date.now();
+  const rec = failedLogins.get(ip);
+  const blocked = Boolean(rec && rec.resetAt > now && rec.count >= FAIL_LIMIT);
 
-  if (bearer && c.env.API_TOKEN) {
+  if (bearer && c.env.API_TOKEN && !blocked) {
     if (await constantTimeEqual(bearer, c.env.API_TOKEN)) {
+      failedLogins.delete(ip);
       c.set("actor", "owner");
       await next();
       return;
     }
+    const cur = rec && rec.resetAt > now ? rec : { count: 0, resetAt: now + FAIL_WINDOW_MS };
+    cur.count += 1;
+    failedLogins.set(ip, cur);
+    if (failedLogins.size > 5000) failedLogins.clear();
   }
+  if (blocked) return fail(c, 429, "RATE_LIMITED", "Terlalu banyak percobaan masuk. Coba lagi nanti.");
 
   const accessJwt = c.req.header("Cf-Access-Jwt-Assertion");
   if (accessJwt && c.env.CF_ACCESS_TEAM_DOMAIN && c.env.CF_ACCESS_AUD) {

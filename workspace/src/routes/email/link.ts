@@ -28,7 +28,10 @@ export async function linkInbound(sql: Sql, messageId: string): Promise<"clinic"
   if (!m) return "skip";
   if (m.metadata && m.metadata.linked) return "skip";
   const from = String(m.from_email);
-  if (from.endsWith("@inbox.ail-aesthetic-labs.my.id")) return "skip";
+  if (from.endsWith("@inbox.ail-aesthetic-labs.my.id")) {
+    await sql`UPDATE email_messages SET metadata = COALESCE(metadata, '{}'::jsonb) || ${JSON.stringify({ linked: true, link_kind: "skip" })}::jsonb WHERE id = ${messageId}::bigint`;
+    return "skip";
+  }
   const when = new Date(m.received_at).toISOString();
   const stop = isStopReply(m.body_text ?? "");
 

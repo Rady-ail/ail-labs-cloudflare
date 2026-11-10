@@ -36,9 +36,14 @@ describe("hubungkan email masuk", () => {
     await mk("other@sup-x.com", "Quotation attached", "lk-4", "2026-11-07T01:00:00Z");
     await mk("yo@liyin.com", "hi", "lk-5", "2026-11-07T02:00:00Z");
     await mk("nobody@gmail.com", "hi", "lk-6", "2026-11-07T03:00:00Z");
+    await mk("alexa@inbox.ail-aesthetic-labs.my.id", "sent copy", "lk-7", "2026-11-07T04:00:00Z");
     const call = async () => (await (await app.request("/api/email/live/relink", { method: "POST", headers: H }, env)).json() as any).data;
-    const r = await call();
-    expect(r.processed).toBeGreaterThanOrEqual(6);
+    const r = { processed: 0, clinic: 0, supplier: 0, remaining: 1 };
+    for (let i = 0; i < 5 && r.remaining > 0; i++) {
+      const x = await call();
+      r.processed += x.processed; r.clinic += x.clinic; r.supplier += x.supplier; r.remaining = x.remaining;
+    }
+    expect(r.processed).toBeGreaterThanOrEqual(7);
     expect(r.clinic).toBe(3);
     expect(r.supplier).toBe(1);
     expect(r.remaining).toBe(0);

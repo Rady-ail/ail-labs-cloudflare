@@ -162,11 +162,12 @@ liveRoutes.post("/live/relink", async (c) => {
   const sql = getSql(c.env);
   const rows = await sql`SELECT id::text AS id FROM email_messages
     WHERE direction = 'inbound' AND NOT (COALESCE(metadata, '{}'::jsonb) ? 'linked')
-    ORDER BY received_at ASC, id ASC LIMIT 100`;
+    ORDER BY received_at ASC, id ASC LIMIT 6`;
   const out = { processed: 0, clinic: 0, supplier: 0, none: 0, remaining: 0 };
   for (const r of rows as Array<{ id: string }>) {
     const kind = await linkInbound(sql, r.id);
     out.processed += 1;
+    if (kind === "skip") continue;
     if (kind === "clinic") out.clinic += 1; else if (kind === "supplier") out.supplier += 1; else out.none += 1;
   }
   const left = await sql`SELECT count(*)::int AS n FROM email_messages
