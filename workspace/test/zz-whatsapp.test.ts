@@ -50,3 +50,20 @@ describe("whatsapp", () => {
     expect(d.counts.klinik_follow_up).toBe(2);
   });
 });
+
+describe("whatsapp pesan, laporan, sampel tertahan", () => {
+  test("pesan, laporan mingguan, pengingat sampel tertahan", async () => {
+    const db = await getDb();
+    await db.exec(`INSERT INTO clinics (name, city, province, stage) VALUES ('Klinik Pesan', 'x', 'x', 'contacted');
+      INSERT INTO clinic_activities (clinic_id, type, summary, detail) SELECT id, 'whatsapp', 'Balasan WhatsApp masuk', E'Halo\\n[wa:wamid.Z]' FROM clinics WHERE name = 'Klinik Pesan';
+      INSERT INTO suppliers (slug, name, category, status) VALUES ('sup-awb', 'Sup AWB', 'skincare_oem', 'sampel_berjalan');
+      INSERT INTO supplier_samples (supplier_id, description, state, awb, updated_at) SELECT id, 'Jarum', 'dikirim', '123', now() - interval '12 days' FROM suppliers WHERE slug = 'sup-awb'`);
+    const p: any = ((await (await app.request("/api/whatsapp/pesan", { headers: H }, env)).json()) as any).data;
+    const m = p.items.find((i: any) => i.clinic_name === "Klinik Pesan");
+    expect(m.arah).toBe("masuk"); expect(m.text).toBe("Halo");
+    const l: any = ((await (await app.request("/api/laporan/mingguan", { headers: H }, env)).json()) as any).data;
+    expect(l.wa_masuk).toBeGreaterThanOrEqual(1); expect(l.sampel_berjalan).toBeGreaterThanOrEqual(1);
+    const d: any = ((await (await app.request("/api/pengingat", { headers: H }, env)).json()) as any).data;
+    expect(d.items.filter((i: any) => i.kind === "sampel_tertahan").map((i: any) => i.title)).toEqual(["Sup AWB"]);
+  });
+});

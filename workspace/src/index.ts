@@ -17,6 +17,7 @@ import { threadsRoutes } from "./routes/email/threads";
 import { draftsRoutes } from "./routes/email/drafts";
 import { liveRoutes } from "./routes/email/live";
 import { webhookRoutes } from "./routes/email/webhook";
+import { laporanRoutes } from "./routes/laporan";
 import { whatsappRoutes } from "./routes/whatsapp";
 import { whatsappWebhookRoutes } from "./routes/whatsapp/webhook";
 import { runScheduledEmailSender } from "./jobs/scheduled-email-sender";
@@ -125,6 +126,7 @@ app.route("/api/email", threadsRoutes);
 app.route("/api/email", draftsRoutes);
 app.route("/api/email", liveRoutes);
 app.route("/api/whatsapp", whatsappRoutes);
+app.route("/api/laporan", laporanRoutes);
 app.route("/", webhookRoutes);
 app.route("/", whatsappWebhookRoutes);
 

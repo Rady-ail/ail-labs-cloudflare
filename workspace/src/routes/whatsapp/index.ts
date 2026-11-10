@@ -26,3 +26,21 @@ whatsappRoutes.get("/kuota", async (c) => {
     can_send: used < WA_DAILY_LIMIT && waitMs === 0,
   });
 });
+
+// Kotak masuk WhatsApp: aktivitas WA terbaru dari semua klinik (masuk, terkirim dari HP, penawaran dibuka dari app).
+whatsappRoutes.get("/pesan", async (c) => {
+  const limit = Math.min(100, Math.max(1, Number(c.req.query("limit")) || 50));
+  const sql = getSql(c.env);
+  const rows = await sql`SELECT a.id::text AS id, a.clinic_id::text AS clinic_id, c.name AS clinic_name, c.phone,
+      a.summary, a.detail, a.occurred_at,
+      CASE WHEN a.summary = ${WA_IN_SUMMARY} THEN 'masuk' ELSE 'keluar' END AS arah
+    FROM clinic_activities a JOIN clinics c ON c.id = a.clinic_id
+    WHERE a.type = 'whatsapp' AND c.archived = false
+    ORDER BY a.occurred_at DESC LIMIT ${limit}`;
+  const items = rows.map((r: Record<string, any>) => ({
+    id: String(r.id), clinic_id: String(r.clinic_id), clinic_name: r.clinic_name, phone: r.phone ?? null,
+    arah: r.arah, summary: r.summary, text: String(r.detail ?? "").replace(/\n?\[wa:[^\]]+\]\s*$/, "") || null,
+    at: new Date(r.occurred_at).toISOString(),
+  }));
+  return ok(c, { items });
+});
