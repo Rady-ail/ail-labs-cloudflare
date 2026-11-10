@@ -168,3 +168,16 @@ describe("agent AI", () => {
     } finally { globalThis.fetch = orig; }
   });
 });
+
+describe("situs katalog", () => {
+  test("503 tanpa secret, auth wajib, validasi", async () => {
+    const r = await app.request("/api/situs/ringkasan", { headers: H }, env);
+    expect(r.status).toBe(503);
+    expect((await app.request("/api/situs/ringkasan", {}, env)).status).toBe(401);
+    const e2 = { ...env, KATALOG_DATABASE_URL: "postgres://x" };
+    const v = await app.request("/api/situs/pelanggan/abc", { method: "PATCH", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ status: "approved" }) }, e2);
+    expect(v.status).toBe(400);
+    const v2 = await app.request("/api/situs/pelanggan/3", { method: "PATCH", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ status: "x" }) }, e2);
+    expect(v2.status).toBe(400);
+  });
+});
