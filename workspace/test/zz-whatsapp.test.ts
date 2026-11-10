@@ -129,3 +129,22 @@ describe("paket & bea, email.sent, supplier diam baru", () => {
     expect((await db.query(`SELECT 1 FROM email_messages WHERE resend_email_id = 're_sent_2'`)).rows.length).toBe(0);
   });
 });
+
+describe("saran balasan", () => {
+  test("deteksi flag dan susun balasan", async () => {
+    const { deteksi, susunBalasan } = await import("../src/routes/email/saran");
+    const f = deteksi("We require 100% T/T payment in advance. Samples are charged USD 50. Buyer pays customs duty.");
+    const kode = f.map((x) => x.kode);
+    expect(kode).toContain("tt_muka"); expect(kode).toContain("sampel_bayar"); expect(kode).toContain("bea_cukai");
+    const s = susunBalasan("Anna", f);
+    expect(s.jenis).toBe("tolak_muka");
+    expect(s.teks).toContain("DDP"); expect(s.teks).toContain("Alexa");
+    expect(deteksi("Thanks, we will send samples free by DHL DDP.").some((x) => x.berat === "tinggi")).toBe(false);
+  });
+  test("endpoint 404 untuk thread tak ada, butuh auth", async () => {
+    const r = await app.request("/api/email/threads/999999/saran-balasan", { headers: H }, env);
+    expect(r.status).toBe(404);
+    const r2 = await app.request("/api/email/threads/1/saran-balasan", {}, env);
+    expect(r2.status).toBe(401);
+  });
+});
