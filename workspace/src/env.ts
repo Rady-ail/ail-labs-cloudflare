@@ -8,5 +8,7 @@ export interface Env {
   CF_ACCESS_AUD?: string;
   WHATSAPP_VERIFY_TOKEN?: string;
   WHATSAPP_APP_SECRET?: string;
+  OPENAI_API_KEY?: string;
+  OPENAI_MODEL?: string;
   DEV?: string;
 }

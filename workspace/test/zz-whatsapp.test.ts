@@ -148,3 +148,23 @@ describe("saran balasan", () => {
     expect(r2.status).toBe(401);
   });
 });
+
+describe("agent AI", () => {
+  test("status & 503 tanpa kunci, auth wajib", async () => {
+    const s = await app.request("/api/agent/status", { headers: H }, env);
+    expect((await s.json() as any).data.aktif).toBe(false);
+    const r = await app.request("/api/agent/chat", { method: "POST", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ pesan: "halo" }) }, env);
+    expect(r.status).toBe(503);
+    const r2 = await app.request("/api/agent/status", {}, env);
+    expect(r2.status).toBe(401);
+  });
+  test("chat memakai OpenAI (mock fetch) + konteks", async () => {
+    const orig = globalThis.fetch; let sent: any = null;
+    globalThis.fetch = (async (_u: any, init: any) => { sent = JSON.parse(init.body); return new Response(JSON.stringify({ choices: [{ message: { content: "Siap." } }] })); }) as any;
+    try {
+      const r = await app.request("/api/agent/chat", { method: "POST", headers: { ...H, "Content-Type": "application/json" }, body: JSON.stringify({ pesan: "apa prioritas?" }) }, { ...env, OPENAI_API_KEY: "k" });
+      expect(r.status).toBe(200); expect((await r.json() as any).data.jawaban).toBe("Siap.");
+      expect(sent.messages[0].content).toContain("KONTEKS"); expect(sent.messages[0].content).not.toMatch(/liyin/i);
+    } finally { globalThis.fetch = orig; }
+  });
+});
