@@ -232,3 +232,22 @@ describe("pusat kerja", () => {
     expect(((await k.json()) as any).data.terkirim).toBe(false);
   });
 });
+
+describe("situs tahap 2 (validasi)", () => {
+  const J = { ...H, "Content-Type": "application/json" };
+  const e2 = { ...env, KATALOG_DATABASE_URL: "postgres://x" };
+  const req = (p: string, method: string, body?: any) => app.request("/api/situs" + p, { method, headers: J, body: body === undefined ? undefined : JSON.stringify(body) }, e2);
+  test("kategori, lead, catatan, follow-up, popup, jadwal menolak input buruk", async () => {
+    expect((await req("/kategori", "POST", { name: "  " })).status).toBe(400);
+    expect((await req("/kategori/abc", "PATCH", { name: "x" })).status).toBe(400);
+    expect((await req("/leads/3", "PATCH", { status: "x" })).status).toBe(400);
+    expect((await req("/catatan", "POST", { source: "zzz", source_id: 1, note: "a" })).status).toBe(400);
+    expect((await req("/catatan", "POST", { source: "lead", source_id: 1, note: "" })).status).toBe(400);
+    expect((await req("/followup", "PUT", { source: "lead", source_id: 1, status: "x" })).status).toBe(400);
+    expect((await req("/followup", "PUT", { source: "lead", source_id: 1, next_followup_at: "bukan-tanggal" })).status).toBe(400);
+    expect((await req("/pengaturan/promo-popup", "PUT", { active: "ya" })).status).toBe(400);
+    expect((await req("/pengaturan/promo-popup", "PUT", { active: true, reappear_hours: 9999 })).status).toBe(400);
+    expect((await req("/jadwal-broadcast/2", "PATCH", { aktif: "x" })).status).toBe(400);
+    expect((await app.request("/api/situs/kategori", {}, e2)).status).toBe(401);
+  });
+});
