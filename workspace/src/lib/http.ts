@@ -1,4 +1,5 @@
 import type { Context } from "hono";
+import { HTTPException } from "hono/http-exception";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
 import type { Env } from "../env";
 
@@ -28,7 +29,10 @@ export function fail(
 }
 
 export function errorHandler(error: Error, c: Context<AppEnv>) {
-  // Never expose stack traces or provider/database error details.
+  if (error instanceof HTTPException) {
+    return fail(c, error.status, "HTTP_ERROR", "Permintaan tidak dapat diproses");
+  }
+  console.error("Unhandled request error", { requestId: c.get("requestId"), name: error.name });
   return fail(c, 500, "INTERNAL_ERROR", "Terjadi kesalahan internal");
 }
 
