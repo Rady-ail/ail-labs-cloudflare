@@ -6,7 +6,28 @@ import { getSql } from "../lib/db";
 import { writeAudit } from "../lib/audit";
 
 export const assistantRoutes = new Hono<AppEnv>();
+
+// Chat invokes a paid model API; fail closed if its per-actor limiter is unavailable.
+assistantRoutes.use("/chat", async (c, next) => {
+  const limiter = c.env.AI_RATE_LIMITER;
+  if (!limiter || typeof limiter.limit !== "function") {
+    console.error("Assistant rate limiter unavailable", { requestId: c.get("requestId") });
+    return fail(c, 503, "RATE_LIMITER_UNAVAILABLE", "Layanan AI sedang tidak tersedia");
+  }
+  try {
+    const { success } = await limiter.limit({
+      key: JSON.stringify([c.get("actor"), c.req.path]),
+    });
+    if (!success) return fail(c, 429, "RATE_LIMITED", "Terlalu banyak permintaan. Coba lagi nanti.");
+  } catch {
+    console.error("Assistant rate limiter unavailable", { requestId: c.get("requestId") });
+    return fail(c, 503, "RATE_LIMITER_UNAVAILABLE", "Layanan AI sedang tidak tersedia");
+  }
+  await next();
+});
+
 const MAX_MESSAGE = 6000;
+const MAX_BODY_BYTES = 12_000;
 const MAX_HISTORY = 12;
 const memorySchema = z.object({
   category: z.enum(["preference","project","workflow","fact","general"]).default("general"),
@@ -36,13 +57,34 @@ const AGENT_RULES: Record<string,string> = {
 };
 
 async function readJson<T>(request: Request, schema: z.ZodType<T>): Promise<T | null> {
-  const len = Number(request.headers.get("Content-Length") || 0);
-  if (len > 12_000) return null;
+  const contentLength = request.headers.get("Content-Length");
+  if (contentLength && /^\\d+$/.test(contentLength) && Number(contentLength) > MAX_BODY_BYTES) return null;
+  const reader = request.body?.getReader();
+  if (!reader) return null;
+  const chunks: Uint8Array[] = [];
+  let size = 0;
   try {
-    const raw = await request.text();
-    if (raw.length > 12_000) return null;
-    return schema.parse(JSON.parse(raw));
-  } catch { return null; }
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        await reader.cancel();
+        return null;
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(size);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  try { return schema.parse(JSON.parse(new TextDecoder().decode(bytes))); }
+  catch { return null; }
 }
 
 assistantRoutes.get("/conversations", async c => {
