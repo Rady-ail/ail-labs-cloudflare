@@ -6,6 +6,7 @@ import type { Env } from "../src/env";
 
 const { sql } = vi.hoisted(() => ({ sql: vi.fn(async (): Promise<Record<string, unknown>[]> => []) }));
 vi.mock("../src/lib/db", () => ({ getSql: () => sql }));
+vi.mock("../src/lib/audit", () => ({ writeAudit: vi.fn(async () => undefined) }));
 const env: Env = {
   DATABASE_URL: "postgres://test", RESEND_API_KEY: "", RESEND_WEBHOOK_SECRET: "",
   API_TOKEN: "token", EMAIL_SEND_MODE: "dry-run",
