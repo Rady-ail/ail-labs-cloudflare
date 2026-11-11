@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Icon } from "./icons";
-import { Operations } from "./Operations";
+import { Operations, EmailStatus } from "./Operations";
 
 type View = "home" | "landed" | "ai" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
@@ -253,7 +253,7 @@ export default function App() {
             {view === "ai" && <AI />}
             {view === "supplier" && <Operations kind="suppliers" />}
             {view === "klinik" && <Operations kind="clinics" />}
-            {view === "email" && <Soon title="Email" sub="Kotak masuk real-time dan draf yang menunggu persetujuan." />}
+            {view === "email" && <EmailStatus />}
           </motion.div>
         </AnimatePresence>
       </main>
