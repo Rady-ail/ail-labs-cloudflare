@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS suppliers (
+CREATE TABLE IF NOT EXISTS workspace_suppliers (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL CHECK (char_length(name) BETWEEN 1 AND 160),
   country TEXT NOT NULL DEFAULT '',
@@ -10,10 +10,10 @@ CREATE TABLE IF NOT EXISTS suppliers (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS suppliers_updated_at_idx ON suppliers(updated_at DESC);
-CREATE INDEX IF NOT EXISTS suppliers_name_idx ON suppliers(name);
+CREATE INDEX IF NOT EXISTS workspace_suppliers_updated_at_idx ON workspace_suppliers(updated_at DESC);
+CREATE INDEX IF NOT EXISTS workspace_suppliers_name_idx ON workspace_suppliers(name);
 
-CREATE TABLE IF NOT EXISTS clinics (
+CREATE TABLE IF NOT EXISTS workspace_clinics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL CHECK (char_length(name) BETWEEN 1 AND 160),
   city TEXT NOT NULL DEFAULT '',
@@ -26,8 +26,8 @@ CREATE TABLE IF NOT EXISTS clinics (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS clinics_updated_at_idx ON clinics(updated_at DESC);
-CREATE INDEX IF NOT EXISTS clinics_name_idx ON clinics(name);
+CREATE INDEX IF NOT EXISTS workspace_clinics_updated_at_idx ON workspace_clinics(updated_at DESC);
+CREATE INDEX IF NOT EXISTS workspace_clinics_name_idx ON workspace_clinics(name);
 
 CREATE TABLE IF NOT EXISTS workspace_activities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
