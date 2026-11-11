@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Icon } from "./icons";
+import { Operations, EmailStatus } from "./Operations";
 
 type View = "home" | "landed" | "ai" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
@@ -56,16 +57,16 @@ function Home({ go }: { go: (v: View) => void }) {
   useEffect(() => {
     const ac = new AbortController();
     fetch("/api/health", { signal: ac.signal })
-      .then(async (r) => { const j = await r.json().catch(() => ({})); const reach = r.ok || r.status === 401 || r.status === 403; setApi(reach ? "ok" : "bad"); setDb(r.ok ? (j.db ? "ok" : "bad") : reach ? "unk" : "bad"); })
+      .then(async (r) => { const j = await r.json().catch(() => ({})); const reachable = r.ok || r.status === 401; setApi(r.ok ? "ok" : r.status === 401 ? "unk" : "bad"); setDb(r.ok ? (j.db ? "ok" : "bad") : reachable ? "unk" : "bad"); })
       .catch(() => { if (!ac.signal.aborted) { setApi("bad"); setDb("bad"); } });
     return () => ac.abort();
   }, []);
   const st = (s: string) => (s === "ok" ? "Aktif" : s === "bad" ? "Tidak terhubung" : s === "unk" ? "Perlu login" : "Memeriksa…");
   const mods: { id: View; t: string; d: string; tag: string; soon?: boolean }[] = [
     { id: "landed", t: "Kalkulator Landed Cost", d: "Hitung biaya mendarat per unit dan harga jual dari target margin.", tag: "Aktif" },
-    { id: "ai", t: "Asisten AI", d: "Menyusun draf balasan supplier dan ringkasan. Tidak pernah mengirim sendiri.", tag: "Menunggu backend", soon: true },
-    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Segera", soon: true },
-    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Segera", soon: true },
+    { id: "ai", t: "Asisten AI", d: "Menyusun draf balasan supplier dan ringkasan. Tidak pernah mengirim sendiri.", tag: "Backend tersedia" },
+    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Perlu migrasi DB", soon: true },
+    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Perlu migrasi DB", soon: true },
   ];
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
@@ -250,9 +251,9 @@ export default function App() {
             {view === "home" && <Home go={setView} />}
             {view === "landed" && <Landed />}
             {view === "ai" && <AI />}
-            {view === "supplier" && <Soon title="Supplier & Sampel" sub="Status negosiasi, sampel, dan dokumen tiap supplier." />}
-            {view === "klinik" && <Soon title="CRM Klinik" sub="Daftar klinik, tindak lanjut WhatsApp, dan pesanan." />}
-            {view === "email" && <Soon title="Email" sub="Kotak masuk real-time dan draf yang menunggu persetujuan." />}
+            {view === "supplier" && <Operations kind="suppliers" />}
+            {view === "klinik" && <Operations kind="clinics" />}
+            {view === "email" && <EmailStatus />}
           </motion.div>
         </AnimatePresence>
       </main>

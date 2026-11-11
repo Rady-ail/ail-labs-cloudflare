@@ -1,0 +1,43 @@
+name: Workspace CI
+on:
+  pull_request:
+    paths:
+      - "workspace/**"
+      - ".github/workflows/workspace-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workspace-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: workspace
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12"
+          cache: npm
+          cache-dependency-path: workspace/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Backend typecheck
+        run: npm run typecheck
+      - name: Frontend typecheck
+        run: npm run typecheck:ui
+      - name: Unit and integration tests
+        run: npm test
+      - name: Build workspace UI
+        run: npm run build:ui
+      - name: Wrangler configuration dry-run
+        run: npx wrangler deploy --dry-run --config wrangler.jsonc
