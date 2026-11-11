@@ -64,9 +64,9 @@ function Home({ go }: { go: (v: View) => void }) {
   const st = (s: string) => (s === "ok" ? "Aktif" : s === "bad" ? "Tidak terhubung" : s === "unk" ? "Perlu login" : "Memeriksa…");
   const mods: { id: View; t: string; d: string; tag: string; soon?: boolean }[] = [
     { id: "landed", t: "Kalkulator Landed Cost", d: "Hitung biaya mendarat per unit dan harga jual dari target margin.", tag: "Aktif" },
-    { id: "ai", t: "Asisten AI", d: "Menyusun draf balasan supplier dan ringkasan. Tidak pernah mengirim sendiri.", tag: "Menunggu backend", soon: true },
-    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Segera", soon: true },
-    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Segera", soon: true },
+    { id: "ai", t: "Asisten AI", d: "Menyusun draf balasan supplier dan ringkasan. Tidak pernah mengirim sendiri.", tag: "Backend tersedia" },
+    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Perlu migrasi DB", soon: true },
+    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Perlu migrasi DB", soon: true },
   ];
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
