@@ -5,6 +5,7 @@ import { errorHandler, fail, newRequestId, notFound } from "./lib/http";
 import { getSql } from "./lib/db";
 import { requireAuth } from "./lib/auth";
 import { aiRoutes } from "./routes/ai";
+import { operationsRoutes } from "./routes/operations";
 
 const app = new Hono<AppEnv>();
 
@@ -40,6 +41,7 @@ app.get("/api/health", async (c) => {
 });
 
 app.route("/api/ai", aiRoutes);
+app.route("/api/ops", operationsRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);
