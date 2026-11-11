@@ -254,9 +254,9 @@ export default function App() {
         {nav(false)}
         <div className="sidebar-spacer" />
         <div className="system-card">
-          <div className="system-card-head"><span className="pulse-dot" /> SYSTEM STATUS</div>
-          <strong>Workspace ready</strong>
-          <small>Secure session · Private scope</small>
+          <div className="system-card-head">WORKSPACE CONTEXT</div>
+          <strong>Actor-scoped workspace</strong>
+          <small>Data access follows account scope</small>
         </div>
         <div className="sidebar-bottom">
           <div className="profile-avatar">R</div>
@@ -272,7 +272,7 @@ export default function App() {
         <header className="os-topbar">
           <div className="breadcrumb"><span>AIL LABS</span><b>/</b><strong>{NAV.find(n => n.id === view)?.label || "Workspace"}</strong></div>
           <div className="topbar-actions">
-            <span className="secure-indicator"><span className="pulse-dot" /> SECURE SESSION</span>
+            <span className="secure-indicator">PRIVATE WORKSPACE</span>
             <button className="chip theme-mobile" onClick={() => setTheme(theme === "midnight" ? "frost" : "midnight")} aria-label="Ganti tema"><Icon name={theme === "midnight" ? "sun" : "moon"} /></button>
           </div>
         </header>
