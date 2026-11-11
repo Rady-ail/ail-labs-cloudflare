@@ -2,12 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Icon } from "./icons";
 import { Operations, EmailStatus } from "./Operations";
+import { AgentWorkspace } from "./AgentWorkspace";
 
-type View = "home" | "landed" | "ai" | "supplier" | "klinik" | "email";
+type View = "home" | "landed" | "ai" | "assistant" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
   { id: "home", label: "Beranda", icon: "home" },
   { id: "landed", label: "Landed Cost", icon: "calc" },
-  { id: "ai", label: "Asisten AI", icon: "ai" },
+  { id: "ai", label: "Draf AI", icon: "ai" },
+  { id: "assistant", label: "Personal Assistant", icon: "ai" },
   { id: "supplier", label: "Supplier", icon: "box" },
   { id: "klinik", label: "Klinik", icon: "users" },
   { id: "email", label: "Email", icon: "mail" },
@@ -251,6 +253,7 @@ export default function App() {
             {view === "home" && <Home go={setView} />}
             {view === "landed" && <Landed />}
             {view === "ai" && <AI />}
+            {view === "assistant" && <AgentWorkspace />}
             {view === "supplier" && <Operations kind="suppliers" />}
             {view === "klinik" && <Operations kind="clinics" />}
             {view === "email" && <EmailStatus />}
