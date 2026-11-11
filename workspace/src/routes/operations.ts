@@ -59,7 +59,6 @@ operationsRoutes.post("/suppliers", async (c) => {
       VALUES (${d.name},${d.country ?? ""},${d.email ?? ""},${d.whatsapp ?? ""},${d.website ?? ""},${d.status ?? "prospect"},${d.notes ?? ""})
       RETURNING id,name,country,email,whatsapp,website,status,notes,created_at,updated_at`;
     await auditMutation(c, "create", "supplier", String(rows[0].id));
-    await auditMutation(c, "create", "clinic", String(rows[0].id));
     return c.json({ data: rows[0] }, 201);
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Supplier gagal disimpan. Periksa migrasi database.");
@@ -79,7 +78,6 @@ operationsRoutes.patch("/suppliers/:id", async (c) => {
       WHERE id=${c.req.param("id")} RETURNING id,name,country,email,whatsapp,website,status,notes,created_at,updated_at`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Supplier tidak ditemukan");
     await auditMutation(c, "update", "supplier", String(rows[0].id));
-    await auditMutation(c, "update", "clinic", String(rows[0].id));
     return c.json({ data: rows[0] });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Perubahan supplier gagal disimpan");
@@ -91,7 +89,6 @@ operationsRoutes.delete("/suppliers/:id", async (c) => {
     const rows = await getSql(c.env)`DELETE FROM suppliers WHERE id=${c.req.param("id")} RETURNING id`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Supplier tidak ditemukan");
     await auditMutation(c, "delete", "supplier", String(rows[0].id));
-    await auditMutation(c, "delete", "clinic", String(rows[0].id));
     return c.json({ ok: true });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Supplier gagal dihapus");
@@ -132,6 +129,7 @@ operationsRoutes.patch("/clinics/:id", async (c) => {
       status=COALESCE(${d.status ?? null},status),notes=COALESCE(${d.notes ?? null},notes),updated_at=now()
       WHERE id=${c.req.param("id")} RETURNING id,name,city,province,contact_name,phone,email,status,notes,created_at,updated_at`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Klinik tidak ditemukan");
+    await auditMutation(c, "update", "clinic", String(rows[0].id));
     return c.json({ data: rows[0] });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Perubahan klinik gagal disimpan");
@@ -142,6 +140,7 @@ operationsRoutes.delete("/clinics/:id", async (c) => {
   try {
     const rows = await getSql(c.env)`DELETE FROM clinics WHERE id=${c.req.param("id")} RETURNING id`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Klinik tidak ditemukan");
+    await auditMutation(c, "delete", "clinic", String(rows[0].id));
     return c.json({ ok: true });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Klinik gagal dihapus");
