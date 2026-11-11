@@ -22,5 +22,17 @@
   },
   "vars": {
     "EMAIL_SEND_MODE": "dry-run"
+  },
+  "previews": {
+    "vars": {
+      "EMAIL_SEND_MODE": "dry-run"
+    },
+    "ratelimits": [
+      {
+        "name": "AI_RATE_LIMITER",
+        "namespace_id": "202611120127",
+        "simple": { "limit": 10, "period": 60 }
+      }
+    ]
   }
 }
