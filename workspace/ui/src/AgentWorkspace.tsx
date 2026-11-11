@@ -99,13 +99,13 @@ export function AgentWorkspace() {
   return <section className="agent-os">
     <div className="top agent-heading">
       <div><div className="eyebrow"><span className="pulse-dot" /> PERSONAL INTELLIGENCE</div><h1>AI Command Center</h1><p className="sub">Orchestrate conversations, memory, tasks, and agent activity from one private workspace.</p></div>
-      <div className="agent-status"><span className="status-orb" /><span><b>CORE ONLINE</b><small>Private workspace</small></span></div>
+      <div className="agent-status"><span className="status-orb" /><span><b>ASSISTANT MODULE</b><small>Private workspace</small></span></div>
     </div>
     <div className="agent-overview">
       <div className="overview-tile"><span>ACTIVE MODULE</span><b>{tab === "chat" ? "AI Conversation" : tab === "memory" ? "Memory Vault" : tab === "tasks" ? "Task Queue" : "Agent Telemetry"}</b><small>AIL Intelligence Layer</small></div>
-      <div className="overview-tile"><span>MEMORY RECORDS</span><b>{memories.length.toString().padStart(2,"0")}</b><small>Explicitly saved</small></div>
-      <div className="overview-tile"><span>OPEN TASKS</span><b>{tasks.filter(t => t.status === "pending").length.toString().padStart(2,"0")}</b><small>Pending actions</small></div>
-      <div className="overview-tile"><span>RECENT RUNS</span><b>{summary.total.toString().padStart(2,"0")}</b><small>Last 7 days</small></div>
+      <div className="overview-tile"><span>MEMORY VAULT</span><b>EXPLICIT</b><small>Manual persistence</small></div>
+      <div className="overview-tile"><span>TASK CONTROL</span><b>TRACKED</b><small>Workspace task queue</small></div>
+      <div className="overview-tile"><span>OBSERVABILITY</span><b>7 DAYS</b><small>Agent activity window</small></div>
     </div>
     <div className="agent-tabs" role="tablist" aria-label="Assistant modules">
       {tabs.map((t, i) => <button key={t.id} className={tab === t.id ? "active" : ""} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}><span className="tab-index">0{i+1}</span>{t.label}{tab === t.id && <i />}</button>)}
@@ -113,7 +113,7 @@ export function AgentWorkspace() {
     {error && <div className="notice" role="alert" style={{ marginBottom: 14 }}>{error}</div>}
     {tab === "chat" && <div className="agent-chat-layout">
       <div className="card chat-card">
-        <div className="panel-head"><div><span className="panel-kicker">LIVE SESSION</span><h3>Conversation stream</h3></div><span className="live-chip"><i /> LIVE</span></div>
+        <div className="panel-head"><div><span className="panel-kicker">CHAT SESSION</span><h3>Conversation stream</h3></div><span className="live-chip"><i /> READY</span></div>
         <div className="chat-stream" aria-live="polite">
           {!messages.length && <div className="chat-empty"><div className="empty-orbit"><span /><i /><b>✳</b></div><h3>Intelligence at your command</h3><p>Mulai percakapan. Assistant memilih spesialis Engineering, Research, Business, Automation, atau General berdasarkan konteks.</p><span className="empty-hint">YOUR PRIVATE AI WORKSPACE</span></div>}
           {messages.map((m, i) => <article key={m.id || i} className={m.role === "assistant" ? "message assistant-message" : "message user-message"}>
@@ -130,7 +130,7 @@ export function AgentWorkspace() {
         {conversationId && <p className="conversation-id">SESSION · {conversationId}</p>}
       </div>
       <aside className="agent-side-panel">
-        <div className="card agent-info-card"><span className="panel-kicker">ROUTING ENGINE</span><h3>Specialist agents</h3><p>Assistant selects a specialist based on your request context.</p><div className="specialist-list">{["Engineering","Research","Business","Automation","General"].map((name, i) => <div key={name}><span className="specialist-icon">{["⌘","⌕","◈","↗","✳"][i]}</span><b>{name}</b><span className="specialist-state">AVAILABLE</span></div>)}</div></div>
+        <div className="card agent-info-card"><span className="panel-kicker">ROUTING ENGINE</span><h3>Specialist capabilities</h3><p>Assistant selects a specialist based on your request context.</p><div className="specialist-list">{["Engineering","Research","Business","Automation","General"].map((name, i) => <div key={name}><span className="specialist-icon">{["⌘","⌕","◈","↗","✳"][i]}</span><b>{name}</b><span className="specialist-state">ROUTED</span></div>)}</div></div>
         <div className="card agent-info-card"><span className="panel-kicker">SAFETY LAYER</span><h3>Human in control</h3><p>Actions remain advisory. Memory is saved only by explicit request. No automatic outbound messages or arbitrary tool execution.</p><div className="safety-line"><span className="pulse-dot" /> Approval boundary active</div></div>
       </aside>
     </div>}
