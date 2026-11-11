@@ -105,3 +105,35 @@ export function Operations({ kind }: Props) {
     </div>
   </motion.div>;
 }
+
+type EmailConfig = { database: boolean; ai: boolean; aiRateLimiter: boolean; email: boolean; emailMode: string };
+export function EmailStatus() {
+  const [status, setStatus] = useState<EmailConfig | null>(null);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/ops/status", { signal: controller.signal })
+      .then(async response => {
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body?.error?.message || `Gagal memeriksa konfigurasi (${response.status})`);
+        setStatus(body as EmailConfig);
+      })
+      .catch(reason => { if (!controller.signal.aborted) setError(reason instanceof Error ? reason.message : "Gagal memeriksa status."); });
+    return () => controller.abort();
+  }, []);
+  return <motion.div initial={{opacity:0,y:8}} animate={{opacity:1,y:0}}>
+    <div className="top"><div><h1>Email</h1><p className="sub">Status integrasi email dan pagar keamanan pengiriman.</p></div></div>
+    <section className="card">
+      <h3>Kesiapan integrasi</h3>
+      {error && <div className="notice" role="alert">{error}</div>}
+      {!status && !error && <p>Memeriksa konfigurasi…</p>}
+      {status && <>
+        <div className="row"><span>Database</span><b>{status.database ? "Terhubung" : "Belum terhubung"}</b></div>
+        <div className="row"><span>Resend API</span><b>{status.email ? "Terkonfigurasi" : "Belum dikonfigurasi"}</b></div>
+        <div className="row"><span>Mode pengiriman</span><b>{status.emailMode}</b></div>
+        <div className="row"><span>AI</span><b>{status.ai ? "Terkonfigurasi" : "Belum dikonfigurasi"}</b></div>
+        <div className="notice" style={{marginTop:14}}>Pengiriman email tetap dinonaktifkan dari antarmuka ini. Mode dry-run dipertahankan; tidak ada email yang dikirim otomatis. Inbox, approval draft, dan scheduled sending memerlukan backend email khusus yang belum terpasang pada repository ini.</div>
+      </>}
+    </section>
+  </motion.div>;
+}
