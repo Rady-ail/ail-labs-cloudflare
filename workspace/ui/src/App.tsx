@@ -72,7 +72,7 @@ function Home({ go }: { go: (v: View) => void }) {
     <motion.div variants={stagger} initial="hidden" animate="show">
       <motion.div variants={rise}><Header title="Intelligence overview" sub="Ruang kendali operasional AIL LABS — workflow bisnis, supplier, klinik, dan intelligence dalam satu workspace." /></motion.div>
       <motion.section variants={rise} className="home-hero">
-        <div className="hero-copy"><div className="eyebrow"><span className="pulse-dot" /> AIL INTELLIGENCE ENVIRONMENT</div><h2>One workspace.<br/><span>More intelligent operations.</span></h2><p>Connect your business workflows with a private AI workspace built for clarity, control, and execution.</p><button className="btn primary" onClick={() => go("assistant")}>Open AI Command Center <span aria-hidden="true">↗</span></button></div>
+        <div className="hero-copy"><div className="eyebrow"><span className="pulse-dot" /> AIL INTELLIGENCE ENVIRONMENT</div><h2>One workspace.<br/><span>More intelligent operations.</span></h2><p>Connect your business workflows with a private AI workspace built for clarity, control, and execution.</p><button className="btn primary" onClick={() => go("ai")}>Open AI Draft Studio <span aria-hidden="true">↗</span></button></div>
         <div className="hero-visual" aria-hidden="true"><div className="hero-ring ring-one"/><div className="hero-ring ring-two"/><div className="hero-core">✳</div><span className="hero-node node-a"/><span className="hero-node node-b"/><span className="hero-node node-c"/></div>
         <div className="hero-foot"><span>PRIVATE BY DESIGN</span><span>HUMAN-LED AUTOMATION</span><span>AIL LABS / OS 01</span></div>
       </motion.section>
