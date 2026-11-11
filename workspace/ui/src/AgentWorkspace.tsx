@@ -96,44 +96,62 @@ export function AgentWorkspace() {
     { id: "tasks", label: "Tugas" }, { id: "activity", label: "Monitoring" }
   ];
 
-  return <section>
-    <div className="top"><div><h1>Personal AI Assistant</h1><p className="sub">Assistant internal AIL LABS · data terpisah per akun</p></div></div>
-    <div className="seg" role="tablist" aria-label="Fitur assistant" style={{ flexWrap: "wrap", marginBottom: 16 }}>
-      {tabs.map(t => <button key={t.id} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}>{t.label}</button>)}
+  return <section className="agent-os">
+    <div className="top agent-heading">
+      <div><div className="eyebrow"><span className="pulse-dot" /> PERSONAL INTELLIGENCE</div><h1>AI Command Center</h1><p className="sub">Orchestrate conversations, memory, tasks, and agent activity from one private workspace.</p></div>
+      <div className="agent-status"><span className="status-orb" /><span><b>CORE ONLINE</b><small>Private workspace</small></span></div>
+    </div>
+    <div className="agent-overview">
+      <div className="overview-tile"><span>ACTIVE MODULE</span><b>{tab === "chat" ? "AI Conversation" : tab === "memory" ? "Memory Vault" : tab === "tasks" ? "Task Queue" : "Agent Telemetry"}</b><small>AIL Intelligence Layer</small></div>
+      <div className="overview-tile"><span>MEMORY RECORDS</span><b>{memories.length.toString().padStart(2,"0")}</b><small>Explicitly saved</small></div>
+      <div className="overview-tile"><span>OPEN TASKS</span><b>{tasks.filter(t => t.status === "pending").length.toString().padStart(2,"0")}</b><small>Pending actions</small></div>
+      <div className="overview-tile"><span>RECENT RUNS</span><b>{summary.total.toString().padStart(2,"0")}</b><small>Last 7 days</small></div>
+    </div>
+    <div className="agent-tabs" role="tablist" aria-label="Assistant modules">
+      {tabs.map((t, i) => <button key={t.id} className={tab === t.id ? "active" : ""} role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)}><span className="tab-index">0{i+1}</span>{t.label}{tab === t.id && <i />}</button>)}
     </div>
     {error && <div className="notice" role="alert" style={{ marginBottom: 14 }}>{error}</div>}
-    {tab === "chat" && <div className="card">
-      <div style={{ minHeight: 280, maxHeight: 480, overflowY: "auto", display: "grid", gap: 12, alignContent: "start", marginBottom: 16 }}>
-        {!messages.length && <p>Mulai percakapan. Assistant memilih spesialis Engineering, Research, Business, Automation, atau General berdasarkan konteks.</p>}
-        {messages.map((m, i) => <article key={m.id || i} style={{ padding: 12, borderRadius: 12, background: m.role === "assistant" ? "var(--panel, rgba(127,127,127,.10))" : "transparent", border: "1px solid var(--line, rgba(127,127,127,.2))" }}>
-          <div style={{ fontSize: 11, opacity: .7, marginBottom: 6 }}>{m.role === "assistant" ? `AIL Assistant · ${m.agent_name || "agent"}` : "Kamu"}</div>
-          <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.6 }}>{m.content}</div>
-        </article>)}
-        {busy && <p>Assistant sedang berpikir…</p>}
+    {tab === "chat" && <div className="agent-chat-layout">
+      <div className="card chat-card">
+        <div className="panel-head"><div><span className="panel-kicker">LIVE SESSION</span><h3>Conversation stream</h3></div><span className="live-chip"><i /> LIVE</span></div>
+        <div className="chat-stream" aria-live="polite">
+          {!messages.length && <div className="chat-empty"><div className="empty-orbit"><span /><i /><b>✳</b></div><h3>Intelligence at your command</h3><p>Mulai percakapan. Assistant memilih spesialis Engineering, Research, Business, Automation, atau General berdasarkan konteks.</p><span className="empty-hint">YOUR PRIVATE AI WORKSPACE</span></div>}
+          {messages.map((m, i) => <article key={m.id || i} className={m.role === "assistant" ? "message assistant-message" : "message user-message"}>
+            <div className="message-meta"><span className={m.role === "assistant" ? "message-avatar ai-avatar" : "message-avatar"}>{m.role === "assistant" ? "✳" : "U"}</span><b>{m.role === "assistant" ? "AIL Assistant" : "You"}</b><small>{m.role === "assistant" ? m.agent_name || "agent" : "USER INPUT"}</small></div>
+            <div className="message-content">{m.content}</div>
+          </article>)}
+          {busy && <div className="thinking-state"><span /><span /><span /> Agent is reasoning…</div>}
+        </div>
+        <form onSubmit={send} className="composer">
+          <input className="in" value={input} onChange={e => setInput(e.target.value)} maxLength={6000} placeholder="Message your AI workspace…" aria-label="Pesan untuk assistant" />
+          <button className="btn primary" disabled={busy || !input.trim()}>{busy ? "…" : "Send ↗"}</button>
+        </form>
+        <div className="composer-foot"><span>↳ ENTER TO SEND</span><span>UP TO 6,000 CHARACTERS</span></div>
+        {conversationId && <p className="conversation-id">SESSION · {conversationId}</p>}
       </div>
-      <form onSubmit={send} style={{ display: "flex", gap: 8 }}>
-        <input className="in" value={input} onChange={e => setInput(e.target.value)} maxLength={6000} placeholder="Tulis instruksi atau pertanyaan…" aria-label="Pesan untuk assistant" />
-        <button className="btn primary" disabled={busy || !input.trim()}>{busy ? "…" : "Kirim"}</button>
+      <aside className="agent-side-panel">
+        <div className="card agent-info-card"><span className="panel-kicker">ROUTING ENGINE</span><h3>Specialist agents</h3><p>Assistant selects a specialist based on your request context.</p><div className="specialist-list">{["Engineering","Research","Business","Automation","General"].map((name, i) => <div key={name}><span className="specialist-icon">{["⌘","⌕","◈","↗","✳"][i]}</span><b>{name}</b><span className="specialist-state">AVAILABLE</span></div>)}</div></div>
+        <div className="card agent-info-card"><span className="panel-kicker">SAFETY LAYER</span><h3>Human in control</h3><p>Actions remain advisory. Memory is saved only by explicit request. No automatic outbound messages or arbitrary tool execution.</p><div className="safety-line"><span className="pulse-dot" /> Approval boundary active</div></div>
+      </aside>
+    </div>}
+    {tab === "memory" && <div className="grid g2 agent-data-grid">
+      <form className="card" onSubmit={saveMemory}><span className="panel-kicker">LONG-TERM CONTEXT</span><h3>Memory vault</h3><p>Save durable context explicitly. No background capture.</p>
+        <label className="f">Category<select className="in" value={memoryCategory} onChange={e => setMemoryCategory(e.target.value)}><option value="general">General</option><option value="preference">Preference</option><option value="project">Project</option><option value="workflow">Workflow</option><option value="fact">Fact</option></select></label>
+        <label className="f">Memory<textarea className="in" value={memoryText} onChange={e => setMemoryText(e.target.value)} maxLength={2000} placeholder="Add a useful fact, preference, or project context…" /></label>
+        <button className="btn primary" disabled={!memoryText.trim()}>Save to vault ↗</button>
       </form>
-      {conversationId && <p style={{ marginTop: 8, fontSize: 11, opacity: .65 }}>ID percakapan: {conversationId}</p>}
+      <div className="card"><span className="panel-kicker">PERSISTENT RECORDS</span><h3>Saved memories</h3>{memories.length ? memories.map(m => <div key={m.id} className="row"><div><b>{m.category}</b><p>{m.content}</p></div><button className="btn" onClick={() => deleteMemory(m.id)}>Delete</button></div>) : <div className="empty-state">No saved memories yet.</div>}</div>
     </div>}
-    {tab === "memory" && <div className="grid g2">
-      <form className="card" onSubmit={saveMemory}>
-        <h3>Simpan memori</h3><p>Memori disimpan hanya atas tindakan eksplisitmu.</p>
-        <label className="f">Kategori<select className="in" value={memoryCategory} onChange={e => setMemoryCategory(e.target.value)}><option value="general">Umum</option><option value="preference">Preferensi</option><option value="project">Proyek</option><option value="workflow">Workflow</option><option value="fact">Fakta</option></select></label>
-        <label className="f">Isi memori<textarea className="in" value={memoryText} onChange={e => setMemoryText(e.target.value)} maxLength={2000} placeholder="Contoh: Gunakan draft-only untuk komunikasi supplier." /></label>
-        <button className="btn primary" disabled={!memoryText.trim()}>Simpan memori</button>
-      </form>
-      <div className="card"><h3>Memori tersimpan</h3>{memories.length ? memories.map(m => <div key={m.id} className="row"><div><b>{m.category}</b><p>{m.content}</p></div><button className="btn" onClick={() => deleteMemory(m.id)}>Hapus</button></div>) : <p>Belum ada memori.</p>}</div>
+    {tab === "tasks" && <div className="card agent-task-panel">
+      <span className="panel-kicker">EXECUTION BACKLOG</span><h3>Task queue</h3><p>Track actions assigned to your workspace.</p>
+      <form onSubmit={addTask} className="task-composer"><input className="in" value={taskTitle} onChange={e => setTaskTitle(e.target.value)} maxLength={180} placeholder="Create a task…" /><button className="btn primary" disabled={!taskTitle.trim()}>Add task +</button></form>
+      {tasks.length ? tasks.map(t => <div className="row" key={t.id}><div><b>{t.title}</b><p>{t.status}</p></div>{t.status === "pending" && <div style={{ display: "flex", gap: 6 }}><button className="btn" onClick={() => updateTask(t.id,"completed")}>Complete</button><button className="btn" onClick={() => updateTask(t.id,"cancelled")}>Cancel</button></div>}</div>) : <div className="empty-state">Your task queue is clear.</div>}
+      <p style={{ marginTop: 14 }}>Task creation is available. Scheduler and cross-channel reminders are not enabled yet.</p>
     </div>}
-    {tab === "tasks" && <div className="card">
-      <h3>Daftar tugas</h3><form onSubmit={addTask} style={{ display: "flex", gap: 8, margin: "12px 0" }}><input className="in" value={taskTitle} onChange={e => setTaskTitle(e.target.value)} maxLength={180} placeholder="Tambahkan tugas…" /><button className="btn primary" disabled={!taskTitle.trim()}>Tambah</button></form>
-      {tasks.length ? tasks.map(t => <div className="row" key={t.id}><div><b>{t.title}</b><p>{t.status}</p></div>{t.status === "pending" && <div style={{ display: "flex", gap: 6 }}><button className="btn" onClick={() => updateTask(t.id,"completed")}>Selesai</button><button className="btn" onClick={() => updateTask(t.id,"cancelled")}>Batal</button></div>}</div>) : <p>Belum ada tugas.</p>}
-      <p style={{ marginTop: 12 }}>Pembuatan tugas sudah tersedia; scheduler dan pengingat lintas kanal belum diaktifkan.</p>
-    </div>}
-    {tab === "activity" && <div className="card">
-      <h3>Monitoring 7 hari terakhir</h3><div className="grid g3" style={{ margin: "14px 0" }}><div><b>{summary.total}</b><p>Total agent run</p></div><div><b>{summary.completed}</b><p>Berhasil</p></div><div><b>{summary.failed}</b><p>Gagal</p></div></div>
+    {tab === "activity" && <div className="card agent-activity-panel">
+      <span className="panel-kicker">OBSERVABILITY / 7D</span><h3>Agent telemetry</h3><div className="grid g3" style={{ margin: "18px 0" }}><div className="telemetry-kpi"><b>{summary.total}</b><p>Total runs</p></div><div className="telemetry-kpi"><b>{summary.completed}</b><p>Completed</p></div><div className="telemetry-kpi"><b>{summary.failed}</b><p>Failed</p></div></div>
       {runs.map(r => <div className="row" key={r.id}><div><b>{r.agent_name}</b><p>{new Date(r.created_at).toLocaleString()}</p></div><span>{r.status} · {r.duration_ms ?? 0} ms</span></div>)}
+      {!runs.length && <div className="empty-state">No agent activity recorded in this period.</div>}
     </div>}
   </section>;
 }

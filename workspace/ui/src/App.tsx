@@ -234,33 +234,58 @@ export default function App() {
     </button>
   ));
   return (
-    <div className="app">
-      <aside className="side" aria-label="Navigasi utama">
-        <div className="brand"><i />AIL LABS</div>
+    <div className="app os-shell">
+      <aside className="side os-sidebar" aria-label="Navigasi utama">
+        <div className="brand os-brand">
+          <span className="brand-mark"><i /><i /><i /></span>
+          <span className="brand-copy"><strong>AIL<span>LABS</span></strong><small>INTELLIGENCE OS</small></span>
+        </div>
+        <div className="workspace-switcher">
+          <span className="workspace-avatar">A</span>
+          <span><b>AIL Workspace</b><small>Personal environment</small></span>
+          <span className="switch-chevron">⌄</span>
+        </div>
+        <div className="nav-caption">WORKSPACE</div>
         {nav(false)}
-        <div className="grow" />
-        <div className="seg" role="group" aria-label="Tema">
-          <button aria-pressed={theme === "midnight"} onClick={() => setTheme("midnight")}>Midnight</button>
-          <button aria-pressed={theme === "frost"} onClick={() => setTheme("frost")}>Frost</button>
+        <div className="sidebar-spacer" />
+        <div className="system-card">
+          <div className="system-card-head"><span className="pulse-dot" /> SYSTEM STATUS</div>
+          <strong>Workspace ready</strong>
+          <small>Secure session · Private scope</small>
+        </div>
+        <div className="sidebar-bottom">
+          <div className="profile-avatar">R</div>
+          <span><b>Workspace owner</b><small>Administrator</small></span>
+          <span className="profile-more">···</span>
+        </div>
+        <div className="theme-switch seg" role="group" aria-label="Tema">
+          <button aria-pressed={theme === "midnight"} onClick={() => setTheme("midnight")}>◐ Dark</button>
+          <button aria-pressed={theme === "frost"} onClick={() => setTheme("frost")}>☼ Light</button>
         </div>
       </aside>
-      <main className="main">
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }} className="theme-m">
-          <button className="chip" onClick={() => setTheme(theme === "midnight" ? "frost" : "midnight")} aria-label="Ganti tema"><Icon name={theme === "midnight" ? "sun" : "moon"} /><span>{theme === "midnight" ? "Frost" : "Midnight"}</span></button>
+      <main className="main os-main">
+        <header className="os-topbar">
+          <div className="breadcrumb"><span>AIL LABS</span><b>/</b><strong>{NAV.find(n => n.id === view)?.label || "Workspace"}</strong></div>
+          <div className="topbar-actions">
+            <span className="secure-indicator"><span className="pulse-dot" /> SECURE SESSION</span>
+            <button className="chip theme-mobile" onClick={() => setTheme(theme === "midnight" ? "frost" : "midnight")} aria-label="Ganti tema"><Icon name={theme === "midnight" ? "sun" : "moon"} /></button>
+          </div>
+        </header>
+        <div className="page-content">
+          <AnimatePresence mode="wait">
+            <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+              {view === "home" && <Home go={setView} />}
+              {view === "landed" && <Landed />}
+              {view === "ai" && <AI />}
+              {view === "assistant" && <AgentWorkspace />}
+              {view === "supplier" && <Operations kind="suppliers" />}
+              {view === "klinik" && <Operations kind="clinics" />}
+              {view === "email" && <EmailStatus />}
+            </motion.div>
+          </AnimatePresence>
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            {view === "home" && <Home go={setView} />}
-            {view === "landed" && <Landed />}
-            {view === "ai" && <AI />}
-            {view === "assistant" && <AgentWorkspace />}
-            {view === "supplier" && <Operations kind="suppliers" />}
-            {view === "klinik" && <Operations kind="clinics" />}
-            {view === "email" && <EmailStatus />}
-          </motion.div>
-        </AnimatePresence>
       </main>
-      <nav className="tabbar" aria-label="Navigasi">{nav(true)}</nav>
+      <nav className="tabbar os-mobile-nav" aria-label="Navigasi">{nav(true)}</nav>
     </div>
   );
 }
