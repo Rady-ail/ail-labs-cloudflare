@@ -12,6 +12,16 @@ import { writeAudit } from "../lib/audit";
  */
 export const aiRoutes = new Hono<AppEnv>();
 
+aiRoutes.use("*", async (c, next) => {
+  const { success } = await c.env.AI_RATE_LIMITER.limit({
+    key: JSON.stringify([c.get("actor"), c.req.path]),
+  });
+  if (!success) {
+    return fail(c, 429, "RATE_LIMITED", "Terlalu banyak permintaan. Coba lagi nanti.");
+  }
+  await next();
+});
+
 const MAX_INPUT = 8000;
 const MAX_PLAYBOOK = 20000;
 const bodySchema = z.object({

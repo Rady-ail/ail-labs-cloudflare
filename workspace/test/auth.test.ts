@@ -7,6 +7,7 @@ const env = {
   RESEND_WEBHOOK_SECRET: "",
   API_TOKEN: "test-api-token",
   EMAIL_SEND_MODE: "dry-run" as const,
+  AI_RATE_LIMITER: { limit: async () => ({ success: true }) },
 };
 
 describe("API authentication boundary", () => {

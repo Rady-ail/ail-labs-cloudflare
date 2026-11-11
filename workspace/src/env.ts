@@ -9,4 +9,5 @@ export interface Env {
   OPENAI_API_KEY?: string;
   OPENAI_MODEL?: string;
   AI_PLAYBOOK?: string;
+  AI_RATE_LIMITER: RateLimit;
 }
