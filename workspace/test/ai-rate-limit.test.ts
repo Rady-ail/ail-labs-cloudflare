@@ -105,4 +105,56 @@ describe("AI rate limit", () => {
       key: JSON.stringify(["actor-a", "/api/ai/other"]),
     });
   });
+
+  it("returns a generic 503 when the rate limiter binding is missing", async () => {
+    const app = createTestApp();
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    const e = env(makeLimiter(1));
+    Object.assign(e, { AI_RATE_LIMITER: undefined });
+    const request = () => app.request("/api/ai/draft", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: draftBody,
+    }, e);
+
+    const response = await request();
+    expect(response.status).toBe(503);
+    expect(await response.json()).toMatchObject({
+      error: { code: "RATE_LIMITER_UNAVAILABLE", message: expect.any(String) },
+      meta: { requestId: "request-test" },
+    });
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("returns a generic 503 when the rate limiter throws without exposing the exception", async () => {
+    const app = createTestApp();
+    const fetch = vi.fn();
+    vi.stubGlobal("fetch", fetch);
+    const log = vi.spyOn(console, "error").mockImplementation(() => undefined);
+    const limiter = makeLimiter(1);
+    vi.mocked(limiter.limit).mockImplementation(async () => {
+      throw new Error("binding down");
+    });
+    const request = () => app.request("/api/ai/draft", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: draftBody,
+    }, env(limiter));
+
+    const response = await request();
+    expect(response.status).toBe(503);
+    const body = await response.json();
+    expect(body).toMatchObject({
+      error: { code: "RATE_LIMITER_UNAVAILABLE", message: expect.any(String) },
+      meta: { requestId: "request-test" },
+    });
+    expect(JSON.stringify(body)).not.toContain("binding down");
+    expect(log).toHaveBeenCalledWith("AI rate limiter unavailable", {
+      requestId: "request-test",
+    });
+    expect(JSON.stringify(log.mock.calls)).not.toContain("binding down");
+    expect(JSON.stringify(log.mock.calls)).not.toContain("test-actor");
+    expect(fetch).not.toHaveBeenCalled();
+  });
 });

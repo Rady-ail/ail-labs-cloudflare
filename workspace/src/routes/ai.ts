@@ -13,12 +13,24 @@ import { writeAudit } from "../lib/audit";
 export const aiRoutes = new Hono<AppEnv>();
 
 aiRoutes.use("*", async (c, next) => {
-  const { success } = await c.env.AI_RATE_LIMITER.limit({
-    key: JSON.stringify([c.get("actor"), c.req.path]),
-  });
-  if (!success) {
-    return fail(c, 429, "RATE_LIMITED", "Terlalu banyak permintaan. Coba lagi nanti.");
+  const limiter = c.env.AI_RATE_LIMITER;
+  if (!limiter || typeof limiter.limit !== "function") {
+    console.error("AI rate limiter unavailable", { requestId: c.get("requestId") });
+    return fail(c, 503, "RATE_LIMITER_UNAVAILABLE", "Layanan AI sedang tidak tersedia");
   }
+
+  try {
+    const { success } = await limiter.limit({
+      key: JSON.stringify([c.get("actor"), c.req.path]),
+    });
+    if (!success) {
+      return fail(c, 429, "RATE_LIMITED", "Terlalu banyak permintaan. Coba lagi nanti.");
+    }
+  } catch {
+    console.error("AI rate limiter unavailable", { requestId: c.get("requestId") });
+    return fail(c, 503, "RATE_LIMITER_UNAVAILABLE", "Layanan AI sedang tidak tersedia");
+  }
+
   await next();
 });
 
