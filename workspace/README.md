@@ -10,7 +10,7 @@ Private B2B operations workspace for AIL LABS. This application is isolated unde
 - Identity: Cloudflare Access JWT (JWKS verification) or constant-time Bearer `API_TOKEN`.
 - Domains: `app.ail-aesthetic-labs.my.id` only. The route is a Cloudflare custom domain: on deploy, Cloudflare creates the DNS record for this one subdomain automatically (the zone must be on Cloudflare). Nameservers and other records are untouched.
 - Email: Resend, Svix-verified webhook, approval-gated scheduled sending. Default mode is `dry-run`.
-- AI: optional OpenAI integration is isolated behind `OPENAI_API_KEY`; AI may assist analysis and drafting but cannot approve purchases, contracts, payments, or send external messages. Draft requests are capped at 8 KiB, with up to 800 Unicode code points of trimmed source text. The `AI_RATE_LIMITER` Worker binding limits `/api/ai/*` to 10 requests per actor and route per 60 seconds; over-limit requests return the standard JSON error shape with status 429. If the limiter binding is unavailable, AI requests fail closed with status 503.
+- AI: optional OpenAI integration is isolated behind `OPENAI_API_KEY`; AI may assist analysis and drafting but cannot approve purchases, contracts, payments, or send external messages. Draft requests are capped at 8 KiB, with up to 800 Unicode code points of trimmed source text. The `AI_RATE_LIMITER` Worker binding applies an approximate limit of 10 requests per actor and route per 60 seconds in each Cloudflare location; it is a best-effort throttle, not a strict global cap. Over-limit requests return the standard JSON error shape with status 429. If the limiter binding is unavailable, AI requests fail closed with status 503.
 
 ## UI (React + Motion)
 
