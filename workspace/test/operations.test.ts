@@ -38,6 +38,30 @@ describe("workspace operations API", () => {
     const response = await app().request("/api/ops/suppliers/00000000-0000-4000-8000-000000000000", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status:"approved"}) }, env);
     expect(response.status).toBe(404);
   });
+  it("lists supplier records from the database", async () => {
+    sql.mockResolvedValueOnce([{ id: "id-1", name: "Supplier A" }]);
+    const response = await app().request("/api/ops/suppliers", {}, env);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ data: [{ name: "Supplier A" }] });
+  });
+  it("updates a clinic status", async () => {
+    sql.mockResolvedValueOnce([{ id: "00000000-0000-4000-8000-000000000000", name: "Clinic A", status: "customer" }]);
+    const response = await app().request("/api/ops/clinics/00000000-0000-4000-8000-000000000000", { method:"PATCH", headers:{"Content-Type":"application/json"}, body:JSON.stringify({status:"customer"}) }, env);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({data:{status:"customer"}});
+  });
+  it("deletes a clinic record", async () => {
+    sql.mockResolvedValueOnce([{ id: "00000000-0000-4000-8000-000000000000" }]);
+    const response = await app().request("/api/ops/clinics/00000000-0000-4000-8000-000000000000", { method:"DELETE" }, env);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({ok:true});
+  });
+  it("reports configured integration readiness", async () => {
+    sql.mockResolvedValueOnce([{ ok: 1 }]);
+    const response = await app().request("/api/ops/status", {}, env);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({database:true,email:false,emailMode:"dry-run"});
+  });
   it("rejects malformed IDs before database access", async () => {
     const response = await app().request("/api/ops/clinics/not-a-uuid", { method:"DELETE" }, env);
     expect(response.status).toBe(400);
