@@ -1,0 +1,63 @@
+name: Deploy Workspace to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "workspace/**"
+      - ".github/workflows/workspace-deploy.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: workspace-deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: workspace
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12"
+          cache: npm
+          cache-dependency-path: workspace/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Backend typecheck
+        run: npm run typecheck
+
+      - name: Frontend typecheck
+        run: npm run typecheck:ui
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Build original workspace UI
+        run: npm run build:ui
+
+      - name: Deploy workspace Worker and static assets
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: npx wrangler@4.86.0 deploy --config wrangler.jsonc
+
+      - name: Verify deployed workspace
+        shell: bash
+        run: |
+          set -euo pipefail
+          html="$(curl --silent --show-error --fail https://app.ail-aesthetic-labs.my.id/)"
+          grep -q "AIL LABS Workspace" <<< "$html"
+          asset="$(grep -oE 'src="/assets/[^"]+\.js"' <<< "$html" | head -n1 | cut -d'"' -f2)"
+          test -n "$asset"
+          curl --silent --show-error --fail "https://app.ail-aesthetic-labs.my.id$asset" | grep -q "Kalkulator Landed Cost"
