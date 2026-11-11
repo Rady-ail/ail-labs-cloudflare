@@ -44,7 +44,7 @@ function badInput(c: Parameters<typeof fail>[0]) {
 
 operationsRoutes.get("/suppliers", async (c) => {
   try {
-    const rows = await getSql(c.env)`SELECT id,name,country,email,whatsapp,website,status,notes,created_at,updated_at FROM suppliers ORDER BY updated_at DESC LIMIT 250`;
+    const rows = await getSql(c.env)`SELECT id,name,country,email,whatsapp,website,status,notes,created_at,updated_at FROM workspace_suppliers ORDER BY updated_at DESC LIMIT 250`;
     return c.json({ data: rows });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Data supplier belum tersedia. Pastikan migrasi database sudah dijalankan.");
@@ -55,7 +55,7 @@ operationsRoutes.post("/suppliers", async (c) => {
   if (!parsed.success) return badInput(c);
   const d = parsed.data;
   try {
-    const rows = await getSql(c.env)`INSERT INTO suppliers (name,country,email,whatsapp,website,status,notes)
+    const rows = await getSql(c.env)`INSERT INTO workspace_suppliers (name,country,email,whatsapp,website,status,notes)
       VALUES (${d.name},${d.country ?? ""},${d.email ?? ""},${d.whatsapp ?? ""},${d.website ?? ""},${d.status ?? "prospect"},${d.notes ?? ""})
       RETURNING id,name,country,email,whatsapp,website,status,notes,created_at,updated_at`;
     await auditMutation(c, "create", "supplier", String(rows[0].id));
@@ -70,7 +70,7 @@ operationsRoutes.patch("/suppliers/:id", async (c) => {
   if (!parsed.success || Object.keys(parsed.data ?? {}).length === 0) return badInput(c);
   const d = parsed.data;
   try {
-    const rows = await getSql(c.env)`UPDATE suppliers SET
+    const rows = await getSql(c.env)`UPDATE workspace_suppliers SET
       name=COALESCE(${d.name ?? null},name),country=COALESCE(${d.country ?? null},country),
       email=COALESCE(${d.email ?? null},email),whatsapp=COALESCE(${d.whatsapp ?? null},whatsapp),
       website=COALESCE(${d.website ?? null},website),status=COALESCE(${d.status ?? null},status),
@@ -86,7 +86,7 @@ operationsRoutes.patch("/suppliers/:id", async (c) => {
 operationsRoutes.delete("/suppliers/:id", async (c) => {
   if (!uuid.safeParse(c.req.param("id")).success) return fail(c, 400, "INVALID_ID", "ID supplier tidak valid");
   try {
-    const rows = await getSql(c.env)`DELETE FROM suppliers WHERE id=${c.req.param("id")} RETURNING id`;
+    const rows = await getSql(c.env)`DELETE FROM workspace_suppliers WHERE id=${c.req.param("id")} RETURNING id`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Supplier tidak ditemukan");
     await auditMutation(c, "delete", "supplier", String(rows[0].id));
     return c.json({ ok: true });
@@ -97,7 +97,7 @@ operationsRoutes.delete("/suppliers/:id", async (c) => {
 
 operationsRoutes.get("/clinics", async (c) => {
   try {
-    const rows = await getSql(c.env)`SELECT id,name,city,province,contact_name,phone,email,status,notes,created_at,updated_at FROM clinics ORDER BY updated_at DESC LIMIT 250`;
+    const rows = await getSql(c.env)`SELECT id,name,city,province,contact_name,phone,email,status,notes,created_at,updated_at FROM workspace_clinics ORDER BY updated_at DESC LIMIT 250`;
     return c.json({ data: rows });
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Data klinik belum tersedia. Pastikan migrasi database sudah dijalankan.");
@@ -108,9 +108,11 @@ operationsRoutes.post("/clinics", async (c) => {
   if (!parsed.success) return badInput(c);
   const d = parsed.data;
   try {
-    const rows = await getSql(c.env)`INSERT INTO clinics (name,city,province,contact_name,phone,email,status,notes)
+    const rows = await getSql(c.env)`INSERT INTO workspace_clinics (name,city,province,contact_name,phone,email,status,notes)
       VALUES (${d.name},${d.city ?? ""},${d.province ?? ""},${d.contact_name ?? ""},${d.phone ?? ""},${d.email ?? ""},${d.status ?? "lead"},${d.notes ?? ""})
       RETURNING id,name,city,province,contact_name,phone,email,status,notes,created_at,updated_at`;
+    if (!rows.length) return fail(c, 503, "DATABASE_WRITE_FAILED", "Klinik tidak berhasil dibuat");
+    await auditMutation(c, "create", "clinic", String(rows[0].id));
     return c.json({ data: rows[0] }, 201);
   } catch {
     return fail(c, 503, "DATABASE_UNAVAILABLE", "Klinik gagal disimpan. Periksa migrasi database.");
@@ -122,7 +124,7 @@ operationsRoutes.patch("/clinics/:id", async (c) => {
   if (!parsed.success || Object.keys(parsed.data ?? {}).length === 0) return badInput(c);
   const d = parsed.data;
   try {
-    const rows = await getSql(c.env)`UPDATE clinics SET
+    const rows = await getSql(c.env)`UPDATE workspace_clinics SET
       name=COALESCE(${d.name ?? null},name),city=COALESCE(${d.city ?? null},city),
       province=COALESCE(${d.province ?? null},province),contact_name=COALESCE(${d.contact_name ?? null},contact_name),
       phone=COALESCE(${d.phone ?? null},phone),email=COALESCE(${d.email ?? null},email),
@@ -138,7 +140,7 @@ operationsRoutes.patch("/clinics/:id", async (c) => {
 operationsRoutes.delete("/clinics/:id", async (c) => {
   if (!uuid.safeParse(c.req.param("id")).success) return fail(c, 400, "INVALID_ID", "ID klinik tidak valid");
   try {
-    const rows = await getSql(c.env)`DELETE FROM clinics WHERE id=${c.req.param("id")} RETURNING id`;
+    const rows = await getSql(c.env)`DELETE FROM workspace_clinics WHERE id=${c.req.param("id")} RETURNING id`;
     if (!rows.length) return fail(c, 404, "NOT_FOUND", "Klinik tidak ditemukan");
     await auditMutation(c, "delete", "clinic", String(rows[0].id));
     return c.json({ ok: true });
