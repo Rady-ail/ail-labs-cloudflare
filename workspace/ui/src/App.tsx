@@ -155,6 +155,8 @@ const KINDS = [
 function AI() {
   const [kind, setKind] = useState("supplier");
   const [text, setText] = useState("");
+  const inputLength = Array.from(text.trim()).length;
+  const inputTooLong = inputLength > 800;
   const [busy, setBusy] = useState(false);
   const [draft, setDraft] = useState("");
   const [err, setErr] = useState("");
@@ -179,9 +181,12 @@ function AI() {
             {KINDS.map((k) => <button key={k.id} aria-pressed={kind === k.id} onClick={() => setKind(k.id)}>{k.label}</button>)}
           </div>
           <p style={{ marginBottom: 12 }}>{cur.hint}</p>
-          <label className="f">Teks sumber<textarea className="in" value={text} onChange={(e) => setText(e.target.value)} placeholder="Tempel teks di sini…" /></label>
+          <label className="f">Teks sumber<textarea className="in" value={text} maxLength={1600} aria-describedby="ai-input-count" onChange={(e) => setText(e.target.value)} placeholder="Tempel teks di sini…" /></label>
+          <div id="ai-input-count" style={{ marginTop: 6, fontSize: 12, color: inputTooLong ? "var(--orange)" : "var(--muted)" }}>
+            {inputLength}/800 karakter setelah trim
+          </div>
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
-            <motion.button whileTap={{ scale: 0.96 }} className="btn primary" disabled={busy || !text.trim()} onClick={run}>{busy ? "Menyusun…" : "Susun draf"}</motion.button>
+            <motion.button whileTap={{ scale: 0.96 }} className="btn primary" disabled={busy || !text.trim() || inputTooLong} onClick={run}>{busy ? "Menyusun…" : "Susun draf"}</motion.button>
           </div>
         </div>
         <div className="card">

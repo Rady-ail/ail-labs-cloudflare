@@ -16,6 +16,7 @@ describe("GET /api/health", () => {
       RESEND_WEBHOOK_SECRET: "",
       API_TOKEN: "",
       EMAIL_SEND_MODE: "dry-run",
+      AI_RATE_LIMITER: { limit: async () => ({ success: true }) },
     });
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ ok: true, db: true });
@@ -30,6 +31,7 @@ describe("GET /api/health", () => {
       RESEND_WEBHOOK_SECRET: "",
       API_TOKEN: "",
       EMAIL_SEND_MODE: "dry-run",
+      AI_RATE_LIMITER: { limit: async () => ({ success: true }) },
     });
     expect(response.status).toBe(403);
   });
