@@ -58,7 +58,7 @@ const AGENT_RULES: Record<string,string> = {
 
 async function readJson<T>(request: Request, schema: z.ZodType<T>): Promise<T | null> {
   const contentLength = request.headers.get("Content-Length");
-  if (contentLength && /^\\d+$/.test(contentLength) && Number(contentLength) > MAX_BODY_BYTES) return null;
+  if (contentLength && /^\d+$/.test(contentLength) && Number(contentLength) > MAX_BODY_BYTES) return null;
   const reader = request.body?.getReader();
   if (!reader) return null;
   const chunks: Uint8Array[] = [];
