@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Icon } from "./icons";
+import { Operations } from "./Operations";
 
 type View = "home" | "landed" | "ai" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
@@ -56,7 +57,7 @@ function Home({ go }: { go: (v: View) => void }) {
   useEffect(() => {
     const ac = new AbortController();
     fetch("/api/health", { signal: ac.signal })
-      .then(async (r) => { const j = await r.json().catch(() => ({})); const reach = r.ok || r.status === 401 || r.status === 403; setApi(reach ? "ok" : "bad"); setDb(r.ok ? (j.db ? "ok" : "bad") : reach ? "unk" : "bad"); })
+      .then(async (r) => { const j = await r.json().catch(() => ({})); const reachable = r.ok || r.status === 401; setApi(r.ok ? "ok" : r.status === 401 ? "unk" : "bad"); setDb(r.ok ? (j.db ? "ok" : "bad") : reachable ? "unk" : "bad"); })
       .catch(() => { if (!ac.signal.aborted) { setApi("bad"); setDb("bad"); } });
     return () => ac.abort();
   }, []);
@@ -250,8 +251,8 @@ export default function App() {
             {view === "home" && <Home go={setView} />}
             {view === "landed" && <Landed />}
             {view === "ai" && <AI />}
-            {view === "supplier" && <Soon title="Supplier & Sampel" sub="Status negosiasi, sampel, dan dokumen tiap supplier." />}
-            {view === "klinik" && <Soon title="CRM Klinik" sub="Daftar klinik, tindak lanjut WhatsApp, dan pesanan." />}
+            {view === "supplier" && <Operations kind="suppliers" />}
+            {view === "klinik" && <Operations kind="clinics" />}
             {view === "email" && <Soon title="Email" sub="Kotak masuk real-time dan draf yang menunggu persetujuan." />}
           </motion.div>
         </AnimatePresence>
