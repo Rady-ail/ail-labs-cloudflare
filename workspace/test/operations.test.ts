@@ -4,7 +4,7 @@ import { operationsRoutes } from "../src/routes/operations";
 import type { AppEnv } from "../src/lib/http";
 import type { Env } from "../src/env";
 
-const { sql } = vi.hoisted(() => ({ sql: vi.fn(async () => []) }));
+const { sql } = vi.hoisted(() => ({ sql: vi.fn(async (): Promise<Record<string, unknown>[]> => []) }));
 vi.mock("../src/lib/db", () => ({ getSql: () => sql }));
 const env: Env = {
   DATABASE_URL: "postgres://test", RESEND_API_KEY: "", RESEND_WEBHOOK_SECRET: "",
@@ -17,7 +17,7 @@ function app() {
   a.route("/api/ops", operationsRoutes);
   return a;
 }
-afterEach(() => { sql.mockReset(); });
+afterEach(() => { sql.mockReset(); sql.mockResolvedValue([]); });
 
 describe("workspace operations API", () => {
   it("validates and creates a supplier with parameterized SQL", async () => {
