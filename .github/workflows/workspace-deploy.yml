@@ -1,0 +1,76 @@
+name: Workspace Production Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "workspace/**"
+      - ".github/workflows/workspace-deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workspace-production-deploy
+  cancel-in-progress: false
+
+jobs:
+  verify-and-deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: workspace
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.12"
+          cache: npm
+          cache-dependency-path: workspace/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Backend typecheck
+        run: npm run typecheck
+
+      - name: Frontend typecheck
+        run: npm run typecheck:ui
+
+      - name: Unit and integration tests
+        run: npm test
+
+      - name: Build production UI assets
+        run: npm run build:ui
+
+      - name: Validate Worker deployment
+        run: npx wrangler@4.86.0 deploy --dry-run --config wrangler.jsonc
+
+      - name: Deploy Workspace Worker
+        id: deploy
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "4.86.0"
+          workingDirectory: workspace
+          command: deploy --config wrangler.jsonc
+
+      - name: Confirm deployment output
+        shell: bash
+        env:
+          DEPLOYMENT_URL: ${{ steps.deploy.outputs.deployment-url }}
+        run: |
+          set -euo pipefail
+          if [[ -z "${DEPLOYMENT_URL}" ]]; then
+            echo "Wrangler did not return a deployment URL."
+            exit 1
+          fi
+          echo "Workspace Worker deployment accepted by Cloudflare."
+          echo "Deployment URL: ${DEPLOYMENT_URL}"
