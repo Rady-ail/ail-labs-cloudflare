@@ -1,6 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { transporter } = require('../db/mailer');
+const { createRateLimiter } = require('../lib/rate-limit');
+
+// Endpoint publik yang mengirim email ke inbox pembayaran: batasi per IP agar tidak bisa dipakai spam.
+const confirmRateLimit = createRateLimiter({
+  windowMs: 10 * 60 * 1000,
+  max: 5,
+  message: 'Terlalu banyak konfirmasi dari alamat ini. Coba lagi beberapa menit lagi.',
+});
 
 const PAYMENT_EMAIL = 'info@ail-aesthetic-labs.my.id';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,7 +29,7 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
-router.post('/confirm', async (req, res) => {
+router.post('/confirm', confirmRateLimit, async (req, res) => {
   const body = req.body || {};
   const customerName = cleanText(body.customer_name || 'Pelanggan AIL LABS', 120);
   const customerEmail = cleanText(body.customer_email, 160);
