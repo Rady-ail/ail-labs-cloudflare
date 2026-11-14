@@ -8,7 +8,7 @@
     "start": "node server.js",
     "dev": "npx wrangler dev",
     "build": "node scripts/copy-inter-font.js && node scripts/validate-build.js",
-    "test": "node test/catalog-agent.test.js && node test/ail-guard.test.js",
+    "test": "node test/catalog-agent.test.js && node test/ail-guard.test.js && node test/rate-limit.test.js",
     "memory": "node scripts/memory.js",
     "deploy": "npx wrangler deploy",
     "seed": "node scripts/seed.js",
