@@ -1,0 +1,38 @@
+name: DNS inspect (temporary, read-only)
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/dns-inspect.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect Cloudflare custom domains and DNS (no changes)
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          set -uo pipefail
+          api() { curl -sS -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" "https://api.cloudflare.com/client/v4$1"; }
+          echo "== token status"
+          api /user/tokens/verify | jq -c '{success, status: .result.status, errors: [.errors[]?.message]}'
+          echo "== worker custom domains (hostname -> worker)"
+          api "/accounts/${CLOUDFLARE_ACCOUNT_ID}/workers/domains" \
+            | jq -r 'if .success then (.result[] | "\(.hostname)\t->\t\(.service)\t(env=\(.environment))") else "ERR: \([.errors[]?.message] | join("; "))" end'
+          echo "== zone"
+          ZONE=$(api "/zones?name=ail-aesthetic-labs.my.id" | jq -r '.result[0].id // empty')
+          echo "zone id found: $([ -n "$ZONE" ] && echo yes || echo no)"
+          if [ -n "$ZONE" ]; then
+            echo "== DNS records for apex, www, katalog (type name content proxied)"
+            for h in ail-aesthetic-labs.my.id www.ail-aesthetic-labs.my.id katalog.ail-aesthetic-labs.my.id; do
+              api "/zones/${ZONE}/dns_records?name=${h}" \
+                | jq -r 'if .success then (if (.result|length)==0 then "none" else (.result[] | "\(.type)\t\(.name)\t\(.content)\tproxied=\(.proxied)") end) else "ERR: \([.errors[]?.message] | join("; "))" end' \
+                | sed "s|^|[$h] |"
+            done
+          fi
