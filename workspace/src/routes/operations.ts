@@ -149,6 +149,111 @@ operationsRoutes.delete("/clinics/:id", async (c) => {
   }
 });
 
+const activityType = z.enum(["note", "call", "whatsapp", "email", "meeting", "follow_up", "sample"]);
+const activityInput = z.object({
+  entity_type: z.enum(["supplier", "clinic"]),
+  entity_id: uuid,
+  activity_type: activityType.optional(),
+  title: z.string().trim().min(1).max(160),
+  body: z.string().trim().max(5000).optional(),
+  due_at: z.iso.datetime({ offset: true }).nullable().optional(),
+}).strict();
+
+operationsRoutes.get("/summary", async (c) => {
+  try {
+    const sql = getSql(c.env);
+    const [suppliers, clinics, due] = await Promise.all([
+      sql`SELECT status, count(*)::int AS n FROM workspace_suppliers GROUP BY status`,
+      sql`SELECT status, count(*)::int AS n FROM workspace_clinics GROUP BY status`,
+      sql`SELECT count(*) FILTER (WHERE due_at < now())::int AS overdue,
+                 count(*) FILTER (WHERE due_at >= now() AND due_at < now() + interval '7 days')::int AS soon
+          FROM workspace_activities WHERE completed_at IS NULL AND due_at IS NOT NULL`,
+    ]);
+    const tally = (rows: Record<string, unknown>[]) => Object.fromEntries(rows.map((r) => [String(r.status), Number(r.n)]));
+    return c.json({
+      suppliers: tally(suppliers), clinics: tally(clinics),
+      followups: { overdue: Number(due[0]?.overdue ?? 0), soon: Number(due[0]?.soon ?? 0) },
+    });
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Ringkasan belum tersedia. Pastikan migrasi database sudah dijalankan.");
+  }
+});
+
+operationsRoutes.get("/followups", async (c) => {
+  try {
+    const rows = await getSql(c.env)`SELECT a.id,a.entity_type,a.entity_id,a.activity_type,a.title,a.body,a.due_at,
+        COALESCE(s.name,cl.name) AS entity_name
+      FROM workspace_activities a
+      LEFT JOIN workspace_suppliers s ON a.entity_type='supplier' AND s.id=a.entity_id
+      LEFT JOIN workspace_clinics cl ON a.entity_type='clinic' AND cl.id=a.entity_id
+      WHERE a.completed_at IS NULL AND a.due_at IS NOT NULL
+      ORDER BY a.due_at ASC LIMIT 50`;
+    return c.json({ data: rows });
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Tindak lanjut belum tersedia. Pastikan migrasi database sudah dijalankan.");
+  }
+});
+
+operationsRoutes.get("/activities", async (c) => {
+  const type = z.enum(["supplier", "clinic"]).safeParse(c.req.query("entity_type"));
+  const id = uuid.safeParse(c.req.query("entity_id"));
+  if (!type.success || !id.success) return badInput(c);
+  try {
+    const rows = await getSql(c.env)`SELECT id,entity_type,entity_id,activity_type,title,body,due_at,completed_at,created_by,created_at
+      FROM workspace_activities WHERE entity_type=${type.data} AND entity_id=${id.data}
+      ORDER BY created_at DESC LIMIT 100`;
+    return c.json({ data: rows });
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Aktivitas belum tersedia.");
+  }
+});
+
+operationsRoutes.post("/activities", async (c) => {
+  const parsed = activityInput.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return badInput(c);
+  const d = parsed.data;
+  try {
+    const rows = await getSql(c.env)`INSERT INTO workspace_activities (entity_type,entity_id,activity_type,title,body,due_at,created_by)
+      SELECT ${d.entity_type}::text, ${d.entity_id}::uuid, ${d.activity_type ?? "note"}::text, ${d.title}::text, ${d.body ?? ""}::text, ${d.due_at ?? null}::timestamptz, ${c.get("actor") ?? "unknown"}::text
+      WHERE (${d.entity_type}::text='supplier' AND EXISTS (SELECT 1 FROM workspace_suppliers WHERE id=${d.entity_id}::uuid))
+         OR (${d.entity_type}::text='clinic' AND EXISTS (SELECT 1 FROM workspace_clinics WHERE id=${d.entity_id}::uuid))
+      RETURNING id,entity_type,entity_id,activity_type,title,body,due_at,completed_at,created_by,created_at`;
+    if (!rows.length) return fail(c, 404, "NOT_FOUND", "Supplier atau klinik tidak ditemukan");
+    await auditMutation(c, "create", "activity", String(rows[0].id));
+    return c.json({ data: rows[0] }, 201);
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Aktivitas gagal disimpan. Periksa migrasi database.");
+  }
+});
+
+operationsRoutes.patch("/activities/:id", async (c) => {
+  if (!uuid.safeParse(c.req.param("id")).success) return fail(c, 400, "INVALID_ID", "ID aktivitas tidak valid");
+  const parsed = z.object({ completed: z.boolean() }).strict().safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return badInput(c);
+  try {
+    const rows = await getSql(c.env)`UPDATE workspace_activities
+      SET completed_at = CASE WHEN ${parsed.data.completed}::boolean THEN now() ELSE NULL END
+      WHERE id=${c.req.param("id")} RETURNING id,entity_type,entity_id,activity_type,title,body,due_at,completed_at,created_by,created_at`;
+    if (!rows.length) return fail(c, 404, "NOT_FOUND", "Aktivitas tidak ditemukan");
+    await auditMutation(c, "update", "activity", String(rows[0].id));
+    return c.json({ data: rows[0] });
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Aktivitas gagal diperbarui.");
+  }
+});
+
+operationsRoutes.delete("/activities/:id", async (c) => {
+  if (!uuid.safeParse(c.req.param("id")).success) return fail(c, 400, "INVALID_ID", "ID aktivitas tidak valid");
+  try {
+    const rows = await getSql(c.env)`DELETE FROM workspace_activities WHERE id=${c.req.param("id")} RETURNING id`;
+    if (!rows.length) return fail(c, 404, "NOT_FOUND", "Aktivitas tidak ditemukan");
+    await auditMutation(c, "delete", "activity", String(rows[0].id));
+    return c.json({ ok: true });
+  } catch {
+    return fail(c, 503, "DATABASE_UNAVAILABLE", "Aktivitas gagal dihapus.");
+  }
+});
+
 operationsRoutes.get("/status", async (c) => {
   let database = false;
   try { await getSql(c.env)`SELECT 1`; database = true; } catch { /* status only */ }

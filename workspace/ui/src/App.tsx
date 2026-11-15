@@ -2,12 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "motion/react";
 import { Icon } from "./icons";
 import { Operations, EmailStatus } from "./Operations";
+import { AgentWorkspace } from "./AgentWorkspace";
+import { DueList } from "./FollowUps";
 
-type View = "home" | "landed" | "ai" | "supplier" | "klinik" | "email";
+type View = "home" | "landed" | "ai" | "assistant" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
   { id: "home", label: "Beranda", icon: "home" },
   { id: "landed", label: "Landed Cost", icon: "calc" },
-  { id: "ai", label: "Asisten AI", icon: "ai" },
+  { id: "ai", label: "Draf AI", icon: "ai" },
+  { id: "assistant", label: "Personal Assistant", icon: "ai" },
   { id: "supplier", label: "Supplier", icon: "box" },
   { id: "klinik", label: "Klinik", icon: "users" },
   { id: "email", label: "Email", icon: "mail" },
@@ -61,21 +64,41 @@ function Home({ go }: { go: (v: View) => void }) {
       .catch(() => { if (!ac.signal.aborted) { setApi("bad"); setDb("bad"); } });
     return () => ac.abort();
   }, []);
+  const [sum, setSum] = useState<{ suppliers: Record<string, number>; clinics: Record<string, number>; followups: { overdue: number; soon: number } } | null>(null);
+  useEffect(() => {
+    const ac = new AbortController();
+    fetch("/api/ops/summary", { signal: ac.signal }).then((r) => (r.ok ? r.json() : null)).then((j) => { if (j) setSum(j); }).catch(() => { /* ringkasan opsional */ });
+    return () => ac.abort();
+  }, []);
+  const total = (o?: Record<string, number>) => Object.values(o ?? {}).reduce((a, b) => a + b, 0);
   const st = (s: string) => (s === "ok" ? "Aktif" : s === "bad" ? "Tidak terhubung" : s === "unk" ? "Perlu login" : "Memeriksa…");
   const mods: { id: View; t: string; d: string; tag: string; soon?: boolean }[] = [
     { id: "landed", t: "Kalkulator Landed Cost", d: "Hitung biaya mendarat per unit dan harga jual dari target margin.", tag: "Aktif" },
     { id: "ai", t: "Asisten AI", d: "Menyusun draf balasan supplier dan ringkasan. Tidak pernah mengirim sendiri.", tag: "Backend tersedia" },
-    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Perlu migrasi DB", soon: true },
-    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Perlu migrasi DB", soon: true },
+    { id: "supplier", t: "Pelacak Supplier & Sampel", d: "Status negosiasi, sampel, dan dokumen tiap supplier.", tag: "Aktif" },
+    { id: "klinik", t: "CRM Klinik", d: "Daftar klinik, tindak lanjut WhatsApp, dan pesanan.", tag: "Aktif" },
   ];
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
-      <motion.div variants={rise}><Header title="Beranda" sub="Ruang kerja B2B AIL LABS: katalog, supplier, klinik, dan biaya impor dalam satu tempat." /></motion.div>
+      <motion.div variants={rise}><Header title="Intelligence overview" sub="Ruang kendali operasional AIL LABS — workflow bisnis, supplier, klinik, dan intelligence dalam satu workspace." /></motion.div>
+      <motion.section variants={rise} className="home-hero">
+        <div className="hero-copy"><div className="eyebrow"><span className="pulse-dot" /> AIL INTELLIGENCE ENVIRONMENT</div><h2>One workspace.<br/><span>More intelligent operations.</span></h2><p>Connect your business workflows with a private AI workspace built for clarity, control, and execution.</p><button className="btn primary" onClick={() => go("assistant")}>Open AI Command Center <span aria-hidden="true">↗</span></button></div>
+        <div className="hero-visual" aria-hidden="true"><div className="hero-ring ring-one"/><div className="hero-ring ring-two"/><div className="hero-core">✳</div><span className="hero-node node-a"/><span className="hero-node node-b"/><span className="hero-node node-c"/></div>
+        <div className="hero-foot"><span>PRIVATE BY DESIGN</span><span>HUMAN-LED AUTOMATION</span><span>AIL LABS / OS 01</span></div>
+      </motion.section>
       <motion.div variants={rise} className="grid g3" style={{ marginBottom: 16 }}>
         <Tilt><h3>Layanan API</h3><div className="kpi" style={{ display: "flex", alignItems: "center", gap: 10 }}><span className={`dot ${api}`} />{st(api)}</div></Tilt>
         <Tilt><h3>Database</h3><div className="kpi" style={{ display: "flex", alignItems: "center", gap: 10 }}><span className={`dot ${db}`} />{st(db)}</div></Tilt>
         <Tilt><h3>Mode email</h3><div className="kpi">Dry-run</div><p style={{ marginTop: 6 }}>Pengiriman nyata baru aktif setelah Rady mengubahnya.</p></Tilt>
       </motion.div>
+      {sum && (
+        <motion.div variants={rise} className="grid g3" style={{ marginBottom: 16 }}>
+          <Tilt><h3>Klinik</h3><div className="kpi">{total(sum.clinics)}</div><p style={{ marginTop: 6 }}>{sum.clinics.customer ?? 0} pelanggan · {sum.clinics.lead ?? 0} lead · {sum.clinics.follow_up ?? 0} perlu tindak lanjut</p></Tilt>
+          <Tilt><h3>Supplier</h3><div className="kpi">{total(sum.suppliers)}</div><p style={{ marginTop: 6 }}>{sum.suppliers.negotiating ?? 0} negosiasi · {sum.suppliers.sample ?? 0} sampel · {sum.suppliers.approved ?? 0} disetujui</p></Tilt>
+          <Tilt><h3>Tindak lanjut</h3><div className="kpi" style={sum.followups.overdue ? { color: "var(--orange)" } : undefined}>{sum.followups.overdue}</div><p style={{ marginTop: 6 }}>terlambat · {sum.followups.soon} jatuh tempo 7 hari ke depan</p></Tilt>
+        </motion.div>
+      )}
+      <motion.div variants={rise} style={{ marginBottom: 16 }}><DueList go={go} /></motion.div>
       <motion.div variants={rise} className="grid g2">
         {mods.map((m) => (
           <Tilt key={m.id}>
@@ -109,6 +132,11 @@ function Landed() {
   const total = cif + duty + (f.taxCost ? ppn + pph : 0) + f.other;
   const unit = f.qty > 0 ? total / f.qty : NaN;
   const price = f.margin < 100 ? unit / (1 - f.margin / 100) : NaN;
+  const [copied, setCopied] = useState(false);
+  async function copy() {
+    const t = [`Landed cost (${f.qty} unit @ USD ${f.fob}, kurs ${f.kurs})`, `Total mendarat: ${idr(total)}`, `Per unit: ${idr(unit)}`, `Harga jual min. margin ${f.margin}%: ${idr(price)}`].join("\n");
+    try { await navigator.clipboard.writeText(t); setCopied(true); setTimeout(() => setCopied(false), 1800); } catch { setCopied(false); }
+  }
   return (
     <motion.div variants={stagger} initial="hidden" animate="show">
       <motion.div variants={rise}><Header title="Landed Cost" sub="Hitung biaya mendarat per unit. Tarif diisi manual: verifikasi HS code dan tarif resmi sebelum dipakai untuk keputusan." /></motion.div>
@@ -141,6 +169,7 @@ function Landed() {
           <div className="row"><span>Landed cost / unit</span><b className="big">{idr(unit)}</b></div>
           <div className="row"><span>Harga jual minimum untuk margin {f.margin}%</span><b>{idr(price)}</b></div>
           <p style={{ marginTop: 12 }}>Hasil ini alat bantu hitung. Harga jual final tetap Rady yang menentukan.</p>
+          <button className="chip" type="button" style={{ marginTop: 10 }} onClick={() => void copy()}>{copied ? "✓ Tersalin" : "⎘ Salin ringkasan"}</button>
         </div>
       </motion.div>
     </motion.div>
@@ -232,32 +261,58 @@ export default function App() {
     </button>
   ));
   return (
-    <div className="app">
-      <aside className="side" aria-label="Navigasi utama">
-        <div className="brand"><i />AIL LABS</div>
+    <div className="app os-shell">
+      <aside className="side os-sidebar" aria-label="Navigasi utama">
+        <div className="brand os-brand">
+          <span className="brand-mark"><i /><i /><i /></span>
+          <span className="brand-copy"><strong>AIL<span>LABS</span></strong><small>INTELLIGENCE OS</small></span>
+        </div>
+        <div className="workspace-switcher">
+          <span className="workspace-avatar">A</span>
+          <span><b>AIL Workspace</b><small>Personal environment</small></span>
+          <span className="switch-chevron">⌄</span>
+        </div>
+        <div className="nav-caption">WORKSPACE</div>
         {nav(false)}
-        <div className="grow" />
-        <div className="seg" role="group" aria-label="Tema">
-          <button aria-pressed={theme === "midnight"} onClick={() => setTheme("midnight")}>Midnight</button>
-          <button aria-pressed={theme === "frost"} onClick={() => setTheme("frost")}>Frost</button>
+        <div className="sidebar-spacer" />
+        <div className="system-card">
+          <div className="system-card-head">WORKSPACE CONTEXT</div>
+          <strong>Actor-scoped workspace</strong>
+          <small>Data access follows account scope</small>
+        </div>
+        <div className="sidebar-bottom">
+          <div className="profile-avatar">R</div>
+          <span><b>Workspace owner</b><small>Administrator</small></span>
+          <span className="profile-more">···</span>
+        </div>
+        <div className="theme-switch seg" role="group" aria-label="Tema">
+          <button aria-pressed={theme === "midnight"} onClick={() => setTheme("midnight")}>◐ Dark</button>
+          <button aria-pressed={theme === "frost"} onClick={() => setTheme("frost")}>☼ Light</button>
         </div>
       </aside>
-      <main className="main">
-        <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }} className="theme-m">
-          <button className="chip" onClick={() => setTheme(theme === "midnight" ? "frost" : "midnight")} aria-label="Ganti tema"><Icon name={theme === "midnight" ? "sun" : "moon"} /><span>{theme === "midnight" ? "Frost" : "Midnight"}</span></button>
+      <main className="main os-main">
+        <header className="os-topbar">
+          <div className="breadcrumb"><span>AIL LABS</span><b>/</b><strong>{NAV.find(n => n.id === view)?.label || "Workspace"}</strong></div>
+          <div className="topbar-actions">
+            <span className="secure-indicator">PRIVATE WORKSPACE</span>
+            <button className="chip theme-mobile" onClick={() => setTheme(theme === "midnight" ? "frost" : "midnight")} aria-label="Ganti tema"><Icon name={theme === "midnight" ? "sun" : "moon"} /></button>
+          </div>
+        </header>
+        <div className="page-content">
+          <AnimatePresence mode="wait">
+            <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+              {view === "home" && <Home go={setView} />}
+              {view === "landed" && <Landed />}
+              {view === "ai" && <AI />}
+              {view === "assistant" && <AgentWorkspace />}
+              {view === "supplier" && <Operations kind="suppliers" />}
+              {view === "klinik" && <Operations kind="clinics" />}
+              {view === "email" && <EmailStatus />}
+            </motion.div>
+          </AnimatePresence>
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
-            {view === "home" && <Home go={setView} />}
-            {view === "landed" && <Landed />}
-            {view === "ai" && <AI />}
-            {view === "supplier" && <Operations kind="suppliers" />}
-            {view === "klinik" && <Operations kind="clinics" />}
-            {view === "email" && <EmailStatus />}
-          </motion.div>
-        </AnimatePresence>
       </main>
-      <nav className="tabbar" aria-label="Navigasi">{nav(true)}</nav>
+      <nav className="tabbar os-mobile-nav" aria-label="Navigasi">{nav(true)}</nav>
     </div>
   );
 }
