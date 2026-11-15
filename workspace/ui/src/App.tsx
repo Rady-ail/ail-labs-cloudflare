@@ -4,9 +4,13 @@ import { Icon } from "./icons";
 import { Operations, EmailStatus } from "./Operations";
 import { AgentWorkspace } from "./AgentWorkspace";
 import { DueList } from "./FollowUps";
+import { TodayView } from "./Today";
+import { QuoteCompare, SaveQuote } from "./Procurement";
+import { computeLanded } from "../../src/lib/landed";
 
-type View = "home" | "landed" | "ai" | "assistant" | "supplier" | "klinik" | "email";
+type View = "today" | "home" | "landed" | "ai" | "assistant" | "supplier" | "klinik" | "email";
 const NAV: { id: View; label: string; icon: string }[] = [
+  { id: "today", label: "Hari ini", icon: "home" },
   { id: "home", label: "Beranda", icon: "home" },
   { id: "landed", label: "Landed Cost", icon: "calc" },
   { id: "ai", label: "Draf AI", icon: "ai" },
@@ -125,13 +129,8 @@ function Num({ label, v, set, step = "any", suffix }: { label: string; v: number
 function Landed() {
   const [f, setF] = useState({ fob: 0, qty: 1, kurs: 16000, freight: 0, insPct: 0.5, dutyPct: 0, ppnPct: 11, pphPct: 0, other: 0, margin: 30, taxCost: true });
   const u = <K extends keyof typeof f>(k: K) => (v: (typeof f)[K]) => setF((s) => ({ ...s, [k]: v }));
-  const goods = f.fob * f.qty * f.kurs, freight = f.freight * f.kurs;
-  const ins = (goods + freight) * (f.insPct / 100), cif = goods + freight + ins;
-  const duty = cif * (f.dutyPct / 100), base = cif + duty;
-  const ppn = base * (f.ppnPct / 100), pph = base * (f.pphPct / 100);
-  const total = cif + duty + (f.taxCost ? ppn + pph : 0) + f.other;
-  const unit = f.qty > 0 ? total / f.qty : NaN;
-  const price = f.margin < 100 ? unit / (1 - f.margin / 100) : NaN;
+  const { goods, freight, ins, cif, duty, ppn, pph, total, unit, price } = computeLanded(f);
+  const [quotesKey, setQuotesKey] = useState(0);
   const [copied, setCopied] = useState(false);
   async function copy() {
     const t = [`Landed cost (${f.qty} unit @ USD ${f.fob}, kurs ${f.kurs})`, `Total mendarat: ${idr(total)}`, `Per unit: ${idr(unit)}`, `Harga jual min. margin ${f.margin}%: ${idr(price)}`].join("\n");
@@ -172,6 +171,7 @@ function Landed() {
           <button className="chip" type="button" style={{ marginTop: 10 }} onClick={() => void copy()}>{copied ? "✓ Tersalin" : "⎘ Salin ringkasan"}</button>
         </div>
       </motion.div>
+      <motion.div variants={rise}><SaveQuote inputs={f} onSaved={() => setQuotesKey((k) => k + 1)} /><QuoteCompare refreshKey={quotesKey} /></motion.div>
     </motion.div>
   );
 }
@@ -245,7 +245,7 @@ function Soon({ title, sub }: { title: string; sub: string }) {
 
 /* ---------------- Cangkang aplikasi ---------------- */
 export default function App() {
-  const [view, setView] = useState<View>("home");
+  const [view, setView] = useState<View>("today");
   const [theme, setTheme] = useState<"midnight" | "frost">(() => {
     try { const s = localStorage.getItem("ail-theme"); if (s === "midnight" || s === "frost") return s; } catch { /* abaikan */ }
     return matchMedia("(prefers-color-scheme: light)").matches ? "frost" : "midnight";
@@ -301,6 +301,7 @@ export default function App() {
         <div className="page-content">
           <AnimatePresence mode="wait">
             <motion.div key={view} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: 0.22 }}>
+              {view === "today" && <TodayView go={setView} />}
               {view === "home" && <Home go={setView} />}
               {view === "landed" && <Landed />}
               {view === "ai" && <AI />}

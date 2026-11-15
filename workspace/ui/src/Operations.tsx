@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { motion } from "motion/react";
-import { ActivityPanel, downloadCsv, toCsv, waLink } from "./FollowUps";
+import { ActivityPanel, call, downloadCsv, toCsv, waLink } from "./FollowUps";
+import { SopPanel, STAGES, gateSummary, type SopRow } from "./Procurement";
 
 type Supplier = { id: string; name: string; country: string; email: string; whatsapp: string; website: string; status: string; notes: string };
 type Clinic = { id: string; name: string; city: string; province: string; contact_name: string; phone: string; email: string; status: string; notes: string };
@@ -30,6 +31,9 @@ export function Operations({ kind }: Props) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("all");
   const [openId, setOpenId] = useState<string | null>(null);
+  const [gateId, setGateId] = useState<string | null>(null);
+  const [sop, setSop] = useState<Record<string, SopRow>>({});
+  const [sopOk, setSopOk] = useState(true);
   const endpoint = `/api/ops/${kind}`;
 
   const load = useCallback(async () => {
@@ -43,6 +47,11 @@ export function Operations({ kind }: Props) {
     finally { setLoading(false); }
   }, [endpoint]);
   useEffect(() => { void load(); }, [load]);
+  const idsKey = rows.map((r) => r.id).join(",");
+  useEffect(() => {
+    if (!isSupplier) return;
+    call("/api/proc/sop").then((bd) => { setSop(Object.fromEntries((bd.data as SopRow[]).map((r) => [r.id, r]))); setSopOk(true); }).catch(() => setSopOk(false));
+  }, [isSupplier, idsKey]);
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -133,9 +142,11 @@ export function Operations({ kind }: Props) {
         {loading ? <p style={{marginTop:14}}>Memuat data…</p> : rows.length === 0 ? <p style={{marginTop:14}}>Belum ada data. Tambahkan data pertama melalui formulir.</p> : visible.length === 0 ? <p style={{marginTop:14}}>Tidak ada data yang cocok dengan pencarian atau filter.</p> :
           <div style={{display:"grid",gap:12,marginTop:14}}>
             {visible.map(row => <article key={row.id} style={{borderTop:"1px solid var(--line)",paddingTop:12}}>
-              <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"start"}}><div><strong>{row.name}</strong><p>{isSupplier ? (row as Supplier).country : [(row as Clinic).city,(row as Clinic).province].filter(Boolean).join(", ")}</p><p>{row.email || "Email belum diisi"} · {isSupplier ? (row as Supplier).whatsapp : (row as Clinic).phone}</p></div><div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"flex-end"}}>{(() => { const wa = waLink(isSupplier ? (row as Supplier).whatsapp : (row as Clinic).phone, !isSupplier); return wa ? <a className="chip" href={wa} target="_blank" rel="noopener noreferrer" aria-label={`Buka WhatsApp ${row.name}`}>WhatsApp ↗</a> : null; })()}<button className="chip" type="button" aria-expanded={openId === row.id} onClick={() => setOpenId(openId === row.id ? null : row.id)}>Aktivitas</button><button className="chip" type="button" onClick={() => edit(row)}>Edit</button><button className="chip" type="button" onClick={() => void remove(row)} aria-label={`Hapus ${row.name}`}>Hapus</button></div></div>
+              <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"start"}}><div><strong>{row.name}</strong><p>{isSupplier ? (row as Supplier).country : [(row as Clinic).city,(row as Clinic).province].filter(Boolean).join(", ")}</p><p>{row.email || "Email belum diisi"} · {isSupplier ? (row as Supplier).whatsapp : (row as Clinic).phone}</p></div><div style={{display:"flex",gap:6,flexWrap:"wrap",justifyContent:"flex-end"}}>{(() => { const wa = waLink(isSupplier ? (row as Supplier).whatsapp : (row as Clinic).phone, !isSupplier); return wa ? <a className="chip" href={wa} target="_blank" rel="noopener noreferrer" aria-label={`Buka WhatsApp ${row.name}`}>WhatsApp ↗</a> : null; })()}{isSupplier && <button className="chip" type="button" aria-expanded={gateId === row.id} onClick={() => setGateId(gateId === row.id ? null : row.id)}>Gerbang</button>}<button className="chip" type="button" aria-expanded={openId === row.id} onClick={() => setOpenId(openId === row.id ? null : row.id)}>Aktivitas</button><button className="chip" type="button" onClick={() => edit(row)}>Edit</button><button className="chip" type="button" onClick={() => void remove(row)} aria-label={`Hapus ${row.name}`}>Hapus</button></div></div>
               <label className="f" style={{marginTop:8}}>Status<select className="in" value={row.status} onChange={e => void updateStatus(row,e.target.value)}>{statusOptions[kind].map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+              {isSupplier && sop[row.id] && <p style={{marginTop:8,display:"flex",gap:6,flexWrap:"wrap"}}><span className="tag" style={sop[row.id].sop_stage !== "aktif" ? { color: "var(--orange)" } : undefined}>{STAGES.find(([v]) => v === sop[row.id].sop_stage)?.[1]}</span><span className="tag">Gerbang {gateSummary(sop[row.id].gates).done}/{gateSummary(sop[row.id].gates).total}</span></p>}
               {row.notes && <p style={{whiteSpace:"pre-wrap",marginTop:8}}>{row.notes}</p>}
+              {isSupplier && gateId === row.id && (sop[row.id] ? <SopPanel row={sop[row.id]} onChange={(r) => setSop((m) => ({ ...m, [r.id]: r }))} /> : <div className="notice" style={{marginTop:10}}>{sopOk ? "Memuat tahap dan gerbang…" : "Tahap dan gerbang belum tersedia. Jalankan migrasi database 006 lebih dulu."}</div>)}
               {openId === row.id && <ActivityPanel entityType={isSupplier ? "supplier" : "clinic"} entityId={row.id} />}
             </article>)}
           </div>}

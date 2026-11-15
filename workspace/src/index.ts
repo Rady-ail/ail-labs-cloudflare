@@ -7,6 +7,7 @@ import { requireAuth } from "./lib/auth";
 import { aiRoutes } from "./routes/ai";
 import { assistantRoutes } from "./routes/assistant";
 import { operationsRoutes } from "./routes/operations";
+import { procurementRoutes } from "./routes/procurement";
 
 const app = new Hono<AppEnv>();
 
@@ -44,6 +45,7 @@ app.get("/api/health", async (c) => {
 app.route("/api/ai", aiRoutes);
 app.route("/api/assistant", assistantRoutes);
 app.route("/api/ops", operationsRoutes);
+app.route("/api/proc", procurementRoutes);
 
 app.notFound(notFound);
 app.onError(errorHandler);
