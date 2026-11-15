@@ -4,6 +4,7 @@ import type { AppEnv } from "../lib/http";
 import { fail } from "../lib/http";
 import { getSql } from "../lib/db";
 import { writeAudit } from "../lib/audit";
+import { checkGoldenRules } from "../lib/goldenRules";
 
 /*
  * Asisten AI: hanya MENYUSUN DRAF. Tidak mengirim, membayar, menyetujui, atau menandatangani apa pun.
@@ -157,5 +158,6 @@ aiRoutes.post("/draft", async (c) => {
       console.error("AI audit write failed", { requestId: c.get("requestId") });
     }
   }
-  return c.json({ draft, kind, approvalRequired: true, meta: { requestId: c.get("requestId") } });
+  const checks = kind === "supplier" ? checkGoldenRules(draft, { direction: "draft", requireDraftMarker: true }) : null;
+  return c.json({ draft, kind, approvalRequired: true, checks, meta: { requestId: c.get("requestId") } });
 });

@@ -92,6 +92,14 @@ describe("POST /api/ai/draft", () => {
     const sent = JSON.parse((f.mock.calls[0] as any)[1].body);
     expect(sent.messages[0].content).toContain("ATURAN-RAHASIA");
   });
+  it("menyertakan hasil Aturan Emas untuk draf supplier dan null untuk jenis lain", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => new Response(JSON.stringify({ choices: [{ message: { content: "We will pay a 30% deposit." } }] }), { status: 200 })));
+    const a = await (await post({ kind: "supplier", input: "x" }, env({ OPENAI_API_KEY: "sk" }))).json() as any;
+    expect(a.checks.ok).toBe(false);
+    expect(a.checks.findings.map((f: any) => f.id)).toContain("pembayaran_di_muka");
+    const b = await (await post({ kind: "email", input: "x" }, env({ OPENAI_API_KEY: "sk" }))).json() as any;
+    expect(b.checks).toBeNull();
+  });
   it("502 saat penyedia AI gagal, tanpa membocorkan detail", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => new Response("boom sk-secret", { status: 500 })));
     const r = await post({ kind: "email", input: "x" }, env({ OPENAI_API_KEY: "sk-secret" }));
