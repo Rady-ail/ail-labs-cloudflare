@@ -5,6 +5,7 @@ import { fail } from "../lib/http";
 import { getSql } from "../lib/db";
 import { writeAudit } from "../lib/audit";
 import { computeLanded } from "../lib/landed";
+import { checkGoldenRules } from "../lib/goldenRules";
 
 /* Jalur pengadaan: tahap SOP supplier, gerbang, penawaran landed cost, dan layar "Hari ini".
    Terpisah dari /api/ops agar tabel yang belum dimigrasi (006) tidak merusak CRUD yang ada. */
@@ -168,4 +169,12 @@ procurementRoutes.get("/today", async (c) => {
   const w = take("waiting_docs", waiting, [] as Record<string, unknown>[]);
   const h = take("held", held, [{ n: 0 }] as Record<string, unknown>[]);
   return c.json({ followups: f, approvals: a, waiting_docs: w, held: Number(h[0]?.n ?? 0), unavailable: missing });
+});
+
+/* Pemeriksa Aturan Emas: deterministik, tanpa DB dan tanpa AI. Teks tidak disimpan maupun dicatat di audit. */
+const checkInput = z.object({ text: z.string().trim().min(1).max(20000), direction: z.enum(["draft", "incoming"]) }).strict();
+procurementRoutes.post("/check", async (c) => {
+  const parsed = checkInput.safeParse(await c.req.json().catch(() => null));
+  if (!parsed.success) return badInput(c);
+  return c.json({ data: checkGoldenRules(parsed.data.text, { direction: parsed.data.direction }) });
 });

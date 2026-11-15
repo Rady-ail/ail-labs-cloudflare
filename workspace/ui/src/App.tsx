@@ -182,8 +182,29 @@ const KINDS = [
   { id: "email", label: "Ringkas email", hint: "Tempel email masuk untuk diringkas dan diberi usulan tindakan." },
   { id: "landed", label: "Analisis biaya", hint: "Tempel penawaran supplier untuk diperiksa komponen biayanya." },
 ];
+type RuleFinding = { id: string; severity: "blokir" | "peringatan"; message: string; evidence: string };
+type RuleCheck = { ok: boolean; blocking: number; findings: RuleFinding[] };
+function RuleReport({ title, check }: { title: string; check: RuleCheck }) {
+  return (
+    <div style={{ marginTop: 16 }} role="region" aria-label={title}>
+      <h3>{title}</h3>
+      {check.findings.length === 0
+        ? <p style={{ marginTop: 6 }}>Tidak ada pelanggaran Aturan Emas yang terdeteksi. Ini bukan persetujuan: pemeriksaan hanya berbasis kata kunci.</p>
+        : <ul style={{ margin: "8px 0 0", paddingLeft: 18, display: "grid", gap: 8 }}>
+            {check.findings.map((f, i) => (
+              <li key={`${f.id}-${i}`}>
+                <strong style={{ color: f.severity === "blokir" ? "var(--orange)" : "inherit" }}>{f.severity === "blokir" ? "Blokir: " : "Periksa: "}</strong>{f.message}
+                {f.evidence && <div style={{ fontSize: 12, color: "var(--muted)", marginTop: 2 }}>“{f.evidence}”</div>}
+              </li>
+            ))}
+          </ul>}
+    </div>
+  );
+}
 function AI() {
   const [kind, setKind] = useState("supplier");
+  const [draftCheck, setDraftCheck] = useState<RuleCheck | null>(null);
+  const [inCheck, setInCheck] = useState<RuleCheck | null>(null);
   const [text, setText] = useState("");
   const inputLength = Array.from(text.trim()).length;
   const inputTooLong = inputLength > 800;
@@ -191,15 +212,25 @@ function AI() {
   const [draft, setDraft] = useState("");
   const [err, setErr] = useState("");
   async function run() {
-    setBusy(true); setErr(""); setDraft("");
+    setBusy(true); setErr(""); setDraft(""); setDraftCheck(null);
     try {
       const r = await fetch("/api/ai/draft", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ kind, input: text }) });
       if (r.status === 404) throw new Error("Endpoint /api/ai/draft belum ada di backend. Tombol ini aktif setelah backend AI dipasang.");
       const j = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(j?.error?.message || `Gagal (${r.status}).`);
       setDraft(String(j.draft ?? ""));
+      setDraftCheck(j.checks && Array.isArray(j.checks.findings) ? (j.checks as RuleCheck) : null);
     } catch (e) { setErr(e instanceof Error ? e.message : "Gagal menghubungi server."); }
     finally { setBusy(false); }
+  }
+  async function checkIncoming() {
+    setErr(""); setInCheck(null);
+    try {
+      const r = await fetch("/api/proc/check", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text, direction: "incoming" }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j?.error?.message || `Gagal memeriksa (${r.status}).`);
+      setInCheck(j.data as RuleCheck);
+    } catch (e) { setErr(e instanceof Error ? e.message : "Gagal menghubungi server."); }
   }
   const cur = KINDS.find((k) => k.id === kind)!;
   return (
@@ -217,7 +248,9 @@ function AI() {
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 14 }}>
             <motion.button whileTap={{ scale: 0.96 }} className="btn primary" disabled={busy || !text.trim() || inputTooLong} onClick={run}>{busy ? "Menyusun…" : "Susun draf"}</motion.button>
+            <motion.button whileTap={{ scale: 0.96 }} className="btn" disabled={!text.trim() || inputTooLong} onClick={checkIncoming}>Periksa Aturan Emas</motion.button>
           </div>
+          {inCheck && <RuleReport title="Pemeriksaan pesan supplier" check={inCheck} />}
         </div>
         <div className="card">
           <h3>Draf</h3>
@@ -226,6 +259,7 @@ function AI() {
               : draft ? <motion.pre key="d" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ whiteSpace: "pre-wrap", font: "inherit", fontSize: 14, lineHeight: 1.6, margin: "10px 0 0" }}>{draft}</motion.pre>
               : <motion.p key="n" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ marginTop: 10 }}>Draf akan tampil di sini.</motion.p>}
           </AnimatePresence>
+          {draft && draftCheck && <RuleReport title="Pemeriksaan Aturan Emas atas draf" check={draftCheck} />}
           <div className="notice" style={{ marginTop: 16 }}>Gerbang persetujuan: draf tidak dikirim otomatis. Kirim hanya setelah Rady menyetujui, dan atas nama Alexa.</div>
         </div>
       </motion.div>

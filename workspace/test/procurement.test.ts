@@ -163,3 +163,19 @@ describe("Hari ini", () => {
     expect(approvalsCall.slice(1)).toContain("owner");
   });
 });
+
+describe("POST /api/proc/check", () => {
+  it("mengembalikan hasil pemeriksaan tanpa menyentuh database", async () => {
+    const r = await app().request("/api/proc/check", send("POST", { text: "We will pay a 30% deposit.", direction: "draft" }));
+    expect(r.status).toBe(200);
+    const j = await r.json() as any;
+    expect(j.data.ok).toBe(false);
+    expect(j.data.findings[0].id).toBe("pembayaran_di_muka");
+    expect(sql).not.toHaveBeenCalled();
+  });
+  it("menolak input tidak valid", async () => {
+    for (const body of [{ text: "", direction: "draft" }, { text: "x", direction: "other" }, { text: "x".repeat(20001), direction: "draft" }, { text: "x", direction: "draft", extra: 1 }]) {
+      expect((await app().request("/api/proc/check", send("POST", body))).status).toBe(400);
+    }
+  });
+});
