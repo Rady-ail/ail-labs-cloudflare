@@ -34,13 +34,13 @@ export function downloadCsv(name: string, csv: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-async function call(url: string, init?: RequestInit) {
+export async function call(url: string, init?: RequestInit) {
   const r = await fetch(url, init);
   const b = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(b?.error?.message || `Gagal (${r.status})`);
   return b;
 }
-const jsonInit = (method: string, body: unknown): RequestInit => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+export const jsonInit = (method: string, body: unknown): RequestInit => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
 
 /* Riwayat + tindak lanjut satu supplier/klinik. */
 export function ActivityPanel({ entityType, entityId, onChange }: { entityType: EntityType; entityId: string; onChange?: () => void }) {
