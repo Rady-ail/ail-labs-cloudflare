@@ -225,3 +225,20 @@ jobs:
 
             exit "$verify_status"
           done
+
+      - name: Verify public domains serve the Worker
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          for host in ail-aesthetic-labs.my.id www.ail-aesthetic-labs.my.id katalog.ail-aesthetic-labs.my.id; do
+            ok=false
+            for attempt in 1 2 3 4 5 6; do
+              code=$(curl --silent --output /dev/null --write-out '%{http_code}' -A 'Mozilla/5.0 (compatible; AIL-Deploy-Verify)' "https://${host}/" || true)
+              echo "${host} attempt ${attempt}: HTTP ${code}"
+              if [[ "$code" == "200" ]]; then ok=true; break; fi
+              sleep 10
+            done
+            if [[ "$ok" != true ]]; then echo "FAIL ${host} did not return 200"; failed=1; fi
+          done
+          exit "$failed"
