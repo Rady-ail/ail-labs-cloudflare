@@ -10,7 +10,7 @@ const typeLabel = (t: string) => TYPES.find(([v]) => v === t)?.[1] ?? t;
 export const fmtDue = (iso: string) => new Date(iso).toLocaleString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 export const isOverdue = (iso: string | null, done: string | null = null) => Boolean(iso) && !done && new Date(iso as string).getTime() < Date.now();
 
-/* Tautan wa.me: hanya MEMBUKA chat; Rady yang menekan kirim sendiri. */
+/* Tautan wa.me: hanya MEMBUKA chat; pemilik yang menekan kirim sendiri. */
 export function waLink(raw: string, indonesia: boolean): string | null {
   let d = raw.replace(/\D/g, "");
   if (d.startsWith("00")) d = d.slice(2);
