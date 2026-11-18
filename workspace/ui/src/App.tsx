@@ -93,7 +93,7 @@ function Home({ go }: { go: (v: View) => void }) {
       <motion.div variants={rise} className="grid g3" style={{ marginBottom: 16 }}>
         <Tilt><h3>Layanan API</h3><div className="kpi" style={{ display: "flex", alignItems: "center", gap: 10 }}><span className={`dot ${api}`} />{st(api)}</div></Tilt>
         <Tilt><h3>Database</h3><div className="kpi" style={{ display: "flex", alignItems: "center", gap: 10 }}><span className={`dot ${db}`} />{st(db)}</div></Tilt>
-        <Tilt><h3>Mode email</h3><div className="kpi">Dry-run</div><p style={{ marginTop: 6 }}>Pengiriman nyata baru aktif setelah Rady mengubahnya.</p></Tilt>
+        <Tilt><h3>Mode email</h3><div className="kpi">Dry-run</div><p style={{ marginTop: 6 }}>Pengiriman nyata baru aktif setelah pemilik mengubahnya.</p></Tilt>
       </motion.div>
       {sum && (
         <motion.div variants={rise} className="grid g3" style={{ marginBottom: 16 }}>
@@ -167,7 +167,7 @@ function Landed() {
           <div className="row"><span>Total biaya mendarat</span><b>{idr(total)}</b></div>
           <div className="row"><span>Landed cost / unit</span><b className="big">{idr(unit)}</b></div>
           <div className="row"><span>Harga jual minimum untuk margin {f.margin}%</span><b>{idr(price)}</b></div>
-          <p style={{ marginTop: 12 }}>Hasil ini alat bantu hitung. Harga jual final tetap Rady yang menentukan.</p>
+          <p style={{ marginTop: 12 }}>Hasil ini alat bantu hitung. Harga jual final tetap pemilik yang menentukan.</p>
           <button className="chip" type="button" style={{ marginTop: 10 }} onClick={() => void copy()}>{copied ? "✓ Tersalin" : "⎘ Salin ringkasan"}</button>
         </div>
       </motion.div>
@@ -260,7 +260,7 @@ function AI() {
               : <motion.p key="n" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ marginTop: 10 }}>Draf akan tampil di sini.</motion.p>}
           </AnimatePresence>
           {draft && draftCheck && <RuleReport title="Pemeriksaan Aturan Emas atas draf" check={draftCheck} />}
-          <div className="notice" style={{ marginTop: 16 }}>Gerbang persetujuan: draf tidak dikirim otomatis. Kirim hanya setelah Rady menyetujui, dan atas nama Alexa.</div>
+          <div className="notice" style={{ marginTop: 16 }}>Gerbang persetujuan: draf tidak dikirim otomatis. Kirim hanya setelah pemilik menyetujui, dan atas nama Alexa.</div>
         </div>
       </motion.div>
     </motion.div>

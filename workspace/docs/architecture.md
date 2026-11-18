@@ -14,7 +14,7 @@ The `workspace/` directory is a standalone Worker project. It must not import fr
 
 ## Authority and safety
 
-- Rady is the final approver for payments, contracts, procurement decisions, and any transition to live external email.
+- The owner is the final approver for payments, contracts, procurement decisions, and any transition to live external email.
 - AI features are advisory: classify, summarize, draft, and retrieve. They do not approve, pay, contract, or send.
 - Email sends require an approved draft and a due scheduled time. The production default remains `EMAIL_SEND_MODE=dry-run`.
 - Email bodies and webhook payloads are untrusted data. Store body text; never execute or render raw HTML.
