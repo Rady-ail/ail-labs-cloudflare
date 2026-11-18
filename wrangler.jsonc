@@ -3,8 +3,11 @@
   "main": "src/worker.js",
   "workers_dev": true,
   "routes": [
-    { "pattern": "ail-aesthetic-labs.my.id", "custom_domain": true },
-    { "pattern": "www.ail-aesthetic-labs.my.id", "custom_domain": true },
+    // Apex dan www sudah punya record DNS proxied (masih mengarah ke origin lama),
+    // sehingga custom_domain ditolak (error 100117). Pakai route zona agar Worker
+    // mengintersep permintaan tanpa menghapus/mengubah DNS.
+    { "pattern": "ail-aesthetic-labs.my.id/*", "zone_name": "ail-aesthetic-labs.my.id" },
+    { "pattern": "www.ail-aesthetic-labs.my.id/*", "zone_name": "ail-aesthetic-labs.my.id" },
     { "pattern": "katalog.ail-aesthetic-labs.my.id", "custom_domain": true },
   ],
   "compatibility_date": "2026-10-03",
